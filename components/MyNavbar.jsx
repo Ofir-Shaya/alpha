@@ -1,9 +1,8 @@
 import React from 'react';
 import { Navbar, Link, Text, useTheme, Switch, Input } from '@nextui-org/react';
 import { Layout } from './common/Layout';
-import { AcmeLogo } from './common/AcmeLogo';
 import { useTheme as useNextTheme } from 'next-themes';
-import { MoonRounded, SunRounded, Search } from './Icons/AllIcons';
+import { MoonRounded, SunRounded, Search, AcmeLogo } from './Icons/AllIcons';
 
 export default function App() {
     const { setTheme } = useNextTheme();
@@ -36,9 +35,6 @@ export default function App() {
                 </Navbar.Brand>
 
                 <Navbar.Content
-                    activeColor={'secondary'}
-                    variant={'highlight'}
-                    enableCursorHighlight
                     css={{
                         dflex: 'center',
                         w: '100%',
