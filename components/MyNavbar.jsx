@@ -4,7 +4,7 @@ import { Layout } from './common/Layout';
 import { useTheme as useNextTheme } from 'next-themes';
 import { MoonRounded, SunRounded, Search, AcmeLogo } from './Icons/AllIcons';
 
-export default function App() {
+const MyNavbar = () => {
     const { setTheme } = useNextTheme();
     const { isDark } = useTheme();
 
@@ -25,11 +25,11 @@ export default function App() {
         <Layout>
             <Navbar isBordered={isDark} variant='sticky' maxWidth='fluid'>
                 <Navbar.Brand css={{ mx: 50 }}>
-                    <Navbar.Toggle showIn='sm' aria-label='toggle navigation' />
+                    <Navbar.Toggle showIn='xs' aria-label='toggle navigation' />
 
                     <AcmeLogo />
 
-                    <Text b color='inherit' hideIn='sm'>
+                    <Text b color='inherit' hideIn='xs'>
                         ALPHA
                     </Text>
                 </Navbar.Brand>
@@ -49,6 +49,8 @@ export default function App() {
                         }}>
                         <Input
                             clearable
+                            size='md'
+                            fullWidth
                             contentLeft={
                                 <Search
                                     fill='var(--nextui-colors-accents6)'
@@ -58,15 +60,8 @@ export default function App() {
                             contentLeftStyling={false}
                             css={{
                                 w: '100%',
-                                '@smMax': {
-                                    mw: '300px',
-                                },
-                                '& .nextui-input-content--left': {
-                                    h: '100%',
-                                    ml: '$4',
-                                    dflex: 'center',
-                                },
                             }}
+                            labelRight='EUNE'
                             placeholder='Search...'
                         />
                     </Navbar.Item>
@@ -95,11 +90,16 @@ export default function App() {
                         }
                     />
 
-                    <Navbar.Link color='inherit' href='#' css={{ mx: 10 }}>
+                    <Navbar.Link
+                        hideIn='xs'
+                        color='inherit'
+                        href='#'
+                        css={{ mx: 10 }}>
                         Login
                     </Navbar.Link>
 
                     <Navbar.Link
+                        hideIn='xs'
                         color='inherit'
                         href='#'
                         css={{ mx: 10, mr: 50 }}>
@@ -107,7 +107,7 @@ export default function App() {
                     </Navbar.Link>
                 </Navbar.Content>
 
-                <Navbar.Collapse showIn='sm'>
+                <Navbar.Collapse showIn='xs'>
                     {collapseItems.map((item, index) => (
                         <Navbar.CollapseItem key={item}>
                             {index === 0 ? (
@@ -130,4 +130,6 @@ export default function App() {
             </Navbar>
         </Layout>
     );
-}
+};
+
+export default MyNavbar;
