@@ -48,6 +48,7 @@ const MyNavbar = () => {
                             },
                         }}>
                         <Input
+                            id='navbarSearchInput'
                             clearable
                             size='md'
                             fullWidth

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme, Input, Image, Container } from '@nextui-org/react';
+import { useTheme, Input, Image, Container, Button } from '@nextui-org/react';
 import { Search } from './Icons/AllIcons';
 
 const Front = () => {
@@ -27,6 +27,7 @@ const Front = () => {
                     }}
                 />
                 <Input
+                    id='frontSearchInput'
                     clearable
                     size='md'
                     fullWidth
