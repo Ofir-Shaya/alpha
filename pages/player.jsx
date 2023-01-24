@@ -24,6 +24,23 @@ const findIdByKey = (key, json) => {
     return null;
 };
 
+const json = {
+    // your json file here
+    // ...
+};
+
+const dataHashMap = new Map();
+Object.values(json.data).forEach((item) => {
+    dataHashMap.set(item.key, item);
+});
+
+const hashfindIdByKey = (key, dataHashMap) => {
+    return dataHashMap.get(key) ? dataHashMap.get(key).id : null;
+};
+
+const id = hashfindIdByKey(266, dataHashMap); // will return 'Aatrox'
+console.log(id);
+
 const PlayerCard = ({ player, objectProp }) => {
     return (
         <Card css={{ h: '$24', $$cardColor: '$colors$secondary' }}>
