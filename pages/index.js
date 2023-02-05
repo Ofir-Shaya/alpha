@@ -12,29 +12,29 @@ export default function Home() {
 
   const fetchPlayer = async (user) => {
     // console.log("player", JSON.parse(localStorage.player));
-    await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.ok && res.json())
-      .then((data) => {
-        setPlayer(data);
-      });
+    // await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // })
+    //   .then((res) => res.ok && res.json())
+    //   .then((data) => {
+    //     setPlayer(data);
+    //   });
   };
 
   const playerMastery = async (summonerId) => {
-    await fetch(`/api/lolapi?func=playerMastery&id=${summonerId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.ok && res.json())
-      .then((data) => {
-        setMastery(data);
-      });
+    // await fetch(`/api/lolapi?func=playerMastery&id=${summonerId}`, {
+    //   method: "GET",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // })
+    //   .then((res) => res.ok && res.json())
+    //   .then((data) => {
+    //     setMastery(data);
+    //   });
   };
 
   const updateLocalStorage = (key, data) => {
