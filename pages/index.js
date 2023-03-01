@@ -11,17 +11,16 @@ export default function Home() {
   const [mastery, setMastery] = useState(null);
 
   const fetchPlayer = async (user) => {
-    // console.log("player", JSON.parse(localStorage.player));
-    // await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
-    //   .then((res) => res.ok && res.json())
-    //   .then((data) => {
-    //     setPlayer(data);
-    //   });
+    await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.ok)
+      .then((data) => {
+        setPlayer(data);
+      });
   };
 
   const playerMastery = async (summonerId) => {
@@ -58,13 +57,13 @@ export default function Home() {
         >
           Click After
         </Button>
-        <Button onPress={() => updateLocalStorage("player", player)}>
-          Update LS player
-        </Button>
+        <Button onPress={() => console.log(player)}>log player</Button>
+
+        {/*
         <Button onPress={() => updateLocalStorage("mastery", mastery)}>
           Update LS mastery
-        </Button>
-        <Button
+        </Button> 
+         <Button
           onPress={() =>
             setCookie("player", JSON.parse(localStorage.player), {})
           }
@@ -77,7 +76,7 @@ export default function Home() {
           }
         >
           Set mastery cookie
-        </Button>
+        </Button> */}
         <Front />
       </Container>
     </>
