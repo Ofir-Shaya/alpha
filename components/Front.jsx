@@ -49,13 +49,7 @@ const Front = (props) => {
           value={user}
           onChange={handleInputChange}
         />
-        <Button
-          color="secondary"
-          auto
-          ghost
-          autoFocus
-          onClick={handleSearchClick}
-        >
+        <Button color="secondary" auto ghost autoFocus onClick={fetchPlayer}>
           Search
         </Button>
       </Container>
