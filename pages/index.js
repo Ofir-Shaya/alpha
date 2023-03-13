@@ -10,6 +10,13 @@ export default function Home() {
   const [player, setPlayer] = useState(null);
   const [mastery, setMastery] = useState(null);
 
+  async function handleSearch() {
+    if (user) {
+      const player = await fetchPlayer(user);
+      setPlayer(player);
+    }
+  }
+
   const fetchPlayer = async (user) => {
     await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
       method: "GET",
@@ -51,33 +58,8 @@ export default function Home() {
         css={{ margin: 0, padding: 0 }}
       >
         <MySidebar />
-        <Button onPress={() => fetchPlayer("SipTheSoup")}>Click me</Button>
-        <Button
-          onPress={() => playerMastery(JSON.parse(localStorage.player).id)}
-        >
-          Click After
-        </Button>
-        <Button onPress={() => console.log(player)}>log player</Button>
 
-        {/*
-        <Button onPress={() => updateLocalStorage("mastery", mastery)}>
-          Update LS mastery
-        </Button> 
-         <Button
-          onPress={() =>
-            setCookie("player", JSON.parse(localStorage.player), {})
-          }
-        >
-          Set player cookie
-        </Button>
-        <Button
-          onPress={() =>
-            setCookie("mastery", JSON.parse(localStorage.mastery), {})
-          }
-        >
-          Set mastery cookie
-        </Button> */}
-        <Front />
+        <Front fetchPlayer={fetchPlayer} />
       </Container>
     </>
   );
