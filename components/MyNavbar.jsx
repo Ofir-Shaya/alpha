@@ -73,6 +73,16 @@ const MyNavbar = () => {
   const registerUser = async () => {
     if (!String(inputEmail).match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i))
       return console.error(inputEmail + " is not a valid email address.");
+
+    await fetch(
+      `/api/loginapi?email=${inputEmail}&password=${inputPassword}&func=register`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   };
 
   return (
