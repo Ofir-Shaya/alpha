@@ -29,12 +29,50 @@ const MyNavbar = () => {
     "Sign Up",
   ];
 
-  const [visible, setVisible] = React.useState(false);
-  const handler = () => setVisible(true);
+  const [loginVisible, setLoginVisible] = React.useState(false);
+  const [registerVisible, setRegisterVisible] = React.useState(false);
 
-  const closeHandler = () => {
-    setVisible(false);
+  const [inputEmail, setInputEmail] = React.useState("");
+  const [inputPassword, setInputPassword] = React.useState("");
+
+  const emailChangeHandler = (e) => {
+    const newEmail = e.target.value;
+    setInputEmail(newEmail);
+    console.log(newEmail);
+  };
+  const passwordChangeHandler = (e) => {
+    const newPassword = e.target.value;
+    setInputPassword(newPassword);
+    console.log(newPassword);
+  };
+
+  const LoginHandler = () => setLoginVisible(true);
+  const RegisterHandler = () => setRegisterVisible(true);
+
+  const closeLoginHandler = () => {
+    setLoginVisible(false);
     console.log("closed");
+  };
+
+  const closeRegisterHandler = () => {
+    setRegisterVisible(false);
+    console.log("closed");
+  };
+
+  const closeRegisterOpenLoginHandler = () => {
+    setRegisterVisible(false);
+    setLoginVisible(true);
+    console.log("closed,opened");
+  };
+  const closeLoginOpenRegisterHandler = () => {
+    setLoginVisible(false);
+    setRegisterVisible(true);
+    console.log("closed,opened");
+  };
+
+  const registerUser = async () => {
+    if (!String(inputEmail).match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i))
+      return console.error(inputEmail + " is not a valid email address.");
   };
 
   return (
@@ -112,40 +150,62 @@ const MyNavbar = () => {
             css={{ mx: 10 }}
           >
             <div>
-              <Button auto color="secondary" shadow onPress={handler}>
+              <Button auto color="secondary" shadow onPress={LoginHandler}>
                 Login
               </Button>
               <Modal
                 closeButton
-                aria-labelledby="modal-title"
-                open={visible}
-                onClose={closeHandler}
+                aria-labelledby="modal-title-login"
+                open={loginVisible}
+                onClose={closeLoginHandler}
               >
                 <Modal.Header>
-                  <Text id="modal-title" size={18}>
+                  <Text id="modal-title-login" size={24}>
                     Welcome to{" "}
-                    <Text b size={18}>
+                    <Text b size={24}>
                       Alpha
                     </Text>
                   </Text>
                 </Modal.Header>
+                <Row justify="center">
+                  <Text
+                    id="modal-title-register-already"
+                    css={{ display: "inline-flex" }}
+                    size={14}
+                  >
+                    New here?{" "}
+                    <Link
+                      id="modal-login-link"
+                      size={14}
+                      onPress={closeLoginOpenRegisterHandler}
+                    >
+                      Create an account
+                    </Link>
+                  </Text>
+                </Row>
+
                 <Modal.Body>
                   <Input
+                    label="Email"
                     clearable
                     bordered
                     fullWidth
                     color="primary"
                     size="lg"
                     placeholder="Email"
+                    initialValue={inputEmail}
+                    onChange={emailChangeHandler}
                     contentLeft={<Mail fill="currentColor" />}
                   />
-                  <Input
-                    clearable
+                  <Input.Password
+                    label="Password"
                     bordered
                     fullWidth
                     color="primary"
                     size="lg"
                     placeholder="Password"
+                    initialValue={inputPassword}
+                    onChange={passwordChangeHandler}
                     contentLeft={<Password fill="currentColor" />}
                   />
                   <Row justify="space-between">
@@ -156,10 +216,10 @@ const MyNavbar = () => {
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button auto flat color="error" onPress={closeHandler}>
+                  <Button auto flat color="error" onPress={closeLoginHandler}>
                     Close
                   </Button>
-                  <Button auto onPress={closeHandler}>
+                  <Button auto onPress={closeLoginHandler}>
                     Sign in
                   </Button>
                 </Modal.Footer>
@@ -167,14 +227,95 @@ const MyNavbar = () => {
             </div>
           </Navbar.Content>
 
-          <Navbar.Link
+          <Navbar.Content
             hideIn="xs"
             color="inherit"
             href="register"
-            css={{ mx: 10, mr: 50 }}
+            css={{ mx: 10 }}
           >
-            Register
-          </Navbar.Link>
+            <div>
+              <Button auto color="secondary" shadow onPress={RegisterHandler}>
+                Register
+              </Button>
+              <Modal
+                closeButton
+                aria-labelledby="modal-title-register"
+                open={registerVisible}
+                onClose={closeRegisterHandler}
+              >
+                <Modal.Header>
+                  <Text id="modal-title-register" size={24}>
+                    Welcome to{" "}
+                    <Text b size={24}>
+                      Alpha
+                    </Text>
+                  </Text>
+                </Modal.Header>
+                <Modal.Body>
+                  <Row justify="center">
+                    <Text
+                      id="modal-title-register-already"
+                      css={{ display: "inline-flex" }}
+                      size={14}
+                    >
+                      Already have an account?{" "}
+                      <Link
+                        id="modal-login-link"
+                        size={14}
+                        onPress={closeRegisterOpenLoginHandler}
+                      >
+                        Log in.
+                      </Link>
+                    </Text>
+                  </Row>
+                  <Input
+                    label="Email"
+                    clearable
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Email"
+                    initialValue={inputEmail}
+                    onChange={emailChangeHandler}
+                    contentLeft={<Mail fill="currentColor" />}
+                  />
+                  <Input.Password
+                    label="Password"
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Password"
+                    initialValue={inputPassword}
+                    onChange={passwordChangeHandler}
+                    contentLeft={<Password fill="currentColor" />}
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Row justify="center">
+                    <Text size={10}>
+                      By clicking on Create Account, you agree to our{" "}
+                      <Link id="modal-tos-link" size={14} href="#">
+                        Terms of Service.
+                      </Link>
+                    </Text>
+                  </Row>
+                  <Button
+                    auto
+                    flat
+                    color="error"
+                    onPress={closeRegisterHandler}
+                  >
+                    Close
+                  </Button>
+                  <Button auto onPress={registerUser}>
+                    Create Account
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+            </div>
+          </Navbar.Content>
         </Navbar.Content>
 
         <Navbar.Collapse showIn="xs">
