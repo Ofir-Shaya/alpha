@@ -20,8 +20,8 @@ export default async function handler(req, res) {
 }
 
 async function searchPlayer(playerName) {
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
   try {
+    console.log("Searching for player:", playerName);
     const existingProfile = await prisma.profile.findUnique({
       where: {
         username: playerName,
@@ -29,7 +29,7 @@ async function searchPlayer(playerName) {
     });
 
     if (existingProfile) {
-      console.log(existingProfile);
+      console.log("profile exists:", existingProfile);
       return existingProfile;
     } else {
       console.log("Player not found in database.");
@@ -43,9 +43,6 @@ async function searchPlayer(playerName) {
           },
         }
       );
-      console.log("RESPONSE!RESPONSE!RESPONSE!RESPONSE!");
-      console.log(response);
-      console.log("RESPONSE!RESPONSE!RESPONSE!RESPONSE!");
 
       const player = response.data;
       // create a new profile record for the player in the database

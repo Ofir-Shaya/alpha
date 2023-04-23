@@ -45,6 +45,20 @@ async function handleGET(req, res) {
   try {
     let data;
     switch (req.query.func) {
+      default:
+        console.error("bad query func");
+        break;
+    }
+    return data;
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+}
+
+async function handlePOST(req, res) {
+  try {
+    let data;
+    switch (req.query.func) {
       case "register":
         data = await registerUser(req.query.email, req.query.password);
         res.status(200).json(data);
