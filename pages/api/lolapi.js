@@ -32,7 +32,7 @@ async function searchPlayer(playerName) {
       console.log("profile exists:", existingProfile);
       return existingProfile;
     } else {
-      console.log("Player not found in database.");
+      console.log("Player not found in database, trying to create.");
 
       // fetch the player data from the API
       const response = await axios.get(
