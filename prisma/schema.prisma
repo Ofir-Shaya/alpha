@@ -40,7 +40,9 @@ model RankedInformation {
   inactive          Boolean
   freshBlood        Boolean
   hotStreak         Boolean
-  profileId         Int       @unique
+  profileId         Int
   profile           Profile   @relation(fields: [profileId], references: [id])
+  
+  @@unique([id, queueType, profileId])
 }
  

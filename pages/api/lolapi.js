@@ -129,11 +129,26 @@ async function playerRankedInfo(summonerId) {
       },
     });
     const playerRankedArray = response.data;
-    console.log(response.data);
     if (playerRankedArray.length === 1) {
       const player1 = playerRankedArray[0];
-      await prisma.RankedInformation.create({
-        data: {
+      const result = await prisma.RankedInformation.upsert({
+        where: {
+          profileId: {
+            profileId: profileId.id,
+          },
+        },
+        update: {
+          tier: player1.tier,
+          rank: player1.rank,
+          leaguePoints: player1.leaguePoints,
+          wins: player1.wins,
+          losses: player1.losses,
+          veteran: player1.veteran,
+          inactive: player1.inactive,
+          freshBlood: player1.freshBlood,
+          hotStreak: player1.hotStreak,
+        },
+        create: {
           queueType: player1.queueType,
           tier: player1.tier,
           rank: player1.rank,
@@ -148,24 +163,48 @@ async function playerRankedInfo(summonerId) {
           profileId: profileId.id,
         },
       });
+      if (result.created) {
+        console.log("New record created");
+      } else {
+        console.log("Existing record update");
+      }
     } else if (playerRankedArray.length === 2) {
       // create multiple RankedInformation objects
-      const data = playerRankedArray.map((player) => ({
-        queueType: player.queueType,
-        tier: player.tier,
-        rank: player.rank,
-        summonerId: player.summonerId,
-        leaguePoints: player.leaguePoints,
-        wins: player.wins,
-        losses: player.losses,
-        veteran: player.veteran,
-        inactive: player.inactive,
-        freshBlood: player.freshBlood,
-        hotStreak: player.hotStreak,
-        profileId: profileId.id,
-      }));
-      await prisma.rankedInformation.createMany({
-        data,
+
+      playerRankedArray.map((player) => {
+        const result = prisma.rankedInformation.upsert({
+          where: { profileId: profileId.profileId },
+          update: {
+            tier: player.tier,
+            rank: player.rank,
+            leaguePoints: player.leaguePoints,
+            wins: player.wins,
+            losses: player.losses,
+            veteran: player.veteran,
+            inactive: player.inactive,
+            freshBlood: player.freshBlood,
+            hotStreak: player.hotStreak,
+          },
+          create: {
+            queueType: player.queueType,
+            tier: player.tier,
+            rank: player.rank,
+            summonerId: player.summonerId,
+            leaguePoints: player.leaguePoints,
+            wins: player.wins,
+            losses: player.losses,
+            veteran: player.veteran,
+            inactive: player.inactive,
+            freshBlood: player.freshBlood,
+            hotStreak: player.hotStreak,
+            profileId: profileId.id,
+          },
+        });
+        if (result.created) {
+          console.log("New record created");
+        } else {
+          console.log("Existing record update");
+        }
       });
     } else {
       // Handle error case where the length is not 1 or 2
