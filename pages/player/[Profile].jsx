@@ -16,10 +16,9 @@ const getChampionName = (key) => championMap.get(key);
 const Profile = () => {
   const router = useRouter();
   const { Profile, server } = router.query;
-  console.log("router");
-  console.log(router.query);
   const [player, setPlayer] = useState(null);
 
+  // Getting info of player searched
   useEffect(() => {
     const fetchPlayer = async () => {
       try {
@@ -44,10 +43,9 @@ const Profile = () => {
       }
     };
     fetchPlayer();
-  }, []);
+  }, [Profile]);
 
   const PlayerCard = () => {
-    console.log(player);
     return (
       <Card
         css={{
