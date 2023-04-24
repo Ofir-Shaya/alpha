@@ -10,20 +10,37 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
-
-model Profile {
-  summonerId        String      @unique
-  username          String 		@unique
-  summonerLevel     Int?
-  profileIconId		Int?
-  user              User?       @relation(fields: [userId], references: [id])
-  userId            Int?        @unique
-}
-
 model User {
-  id      Int @id @default(autoincrement())
-  email   String @unique
-  password String
-  profile Profile? 
+  id                Int       @id @default(autoincrement())
+  email             String    @unique
+  password          String
+  profile           Profile?
+}
+model Profile {
+  id                Int       @id @default(autoincrement())
+  summonerId        String    @unique
+  username          String    @unique
+  summonerLevel     Int?
+  profileIconId     Int?
+  user              User?     @relation(fields: [userId], references: [id])
+  userId            Int?      @unique
+  rankedInformations RankedInformation[] 
 }
 
+model RankedInformation {
+  id                Int       @id @default(autoincrement())
+  queueType         String
+  tier              String
+  rank              String
+  summonerId        String
+  leaguePoints      Int
+  wins              Int
+  losses            Int
+  veteran           Boolean
+  inactive          Boolean
+  freshBlood        Boolean
+  hotStreak         Boolean
+  profileId         Int       @unique
+  profile           Profile   @relation(fields: [profileId], references: [id])
+}
+ 
