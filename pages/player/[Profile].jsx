@@ -25,34 +25,63 @@ const Profile = () => {
   const router = useRouter();
   const { Profile, server } = router.query;
   const [player, setPlayer] = useState(null);
-  const [playerRanked, setPlayerRanked] = useState(null);
+  const [playerRanked, setPlayerRanked] = useState("");
 
   // Getting info of player searched
   useEffect(() => {
     const fetchPlayer = async () => {
-      try {
-        const response = await fetch(
-          `/api/lolapi?user=${Profile}&func=searchPlayer`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+      if (Profile)
+        try {
+          const response = await fetch(
+            `/api/lolapi?user=${Profile}&func=searchPlayer`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
-        if (response.ok) {
-          const data = await response.json();
-          setPlayer(data);
-        } else {
-          console.log("Error fetching player.");
+          if (response.ok) {
+            const data = await response.json();
+            setPlayer(data);
+          } else {
+            console.log("Error fetching player.");
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      }
     };
     fetchPlayer();
   }, [Profile]);
+
+  // Getting ranked info
+  useEffect(() => {
+    const pullRankedInfo = async () => {
+      if (player) {
+        try {
+          const response = await fetch(
+            `/api/lolapi?summonerId=${player.summonerId}&func=getRankedInformation`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setPlayerRanked(data);
+          } else {
+            console.log("Error fetching player.");
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    pullRankedInfo();
+  }, [player]);
 
   const updateRankedInformation = async () => {
     try {
@@ -118,7 +147,7 @@ const Profile = () => {
         <Image
           height={89}
           width={89}
-          src={`https://ddragon.leagueoflegends.com/cdn/10.18.1/img/profileicon/${player.profileIconId}.png`}
+          src={`https://static.bigbrain.gg/assets/lol/riot_static/13.8.1/img/profileicon/${player.profileIconId}.png`}
           alt={"icon"}
           objectFit="cover"
           css={{
@@ -226,6 +255,14 @@ const Profile = () => {
                 <Text h4 color="secondary">
                   Ranked Solo
                 </Text>
+                <Image
+                  src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRanked.tier}.png`}
+                  alt={playerRanked.tier + "icon"}
+                />
+                <Text color="error">
+                  {playerRanked.tier + "" + playerRanked.rank}
+                </Text>
+                <Text color="error">{playerRanked.leaguePoints}</Text>
               </Grid>
               <Grid xs={3} direction="row">
                 <Text h4 color="secondary">

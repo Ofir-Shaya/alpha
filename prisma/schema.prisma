@@ -28,11 +28,10 @@ model Profile {
 }
 
 model RankedInformation {
-  id                Int       @id @default(autoincrement())
+  summonerId        String @id
   queueType         String
   tier              String
   rank              String
-  summonerId        String
   leaguePoints      Int
   wins              Int
   losses            Int
@@ -40,9 +39,9 @@ model RankedInformation {
   inactive          Boolean
   freshBlood        Boolean
   hotStreak         Boolean
-  profileId         Int
-  profile           Profile   @relation(fields: [profileId], references: [id])
+  profile           Profile   @relation(fields: [summonerId], references: [summonerId])
   
-  @@unique([id, queueType, profileId])
+  @@unique([ queueType, summonerId])
+  @@index([summonerId])
 }
  

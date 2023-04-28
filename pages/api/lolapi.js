@@ -38,6 +38,11 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getRankedInformation":
+        data = await getRankedInformation(req.query.summonerId);
+        res.status(200).json(data);
+
+        break;
       default:
         console.error("bad query func");
         break;
@@ -66,7 +71,6 @@ async function handlePOST(req, res, player) {
 
 async function searchPlayer(playerName) {
   try {
-    console.log("Searching for player:", playerName);
     const existingProfile = await prisma.profile.findUnique({
       where: {
         username: playerName,
@@ -74,11 +78,8 @@ async function searchPlayer(playerName) {
     });
 
     if (existingProfile) {
-      console.log("profile exists:", existingProfile);
       return existingProfile;
     } else {
-      console.log("Player not found in database, trying to create.");
-
       // fetch the player data from the API
       const response = await axios.get(
         `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${playerName}`,
@@ -100,7 +101,6 @@ async function searchPlayer(playerName) {
         },
       });
 
-      console.log("New player created in database:", player);
       return player;
     }
   } catch (error) {
@@ -114,7 +114,6 @@ async function searchPlayer(playerName) {
 
 async function playerRankedInfo(summonerId) {
   try {
-    console.log("Searching for summonerId:", summonerId);
     const response = await axios.get(
       `https://eun1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
       {
@@ -123,7 +122,7 @@ async function playerRankedInfo(summonerId) {
         },
       }
     );
-    const profileId = await prisma.profile.findUnique({
+    const summonerProfile = await prisma.profile.findUnique({
       where: {
         summonerId: summonerId,
       },
@@ -134,8 +133,9 @@ async function playerRankedInfo(summonerId) {
 
       const result = await prisma.RankedInformation.upsert({
         where: {
-          profileId: {
-            profileId: profileId.id,
+          queueType_summonerId: {
+            summonerId: summonerProfile.summonerId,
+            queueType: player.queueType,
           },
         },
         update: {
@@ -161,16 +161,9 @@ async function playerRankedInfo(summonerId) {
           inactive: player.inactive,
           freshBlood: player.freshBlood,
           hotStreak: player.hotStreak,
-          profileId: profileId.id,
         },
       });
-      if (result.created) {
-        console.log("New record created");
-      } else {
-        console.log("Existing record update");
-      }
     }
-    console.log("Player ranked information added:", playerRankedArray);
     return playerRankedArray;
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -191,9 +184,23 @@ async function playerMastery(summonerId) {
         },
       }
     );
-    console.log(summonerId);
     const data = response.data;
 
     return data;
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getRankedInformation(summonerId) {
+  try {
+    const data = await prisma.rankedInformation.findMany({
+      where: {
+        summonerId: summonerId,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
 }
