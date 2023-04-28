@@ -26,6 +26,8 @@ const Profile = () => {
   const { Profile, server } = router.query;
   const [player, setPlayer] = useState(null);
   const [playerRanked, setPlayerRanked] = useState("");
+  const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
+  const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
 
   // Getting info of player searched
   useEffect(() => {
@@ -53,6 +55,7 @@ const Profile = () => {
         }
     };
     fetchPlayer();
+    console.log("player", player);
   }, [Profile]);
 
   // Getting ranked info
@@ -81,8 +84,10 @@ const Profile = () => {
       }
     };
     pullRankedInfo();
+    console.log("playerRanked", playerRanked);
   }, [player]);
 
+  // Update ranked info
   const updateRankedInformation = async () => {
     try {
       const response = await fetch(
@@ -103,8 +108,23 @@ const Profile = () => {
     } catch (error) {
       console.error(error);
     }
+    console.log("playerRanked", playerRanked);
   };
 
+  // Update solo and flex rank
+  useEffect(() => {
+    console.log("123", playerRanked);
+    for (let index = 0; index < playerRanked.length; index++) {
+      if (playerRanked[index].queueType === "RANKED_SOLO_5x5") {
+        setPlayerRankedSolo(playerRanked[index]);
+      }
+      if (playerRanked[index].queueType === "RANKED_FLEX_SR") {
+        setPlayerRankedFlex(playerRanked[index]);
+      }
+    }
+  }, [playerRanked]);
+
+  // summoner Icon component builder
   const SummonerIcon = () => {
     return (
       <Card
@@ -200,7 +220,6 @@ const Profile = () => {
         css={{ margin: 0, padding: 0 }}
       >
         <MySidebar />
-
         <Container css={{ marginTop: "$10" }}>
           <Grid.Container
             className="summoner-profile-header"
@@ -251,29 +270,90 @@ const Profile = () => {
             }}
           >
             <Grid.Container className="rank-block" direction="column">
-              <Grid xs={3} direction="row">
-                <Text h4 color="secondary">
-                  Ranked Solo
-                </Text>
-                <Image
-                  src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRanked.tier}.png`}
-                  alt={playerRanked.tier + "icon"}
-                />
-                <Text color="error">
-                  {playerRanked.tier + "" + playerRanked.rank}
-                </Text>
-                <Text color="error">{playerRanked.leaguePoints}</Text>
+              <Grid
+                xs={3}
+                display="flex"
+                direction="column"
+                css={{
+                  backgroundColor: "$secondary",
+                  borderRadius: "18px",
+                  margin: "$10",
+                }}
+              >
+                <Container className="queue-container">
+                  <Text h4 css={{ width: "100%" }}>
+                    Ranked Solo
+                  </Text>
+                </Container>
+
+                {playerRankedSolo ? (
+                  <Container display="flex" direction="row">
+                    <Image
+                      width={68}
+                      height={68}
+                      src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedSolo.tier.toLowerCase()}.png`}
+                      alt={playerRankedSolo.tier + "icon"}
+                    />
+                    <Container display="flex" direction="row">
+                      <Text>
+                        {playerRankedSolo.tier.charAt(0) +
+                          playerRankedSolo.tier.substring(1).toLowerCase() +
+                          " " +
+                          playerRankedSolo.rank +
+                          " "}
+                      </Text>
+                      <Text>{" " + playerRankedSolo.leaguePoints} LP</Text>
+                    </Container>
+                  </Container>
+                ) : (
+                  <Loading />
+                )}
               </Grid>
-              <Grid xs={3} direction="row">
-                <Text h4 color="secondary">
+              <Grid
+                xs={3}
+                display="flex"
+                direction="row"
+                css={{
+                  backgroundColor: "$secondary",
+                  borderRadius: "18px",
+                  margin: "$10",
+                }}
+              >
+                <Text h4 css={{ width: "40%" }}>
                   Ranked Flex
                 </Text>
+                {playerRankedFlex ? (
+                  <Container display="flex" direction="row">
+                    <Image
+                      width={68}
+                      height={68}
+                      src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedFlex.tier.toLowerCase()}.png`}
+                      alt={playerRankedFlex.tier + "icon"}
+                    />
+                    <Text>
+                      {playerRankedFlex.tier.charAt(0) +
+                        playerRankedFlex.tier.substring(1).toLowerCase() +
+                        " " +
+                        playerRankedFlex.rank}
+                    </Text>
+                    <Text>{playerRankedFlex.leaguePoints} LP</Text>
+                  </Container>
+                ) : (
+                  <Loading />
+                )}
               </Grid>
             </Grid.Container>
-            <Grid xs={8}>
-              <Text h4 color="secondary">
-                Champion Stats
-              </Text>
+            <Grid
+              xs={8}
+              display="flex"
+              direction="column"
+              css={{
+                backgroundColor: "$secondary",
+                borderRadius: "18px",
+                margin: "$10",
+              }}
+            >
+              <Text h4>Champion Stats</Text>
             </Grid>
           </Grid.Container>
         </Container>
