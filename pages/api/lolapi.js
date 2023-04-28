@@ -129,8 +129,9 @@ async function playerRankedInfo(summonerId) {
       },
     });
     const playerRankedArray = response.data;
-    if (playerRankedArray.length === 1) {
-      const player1 = playerRankedArray[0];
+    for (let index = 0; index < playerRankedArray.length; index++) {
+      const player = playerRankedArray[index];
+
       const result = await prisma.RankedInformation.upsert({
         where: {
           profileId: {
@@ -138,28 +139,28 @@ async function playerRankedInfo(summonerId) {
           },
         },
         update: {
-          tier: player1.tier,
-          rank: player1.rank,
-          leaguePoints: player1.leaguePoints,
-          wins: player1.wins,
-          losses: player1.losses,
-          veteran: player1.veteran,
-          inactive: player1.inactive,
-          freshBlood: player1.freshBlood,
-          hotStreak: player1.hotStreak,
+          tier: player.tier,
+          rank: player.rank,
+          leaguePoints: player.leaguePoints,
+          wins: player.wins,
+          losses: player.losses,
+          veteran: player.veteran,
+          inactive: player.inactive,
+          freshBlood: player.freshBlood,
+          hotStreak: player.hotStreak,
         },
         create: {
-          queueType: player1.queueType,
-          tier: player1.tier,
-          rank: player1.rank,
-          summonerId: player1.summonerId,
-          leaguePoints: player1.leaguePoints,
-          wins: player1.wins,
-          losses: player1.losses,
-          veteran: player1.veteran,
-          inactive: player1.inactive,
-          freshBlood: player1.freshBlood,
-          hotStreak: player1.hotStreak,
+          queueType: player.queueType,
+          tier: player.tier,
+          rank: player.rank,
+          summonerId: player.summonerId,
+          leaguePoints: player.leaguePoints,
+          wins: player.wins,
+          losses: player.losses,
+          veteran: player.veteran,
+          inactive: player.inactive,
+          freshBlood: player.freshBlood,
+          hotStreak: player.hotStreak,
           profileId: profileId.id,
         },
       });
@@ -168,47 +169,6 @@ async function playerRankedInfo(summonerId) {
       } else {
         console.log("Existing record update");
       }
-    } else if (playerRankedArray.length === 2) {
-      // create multiple RankedInformation objects
-
-      playerRankedArray.map((player) => {
-        const result = prisma.rankedInformation.upsert({
-          where: { profileId: profileId.profileId },
-          update: {
-            tier: player.tier,
-            rank: player.rank,
-            leaguePoints: player.leaguePoints,
-            wins: player.wins,
-            losses: player.losses,
-            veteran: player.veteran,
-            inactive: player.inactive,
-            freshBlood: player.freshBlood,
-            hotStreak: player.hotStreak,
-          },
-          create: {
-            queueType: player.queueType,
-            tier: player.tier,
-            rank: player.rank,
-            summonerId: player.summonerId,
-            leaguePoints: player.leaguePoints,
-            wins: player.wins,
-            losses: player.losses,
-            veteran: player.veteran,
-            inactive: player.inactive,
-            freshBlood: player.freshBlood,
-            hotStreak: player.hotStreak,
-            profileId: profileId.id,
-          },
-        });
-        if (result.created) {
-          console.log("New record created");
-        } else {
-          console.log("Existing record update");
-        }
-      });
-    } else {
-      // Handle error case where the length is not 1 or 2
-      console.error("Array length is not 1 or 2");
     }
     console.log("Player ranked information added:", playerRankedArray);
     return playerRankedArray;
