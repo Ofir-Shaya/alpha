@@ -11,23 +11,58 @@ import {
 } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import Champs from "@/public/json/champions.json";
 
-const champsData = Champs;
+const romanHash = {
+  I: 1,
+  V: 5,
+  X: 10,
+  // L: 50,
+  // C: 100,
+  // D: 500,
+  // M: 1000,
+};
 
-const championMap = new Map();
-for (const [key, value] of Object.entries(champsData)) {
-  championMap.set(value.key, value.name);
-}
-const getChampionName = (key) => championMap.get(key);
+const romanToInt = (roman) => {
+  let accumulator = 0;
+  for (let i = 0; i < roman.length; i++) {
+    if (roman[i] === "I" && roman[i + 1] === "V") {
+      accumulator += 4;
+      i++;
+    } else if (roman[i] === "I" && roman[i + 1] === "X") {
+      accumulator += 9;
+      i++;
+    }
+    // useless part ->
+    //  else if (roman[i] === "X" && roman[i + 1] === "L") {
+    //   accumulator += 40;
+    //   i++;
+    // } else if (roman[i] === "X" && roman[i + 1] === "C") {
+    //   accumulator += 90;
+    //   i++;
+    // } else if (roman[i] === "C" && roman[i + 1] === "D") {
+    //   accumulator += 400;
+    //   i++;
+    // } else if (roman[i] === "C" && roman[i + 1] === "M") {
+    //   accumulator += 900;
+    //   i++;
+    // }
+    else accumulator += romanHash[roman[i]];
+  }
+  return accumulator;
+};
+
+const calcWinPerc = (wins, losses) => {
+  const total = wins + losses;
+  return ((wins / total) * 100).toFixed(1);
+};
 
 const Profile = () => {
   const router = useRouter();
   const { Profile, server } = router.query;
   const [player, setPlayer] = useState(null);
-  const [playerRanked, setPlayerRanked] = useState("");
+  const [playerRanked, setPlayerRanked] = useState(null);
   const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
-  const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
+  // const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
 
   // Getting info of player searched
   useEffect(() => {
@@ -47,21 +82,19 @@ const Profile = () => {
           if (response.ok) {
             const data = await response.json();
             setPlayer(data);
-          } else {
-            console.log("Error fetching player.");
-          }
+          } else console.log("Error fetching player.");
         } catch (error) {
           console.error(error);
         }
     };
     fetchPlayer();
-    console.log("player", player);
   }, [Profile]);
 
   // Getting ranked info
   useEffect(() => {
     const pullRankedInfo = async () => {
       if (player) {
+        console.log("player:", player);
         try {
           const response = await fetch(
             `/api/lolapi?summonerId=${player.summonerId}&func=getRankedInformation`,
@@ -75,23 +108,37 @@ const Profile = () => {
           if (response.ok) {
             const data = await response.json();
             setPlayerRanked(data);
-          } else {
-            console.log("Error fetching player.");
-          }
+          } else console.log("Error fetching player.");
         } catch (error) {
           console.error(error);
         }
       }
     };
     pullRankedInfo();
-    console.log("playerRanked", playerRanked);
   }, [player]);
+
+  // Update soloq and flexq rank
+  useEffect(() => {
+    if (playerRanked) {
+      if (playerRanked.queueType === "RANKED_SOLO_5x5") {
+        setPlayerRankedSolo(playerRanked);
+      } else
+        for (let index = 0; index < playerRanked.length; index++) {
+          if (playerRanked[index].queueType === "RANKED_SOLO_5x5") {
+            setPlayerRankedSolo(playerRanked[index]);
+          }
+          // if (playerRanked[index].queueType === "RANKED_FLEX_SR") {
+          //   setPlayerRankedFlex(playerRanked[index]);
+          // }
+        }
+    }
+  }, [playerRanked]);
 
   // Update ranked info
   const updateRankedInformation = async () => {
     try {
       const response = await fetch(
-        `/api/lolapi?summonerId=${player.summonerId}&func=playerRankedInfo`,
+        `/api/lolapi?summonerName=${player.username}&func=updateUser`,
         {
           method: "GET",
           headers: {
@@ -102,27 +149,57 @@ const Profile = () => {
       if (response.ok) {
         const data = await response.json();
         setPlayerRanked(data);
-      } else {
-        console.log("Error fetching player.");
-      }
+      } else console.log("Error fetching player.");
     } catch (error) {
       console.error(error);
     }
-    console.log("playerRanked", playerRanked);
   };
 
-  // Update solo and flex rank
-  useEffect(() => {
-    console.log("123", playerRanked);
-    for (let index = 0; index < playerRanked.length; index++) {
-      if (playerRanked[index].queueType === "RANKED_SOLO_5x5") {
-        setPlayerRankedSolo(playerRanked[index]);
-      }
-      if (playerRanked[index].queueType === "RANKED_FLEX_SR") {
-        setPlayerRankedFlex(playerRanked[index]);
-      }
-    }
-  }, [playerRanked]);
+  // useless func
+  // const getMatchesInformation = async () => {
+  //   if (player) {
+  //     try {
+  //       const response = await fetch(
+  //         `/api/lolapi?puuid=${player.puuid}&func=getAllMatchesByPuuid`,
+  //         {
+  //           method: "GET",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //         }
+  //       );
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         setMatchesArray(data);
+  //       } else console.log("error fetching data");
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  // };
+
+  // useless func
+  // const updateUserMatches = async () => {
+  //   try {
+  //     const testArray = [matchesArray.slice(0, 1)];
+  //     const response = await fetch(
+  //       `
+  //     /api/lolapi?matches=${testArray}&func=updateUserMatches`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data);
+  //     } else console.log("error fetching player");
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   // summoner Icon component builder
   const SummonerIcon = () => {
@@ -287,61 +364,167 @@ const Profile = () => {
                 </Container>
 
                 {playerRankedSolo ? (
-                  <Container display="flex" direction="row">
-                    <Image
-                      width={68}
-                      height={68}
-                      src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedSolo.tier.toLowerCase()}.png`}
-                      alt={playerRankedSolo.tier + "icon"}
-                    />
-                    <Container display="flex" direction="row">
-                      <Text>
-                        {playerRankedSolo.tier.charAt(0) +
-                          playerRankedSolo.tier.substring(1).toLowerCase() +
-                          " " +
-                          playerRankedSolo.rank +
-                          " "}
-                      </Text>
-                      <Text>{" " + playerRankedSolo.leaguePoints} LP</Text>
+                  <Container
+                    display="flex"
+                    direction="row"
+                    css={{
+                      flexWrap: "nowrap",
+                      paddingLeft: "10px",
+                      paddingRight: "10px",
+                    }}
+                  >
+                    <Container
+                      css={{
+                        margin: 0,
+                        padding: 0,
+                        display: "flex",
+                        alignContent: "center",
+                        justifyContent: "flex-start",
+                        width: "68px",
+                      }}
+                    >
+                      <Image
+                        width={68}
+                        height={68}
+                        src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedSolo.tier.toLowerCase()}.png`}
+                        alt={playerRankedSolo.tier + "icon"}
+                        containerCss={{ margin: 0 }}
+                      />
+                    </Container>
+                    <Container
+                      fluid
+                      display="flex"
+                      direction="column"
+                      css={{ margin: "0", padding: "0" }}
+                    >
+                      <Container
+                        display="flex"
+                        direction="row"
+                        justify="space-between"
+                        alignItems="center"
+                        css={{ padding: "0" }}
+                      >
+                        <Text b>
+                          {playerRankedSolo.tier.charAt(0) +
+                            playerRankedSolo.tier.substring(1).toLowerCase() +
+                            " " +
+                            romanToInt(playerRankedSolo.rank)}
+                        </Text>
+                        <Text>
+                          {playerRankedSolo.wins}W {playerRankedSolo.losses}L
+                        </Text>
+                      </Container>
+                      <Container
+                        display="flex"
+                        direction="row"
+                        justify="space-between"
+                        alignItems="center"
+                        css={{ padding: "0" }}
+                      >
+                        <Text>{playerRankedSolo.leaguePoints} LP</Text>
+                        <Text>
+                          {calcWinPerc(
+                            playerRankedSolo.wins,
+                            playerRankedSolo.losses
+                          )}
+                          % Win Rate
+                        </Text>
+                      </Container>
                     </Container>
                   </Container>
                 ) : (
-                  <Loading />
+                  ""
                 )}
               </Grid>
-              <Grid
+              {/* <Grid
                 xs={3}
                 display="flex"
-                direction="row"
+                direction="column"
                 css={{
                   backgroundColor: "$secondary",
                   borderRadius: "18px",
                   margin: "$10",
                 }}
               >
-                <Text h4 css={{ width: "40%" }}>
-                  Ranked Flex
-                </Text>
+                <Container className="queue-container">
+                  <Text h4 css={{ width: "100%" }}>
+                    Ranked Flex
+                  </Text>
+                </Container>
+
                 {playerRankedFlex ? (
-                  <Container display="flex" direction="row">
-                    <Image
-                      width={68}
-                      height={68}
-                      src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedFlex.tier.toLowerCase()}.png`}
-                      alt={playerRankedFlex.tier + "icon"}
-                    />
-                    <Text>
-                      {playerRankedFlex.tier.charAt(0) +
-                        playerRankedFlex.tier.substring(1).toLowerCase() +
-                        " " +
-                        playerRankedFlex.rank}
-                    </Text>
-                    <Text>{playerRankedFlex.leaguePoints} LP</Text>
+                  <Container
+                    display="flex"
+                    direction="row"
+                    css={{
+                      flexWrap: "nowrap",
+                      paddingLeft: "10px",
+                      paddingRight: "10px",
+                    }}
+                  >
+                    <Container
+                      css={{
+                        margin: 0,
+                        padding: 0,
+                        display: "flex",
+                        alignContent: "center",
+                        justifyContent: "flex-start",
+                        width: "68px",
+                      }}
+                    >
+                      <Image
+                        width={68}
+                        height={68}
+                        src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedFlex.tier.toLowerCase()}.png`}
+                        alt={playerRankedFlex.tier + "icon"}
+                        containerCss={{ margin: 0 }}
+                      />
+                    </Container>
+                    <Container
+                      fluid
+                      display="flex"
+                      direction="column"
+                      css={{ margin: "0", padding: "0" }}
+                    >
+                      <Container
+                        display="flex"
+                        direction="row"
+                        justify="space-between"
+                        alignItems="center"
+                        css={{ padding: "0" }}
+                      >
+                        <Text b>
+                          {playerRankedFlex.tier.charAt(0) +
+                            playerRankedFlex.tier.substring(1).toLowerCase() +
+                            " " +
+                            romanToInt(playerRankedFlex.rank)}
+                        </Text>
+                        <Text>
+                          {playerRankedFlex.wins}W {playerRankedFlex.losses}L
+                        </Text>
+                      </Container>
+                      <Container
+                        display="flex"
+                        direction="row"
+                        justify="space-between"
+                        alignItems="center"
+                        css={{ padding: "0" }}
+                      >
+                        <Text>{playerRankedFlex.leaguePoints} LP</Text>
+                        <Text>
+                          {calcWinPerc(
+                            playerRankedFlex.wins,
+                            playerRankedFlex.losses
+                          )}
+                          % Win Rate
+                        </Text>
+                      </Container>
+                    </Container>
                   </Container>
                 ) : (
-                  <Loading />
+                  ""
                 )}
-              </Grid>
+              </Grid> */}
             </Grid.Container>
             <Grid
               xs={8}

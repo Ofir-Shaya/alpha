@@ -5,6 +5,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function fmtMSS(s) {
+  return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
+}
+
 export default async function handler(req, res) {
   switch (req.method) {
     case "POST":
@@ -33,13 +37,33 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
-      case "playerRankedInfo":
-        data = await playerRankedInfo(req.query.summonerId);
+      case "getPlayerRankedInfo":
+        data = await getPlayerRankedInfo(req.query.summonerId);
         res.status(200).json(data);
 
         break;
       case "getRankedInformation":
         data = await getRankedInformation(req.query.summonerId);
+        res.status(200).json(data);
+
+        break;
+      case "getAllMatchesByPuuid":
+        data = await getAllMatchesByPuuid(req.query.puuid);
+        res.status(200).json(data);
+
+        break;
+      case "analyzeMatch":
+        data = await analyzeMatch(req.query.matchId);
+        res.status(200).json(data);
+
+        break;
+      case "updateAllUsersOfMatches":
+        data = await updateAllUsersOfMatches(req.query.matches);
+        res.status(200).json(data);
+
+        break;
+      case "updateUser":
+        data = await updateUser(req.query.summonerName);
         res.status(200).json(data);
 
         break;
@@ -79,30 +103,8 @@ async function searchPlayer(playerName) {
 
     if (existingProfile) {
       return existingProfile;
-    } else {
-      // fetch the player data from the API
-      const response = await axios.get(
-        `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${playerName}`,
-        {
-          headers: {
-            "X-Riot-Token": process.env.API_KEY,
-          },
-        }
-      );
-
-      const player = response.data;
-      // create a new profile record for the player in the database
-      await prisma.profile.create({
-        data: {
-          summonerId: player.id,
-          username: player.name,
-          summonerLevel: player.summonerLevel,
-          profileIconId: player.profileIconId,
-        },
-      });
-
-      return player;
-    }
+    } else createPlayer(playerName);
+    // fetch the player data from the API if can't find
   } catch (error) {
     if (error.response && error.response.status === 404) {
       console.log("Player doesn't exist.");
@@ -112,7 +114,39 @@ async function searchPlayer(playerName) {
   }
 }
 
-async function playerRankedInfo(summonerId) {
+async function createPlayer(playerName) {
+  try {
+    const response = await axios.get(
+      `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${playerName}`,
+      {
+        headers: {
+          "X-Riot-Token": process.env.API_KEY,
+        },
+      }
+    );
+    const player = response.data;
+    // create a new profile record for the player in the database
+    await prisma.profile.create({
+      data: {
+        summonerId: player.id,
+        username: player.name,
+        summonerLevel: player.summonerLevel,
+        profileIconId: player.profileIconId,
+        puuid: player.puuid,
+      },
+    });
+
+    return player;
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      console.log("Player doesn't exist.");
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+async function getPlayerRankedInfo(summonerId) {
   try {
     const response = await axios.get(
       `https://eun1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
@@ -122,55 +156,73 @@ async function playerRankedInfo(summonerId) {
         },
       }
     );
-    const summonerProfile = await prisma.profile.findUnique({
-      where: {
-        summonerId: summonerId,
-      },
-    });
+
     const playerRankedArray = response.data;
+    let soloqIndex;
     for (let index = 0; index < playerRankedArray.length; index++) {
       const player = playerRankedArray[index];
-
-      const result = await prisma.RankedInformation.upsert({
-        where: {
-          queueType_summonerId: {
-            summonerId: summonerProfile.summonerId,
-            queueType: player.queueType,
+      if (player.queueType === "RANKED_SOLO_5x5") {
+        soloqIndex = index;
+        await prisma.RankedInformation.upsert({
+          where: {
+            summonerId: summonerId,
           },
-        },
-        update: {
-          tier: player.tier,
-          rank: player.rank,
-          leaguePoints: player.leaguePoints,
-          wins: player.wins,
-          losses: player.losses,
-          veteran: player.veteran,
-          inactive: player.inactive,
-          freshBlood: player.freshBlood,
-          hotStreak: player.hotStreak,
-        },
-        create: {
-          queueType: player.queueType,
-          tier: player.tier,
-          rank: player.rank,
-          summonerId: player.summonerId,
-          leaguePoints: player.leaguePoints,
-          wins: player.wins,
-          losses: player.losses,
-          veteran: player.veteran,
-          inactive: player.inactive,
-          freshBlood: player.freshBlood,
-          hotStreak: player.hotStreak,
-        },
-      });
+          update: {
+            tier: player.tier,
+            rank: player.rank,
+            leaguePoints: player.leaguePoints,
+            wins: player.wins,
+            losses: player.losses,
+            veteran: player.veteran,
+            inactive: player.inactive,
+            freshBlood: player.freshBlood,
+            hotStreak: player.hotStreak,
+          },
+          create: {
+            summonerId: summonerId,
+            queueType: player.queueType,
+            tier: player.tier,
+            rank: player.rank,
+            leaguePoints: player.leaguePoints,
+            wins: player.wins,
+            losses: player.losses,
+            veteran: player.veteran,
+            inactive: player.inactive,
+            freshBlood: player.freshBlood,
+            hotStreak: player.hotStreak,
+            profile: {
+              connect: {
+                summonerId: summonerId,
+              },
+            },
+          },
+        });
+      }
     }
-    return playerRankedArray;
+    return playerRankedArray[soloqIndex];
   } catch (error) {
     if (error.response && error.response.status === 404) {
       console.log("Player doesn't exist.");
     } else {
       console.error(error);
     }
+  }
+}
+
+async function getRankedInformation(summonerId) {
+  try {
+    const data = await prisma.rankedInformation.findUnique({
+      where: {
+        summonerId: summonerId,
+      },
+    });
+    if (!data) {
+      const newData = await getPlayerRankedInfo(summonerId);
+      return newData;
+    }
+    return data;
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -192,15 +244,558 @@ async function playerMastery(summonerId) {
   }
 }
 
-async function getRankedInformation(summonerId) {
+async function get10MatchesIdByPuuid(puuid, startIndex) {
   try {
-    const data = await prisma.rankedInformation.findMany({
-      where: {
-        summonerId: summonerId,
-      },
-    });
+    const response = await axios.get(
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=10`,
+      {
+        headers: {
+          "X-Riot-Token": process.env.API_KEY,
+        },
+      }
+    );
+    const data = response.data;
     return data;
   } catch (error) {
     console.error(error);
   }
+}
+
+async function getAllMatchesByPuuid(puuid) {
+  const matchesArray = [];
+  let startIndex = 0;
+  let matchIds;
+  try {
+    do {
+      matchIds = await get10MatchesIdByPuuid(puuid, startIndex);
+      matchesArray.push(...matchIds);
+      startIndex += matchIds.length;
+    } while (matchIds.length === 10);
+    return matchesArray;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function analyzeMatch(matchId) {
+  try {
+    const response = await axios.get(
+      `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`,
+      {
+        headers: {
+          "X-Riot-Token": process.env.API_KEY,
+        },
+      }
+    );
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function updateAllUsersOfMatches(matchesArray) {
+  const matches =
+    typeof matchesArray === "string"
+      ? matchesArray.split(",")
+      : [...matchesArray];
+
+  try {
+    for (const match of matches) {
+      //TEST IF ALREADY EXIST
+      const uniqueMatch = await prisma.match.findUnique({
+        where: {
+          id: match,
+        },
+      });
+
+      // Needs matchData for both cases of uniqueMatch
+      const matchData = await analyzeMatch(match);
+
+      if (!uniqueMatch) {
+        // Create Match
+        const match = await prisma.match.create({
+          data: {
+            id: matchData.metadata.matchId,
+            queueId: matchData.info.queueId,
+            gameVersion: matchData.info.gameVersion,
+            gameMode: matchData.info.gameMode,
+            mapId: matchData.info.mapId,
+            gameDuration: fmtMSS(matchData.info.gameDuration),
+          },
+        });
+      }
+
+      // Create PlayerMatchStats for each player in the match
+      for (const participant of matchData.info.participants) {
+        const player = await prisma.rankedInformation.findUnique({
+          where: {
+            summonerId: participant.summonerId,
+          },
+        });
+
+        // Create player info if doesn't exist
+        let profile;
+        let playerRanked;
+        if (!player) {
+          profile = await createPlayer(participant.summonerName);
+          playerRanked = await getRankedInformation(participant.summonerId);
+        }
+
+        const champion = await prisma.champions.findUnique({
+          where: {
+            id: participant.championId,
+          },
+        });
+
+        const uniqueParticipant = await prisma.playerMatchStats.findUnique({
+          where: {
+            matchId_playerId: {
+              matchId: matchData.metadata.matchId,
+              playerId: participant.summonerId,
+            },
+          },
+        });
+
+        if (!profile || !playerRanked) {
+          console.error("Player not found");
+          continue;
+        }
+        if (!champion) {
+          console.error("Champion not found");
+          continue;
+        }
+        if (!uniqueParticipant) {
+          const playerMatchStats = await prisma.playerMatchStats.create({
+            data: {
+              win: participant.win,
+              championName: participant.championName,
+              spell1Id: participant.summoner1Id,
+              spell2Id: participant.summoner2Id,
+              item0: participant.item0,
+              item1: participant.item1,
+              item2: participant.item2,
+              item3: participant.item3,
+              item4: participant.item4,
+              item5: participant.item5,
+              item6: participant.item6,
+              kills: participant.kills,
+              deaths: participant.deaths,
+              assists: participant.assists,
+              doubleKills: participant.doubleKills,
+              tripleKills: participant.tripleKills,
+              quadraKills: participant.quadraKills,
+              pentaKills: participant.pentaKills,
+              totalDamageDealtToChampions:
+                participant.totalDamageDealtToChampions,
+              totalHeal: participant.totalHeal,
+              totalHealsOnTeammates: participant.totalHealsOnTeammates,
+              damageDealtToObjectives: participant.damageDealtToObjectives,
+              damageDealtToTurrets: participant.damageDealtToTurrets,
+              visionScore: participant.visionScore,
+              timeCCingOthers: participant.timeCCingOthers,
+              totalDamageTaken: participant.totalDamageTaken,
+              goldEarned: participant.goldEarned,
+              wardsPlaced: participant.wardsPlaced,
+              wardsKilled: participant.wardsKilled,
+              firstBloodKill: participant.firstBloodKill,
+              firstTowerKill: participant.firstTowerKill,
+              firstInhibitorKill: Boolean(participant.firstInhibitorKill),
+              firstBaronKill: Boolean(participant.firstBaronKill),
+              firstDragonKill: Boolean(participant.firstDragonKill),
+              firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
+              completeSupportQuestInTime: Boolean(
+                participant.completeSupportQuestInTime
+              ),
+              match: {
+                connect: {
+                  id: matchData.metadata.matchId,
+                },
+              },
+              player: {
+                connect: {
+                  summonerId: participant.summonerId,
+                },
+              },
+            },
+          });
+        }
+
+        // Update Champion statistics
+
+        await prisma.champions.update({
+          where: {
+            id: champion.id,
+          },
+          data: {
+            gamesPlayed: {
+              increment: 1,
+            },
+            wins: {
+              increment: participant.win ? 1 : 0,
+            },
+            losses: {
+              increment: participant.win ? 0 : 1,
+            },
+            kills: {
+              increment: participant.kills,
+            },
+            deaths: {
+              increment: participant.deaths,
+            },
+            assists: {
+              increment: participant.assists,
+            },
+            killingSprees: {
+              increment: participant.killingSprees,
+            },
+            doubleKills: {
+              increment: participant.doubleKills,
+            },
+            tripleKills: {
+              increment: participant.tripleKills,
+            },
+            quadraKills: {
+              increment: participant.quadraKills,
+            },
+            pentaKills: {
+              increment: participant.pentaKills,
+            },
+            totalDamageDealtToChampions: {
+              increment: participant.totalDamageDealtToChampions,
+            },
+            totalHeal: {
+              increment: participant.totalHeal,
+            },
+            totalUnitsHealed: {
+              increment: participant.totalUnitsHealed,
+            },
+            damageDealtToObjectives: {
+              increment: participant.damageDealtToObjectives,
+            },
+            damageDealtToTurrets: {
+              increment: participant.damageDealtToTurrets,
+            },
+            visionScore: {
+              increment: participant.visionScore,
+            },
+            timeCCingOthers: {
+              increment: participant.timeCCingOthers,
+            },
+            totalDamageTaken: {
+              increment: participant.totalDamageTaken,
+            },
+            goldEarned: {
+              increment: participant.goldEarned,
+            },
+            wardsPlaced: {
+              increment: participant.wardsPlaced,
+            },
+            wardsKilled: {
+              increment: participant.wardsKilled,
+            },
+            firstBloodKill: {
+              increment: participant.firstBloodKill ? 1 : 0,
+            },
+            firstTowerKill: {
+              increment: participant.firstTowerKill ? 1 : 0,
+            },
+            firstInhibitorKill: {
+              increment: participant.firstInhibitorKill ? 1 : 0,
+            },
+            firstBaronKill: {
+              increment: participant.firstBaronKill ? 1 : 0,
+            },
+            firstDragonKill: {
+              increment: participant.firstDragonKill ? 1 : 0,
+            },
+            firstRiftHeraldKill: {
+              increment: participant.firstRiftHeraldKill ? 1 : 0,
+            },
+            completeSupportQuestInTime: {
+              increment: participant.completeSupportQuestInTime ? 1 : 0,
+            },
+          },
+        });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function updateOneUserFromMatches(matchesArray, summonerName) {
+  const matches =
+    typeof matchesArray === "string"
+      ? matchesArray.split(",")
+      : [...matchesArray];
+
+  try {
+    for (const match of matches) {
+      //TEST IF ALREADY EXIST
+      const uniqueMatch = await prisma.match.findUnique({
+        where: {
+          id: match,
+        },
+      });
+
+      // Needs matchData for both cases of uniqueMatch
+      const matchData = await analyzeMatch(match);
+
+      if (!uniqueMatch) {
+        // Create Match
+
+        await prisma.match.create({
+          data: {
+            id: matchData.metadata.matchId,
+            queueId: matchData.info.queueId,
+            gameVersion: matchData.info.gameVersion,
+            gameMode: matchData.info.gameMode,
+            mapId: matchData.info.mapId,
+            gameDuration: fmtMSS(matchData.info.gameDuration),
+          },
+        });
+      }
+
+      // Find player & Create PlayerMatchStats for player in the match
+      let participant = null;
+      for (const p of matchData.info.participants) {
+        if (p.summonerName === summonerName) {
+          participant = p;
+          break;
+        }
+      }
+
+      if (participant === null) {
+        console.error("Participant not found;");
+        return null;
+      }
+
+      // Looks for player info
+      const player = await prisma.rankedInformation.findUnique({
+        where: {
+          summonerId: participant.summonerId,
+        },
+      });
+
+      // Create player info if doesn't exist
+      let profile;
+      let playerRanked;
+      if (!player) {
+        profile = await createPlayer(participant.summonerName);
+        playerRanked = await getRankedInformation(participant.summonerId);
+      }
+
+      // Looks for champion
+      const champion = await prisma.champions.findUnique({
+        where: {
+          id: participant.championId,
+        },
+      });
+
+      // Checks if record already entered
+      const uniqueParticipant = await prisma.playerMatchStats.findUnique({
+        where: {
+          matchId_playerId: {
+            matchId: matchData.metadata.matchId,
+            playerId: participant.summonerId,
+          },
+        },
+      });
+
+      if (!profile || !playerRanked) {
+        console.error("Player not found");
+        continue;
+      }
+      if (!champion) {
+        console.error("Champion not found");
+        continue;
+      }
+
+      if (!uniqueParticipant) {
+        await prisma.playerMatchStats.create({
+          data: {
+            win: participant.win,
+            championName: participant.championName,
+            spell1Id: participant.summoner1Id,
+            spell2Id: participant.summoner2Id,
+            item0: participant.item0,
+            item1: participant.item1,
+            item2: participant.item2,
+            item3: participant.item3,
+            item4: participant.item4,
+            item5: participant.item5,
+            item6: participant.item6,
+            kills: participant.kills,
+            deaths: participant.deaths,
+            assists: participant.assists,
+            doubleKills: participant.doubleKills,
+            tripleKills: participant.tripleKills,
+            quadraKills: participant.quadraKills,
+            pentaKills: participant.pentaKills,
+            totalDamageDealtToChampions:
+              participant.totalDamageDealtToChampions,
+            totalHeal: participant.totalHeal,
+            totalHealsOnTeammates: participant.totalHealsOnTeammates,
+            damageDealtToObjectives: participant.damageDealtToObjectives,
+            damageDealtToTurrets: participant.damageDealtToTurrets,
+            visionScore: participant.visionScore,
+            timeCCingOthers: participant.timeCCingOthers,
+            totalDamageTaken: participant.totalDamageTaken,
+            goldEarned: participant.goldEarned,
+            wardsPlaced: participant.wardsPlaced,
+            wardsKilled: participant.wardsKilled,
+            firstBloodKill: participant.firstBloodKill,
+            firstTowerKill: participant.firstTowerKill,
+            firstInhibitorKill: Boolean(participant.firstInhibitorKill),
+            firstBaronKill: Boolean(participant.firstBaronKill),
+            firstDragonKill: Boolean(participant.firstDragonKill),
+            firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
+            completeSupportQuestInTime: Boolean(
+              participant.completeSupportQuestInTime
+            ),
+            match: {
+              connect: {
+                id: matchData.metadata.matchId,
+              },
+            },
+            player: {
+              connect: {
+                summonerId: participant.summonerId,
+              },
+            },
+          },
+        });
+      }
+
+      // Update Champion statistics
+
+      await prisma.champions.update({
+        where: {
+          id: champion.id,
+        },
+        data: {
+          gamesPlayed: {
+            increment: 1,
+          },
+          wins: {
+            increment: participant.win ? 1 : 0,
+          },
+          losses: {
+            increment: participant.win ? 0 : 1,
+          },
+          kills: {
+            increment: participant.kills,
+          },
+          deaths: {
+            increment: participant.deaths,
+          },
+          assists: {
+            increment: participant.assists,
+          },
+          killingSprees: {
+            increment: participant.killingSprees,
+          },
+          doubleKills: {
+            increment: participant.doubleKills,
+          },
+          tripleKills: {
+            increment: participant.tripleKills,
+          },
+          quadraKills: {
+            increment: participant.quadraKills,
+          },
+          pentaKills: {
+            increment: participant.pentaKills,
+          },
+          totalDamageDealtToChampions: {
+            increment: participant.totalDamageDealtToChampions,
+          },
+          totalHeal: {
+            increment: participant.totalHeal,
+          },
+          totalUnitsHealed: {
+            increment: participant.totalUnitsHealed,
+          },
+          damageDealtToObjectives: {
+            increment: participant.damageDealtToObjectives,
+          },
+          damageDealtToTurrets: {
+            increment: participant.damageDealtToTurrets,
+          },
+          visionScore: {
+            increment: participant.visionScore,
+          },
+          timeCCingOthers: {
+            increment: participant.timeCCingOthers,
+          },
+          totalDamageTaken: {
+            increment: participant.totalDamageTaken,
+          },
+          goldEarned: {
+            increment: participant.goldEarned,
+          },
+          wardsPlaced: {
+            increment: participant.wardsPlaced,
+          },
+          wardsKilled: {
+            increment: participant.wardsKilled,
+          },
+          firstBloodKill: {
+            increment: participant.firstBloodKill ? 1 : 0,
+          },
+          firstTowerKill: {
+            increment: participant.firstTowerKill ? 1 : 0,
+          },
+          firstInhibitorKill: {
+            increment: participant.firstInhibitorKill ? 1 : 0,
+          },
+          firstBaronKill: {
+            increment: participant.firstBaronKill ? 1 : 0,
+          },
+          firstDragonKill: {
+            increment: participant.firstDragonKill ? 1 : 0,
+          },
+          firstRiftHeraldKill: {
+            increment: participant.firstRiftHeraldKill ? 1 : 0,
+          },
+          completeSupportQuestInTime: {
+            increment: participant.completeSupportQuestInTime ? 1 : 0,
+          },
+        },
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function updateUser(summonerName) {
+  // Get or create if needed Player
+  const player = await searchPlayer(summonerName);
+
+  if (!player) {
+    console.error("Player not found");
+    return;
+  }
+  console.log("Player Found:", player);
+  // Create player info if doesn't exist
+  const playerRanked = await getRankedInformation(player.summonerId);
+
+  if (!playerRanked) {
+    console.error("Player ranked not found");
+    return;
+  }
+  console.log("Player Ranked Found:", playerRanked);
+
+  const last10Matches = await get10MatchesIdByPuuid(player.puuid, 0);
+  if (!last10Matches) {
+    console.error("Player matches not found");
+    return;
+  }
+  console.log("Player Matches Found:", last10Matches);
+
+  await updateOneUserFromMatches(last10Matches, summonerName);
+  console.log(summonerName + " Profile was updated.");
+  return playerRanked;
 }
