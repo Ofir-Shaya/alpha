@@ -81,6 +81,7 @@ const Profile = () => {
 
           if (response.ok) {
             const data = await response.json();
+            console.log(data);
             setPlayer(data);
           } else console.log("Error fetching player.");
         } catch (error) {
@@ -94,10 +95,9 @@ const Profile = () => {
   useEffect(() => {
     const pullRankedInfo = async () => {
       if (player) {
-        console.log("player:", player);
         try {
           const response = await fetch(
-            `/api/lolapi?summonerId=${player.summonerId}&func=getRankedInformation`,
+            `/api/lolapi?summonerName=${player.summonerName}&func=getRankedInformation`,
             {
               method: "GET",
               headers: {
