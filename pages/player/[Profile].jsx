@@ -1,5 +1,6 @@
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
+import { headers } from "@/next.config";
 import {
   Container,
   Grid,
@@ -63,6 +64,7 @@ const Profile = () => {
   const [playerRanked, setPlayerRanked] = useState(null);
   const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
   // const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
+  const [playerChamps, setPlayerChamps] = useState(null);
 
   // Getting info of player searched
   useEffect(() => {
@@ -81,7 +83,6 @@ const Profile = () => {
 
           if (response.ok) {
             const data = await response.json();
-            console.log(data);
             setPlayer(data);
           } else console.log("Error fetching player.");
         } catch (error) {
@@ -97,7 +98,7 @@ const Profile = () => {
       if (player) {
         try {
           const response = await fetch(
-            `/api/lolapi?summonerName=${player.summonerName}&func=getRankedInformation`,
+            `/api/lolapi?summonerName=${player.username}&func=getRankedInformation`,
             {
               method: "GET",
               headers: {
@@ -108,7 +109,7 @@ const Profile = () => {
           if (response.ok) {
             const data = await response.json();
             setPlayerRanked(data);
-          } else console.log("Error fetching player.");
+          } else console.error("Error fetching player.");
         } catch (error) {
           console.error(error);
         }
@@ -132,6 +133,32 @@ const Profile = () => {
           // }
         }
     }
+  }, [playerRanked]);
+
+  useEffect(() => {
+    const pullPlayerChamps = async () => {
+      if (playerRanked) {
+        try {
+          const response = await fetch(
+            `/api/lolapi?summonerId=${playerRanked.summonerId}&func=getPlayerChamps`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setPlayerChamps(data);
+            console.log(data);
+          } else console.error("Error fetching player.");
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+    pullPlayerChamps();
   }, [playerRanked]);
 
   // Update ranked info

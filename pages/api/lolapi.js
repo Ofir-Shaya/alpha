@@ -67,6 +67,11 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getPlayerChamps":
+        data = await getPlayerChamps(req.query.summonerId);
+        res.status(200).json(data);
+
+        break;
       default:
         console.error("bad query func");
         break;
@@ -146,8 +151,17 @@ async function createPlayer(playerName) {
 
 async function getPlayerRankedInfo(summonerName) {
   try {
+    const summonerProfile = await axios.get(
+      `https://eun1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${summonerName}`,
+      {
+        headers: {
+          "X-Riot-Token": process.env.API_KEY,
+        },
+      }
+    );
+
     const response = await axios.get(
-      `https://eun1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerId}`,
+      `https://eun1.api.riotgames.com/lol/league/v4/entries/by-summoner/${summonerProfile.summonerId}`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -157,8 +171,6 @@ async function getPlayerRankedInfo(summonerName) {
 
     const playerRankedArray = response.data;
     let soloqIndex;
-    console.log("championName:", playerRankedArray[0].championName);
-    const player = await searchPlayer(playerRankedArray[0].championName);
 
     for (let index = 0; index < playerRankedArray.length; index++) {
       const player = playerRankedArray[index];
@@ -193,7 +205,7 @@ async function getPlayerRankedInfo(summonerName) {
             hotStreak: player.hotStreak,
             profile: {
               connect: {
-                profileId: player.puuid,
+                profileId: summonerProfile.puuid,
               },
             },
           },
@@ -210,17 +222,19 @@ async function getPlayerRankedInfo(summonerName) {
   }
 }
 
-async function getRankedInformation(summonerName) {
+async function getRankedInformation(username) {
   try {
-    const data = await prisma.rankedInformation.findUnique({
+    const data = await prisma.profile.findUnique({
       where: {
-        profile: {
-          summonerName: summonerName,
-        },
+        username: username,
+      },
+      include: {
+        rankedInformation: true,
       },
     });
+    console.log(data);
     if (!data) {
-      const newData = await getPlayerRankedInfo(summonerName);
+      const newData = await getPlayerRankedInfo(username);
       return newData;
     }
     return data;
@@ -802,4 +816,12 @@ async function updateUser(summonerName) {
   await updateAllUsersOfMatches(last10Matches);
   console.log(summonerName + " Profile was updated.");
   return playerRanked;
+}
+
+async function getPlayerChamps(summonerId) {
+  const playerRanked = await prisma.playerRanked.findUnique({
+    where: { summonerId: summonerId },
+  });
+  if (!playerRanked) return null;
+  return playerRanked.playerMatchStats;
 }
