@@ -84,7 +84,7 @@ const Profile = () => {
           if (response.ok) {
             const data = await response.json();
             setPlayer(data);
-          } else console.log("Error fetching player.");
+          } else console.log("Error fetching player search.");
         } catch (error) {
           console.error(error);
         }
@@ -109,7 +109,7 @@ const Profile = () => {
           if (response.ok) {
             const data = await response.json();
             setPlayerRanked(data);
-          } else console.error("Error fetching player.");
+          } else console.error("Error pulling player ranked.");
         } catch (error) {
           console.error(error);
         }
@@ -152,7 +152,7 @@ const Profile = () => {
             const data = await response.json();
             setPlayerChamps(data);
             console.log(data);
-          } else console.error("Error fetching player.");
+          } else console.error("Error fetching player champs.");
         } catch (error) {
           console.error(error);
         }
@@ -176,7 +176,7 @@ const Profile = () => {
       if (response.ok) {
         const data = await response.json();
         setPlayerRanked(data);
-      } else console.log("Error fetching player.");
+      } else console.log("Error fetching player ranked update.");
     } catch (error) {
       console.error(error);
     }
