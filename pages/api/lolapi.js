@@ -72,6 +72,11 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getMatchInformation":
+        data = await getMatchInformation(req.query.match);
+        res.status(200).json(data);
+
+        break;
       default:
         console.error("bad query func");
         break;
@@ -339,6 +344,7 @@ async function updateAllUsersOfMatches(matchesArray) {
             gameVersion: matchData.info.gameVersion,
             gameMode: matchData.info.gameMode,
             mapId: matchData.info.mapId,
+            gameCreation: matchData.info,
             gameDuration: fmtMSS(matchData.info.gameDuration),
           },
         });
@@ -583,12 +589,14 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
             gameVersion: matchData.info.gameVersion,
             gameMode: matchData.info.gameMode,
             mapId: matchData.info.mapId,
+            gameCreation: matchdata.info.gameCreation,
             gameDuration: fmtMSS(matchData.info.gameDuration),
           },
         });
       }
 
       // Find player & Create PlayerMatchStats for player in the match
+
       let participant = null;
       for (const p of matchData.info.participants) {
         if (p.summonerName === summonerName) {
@@ -601,6 +609,11 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
         return null;
       }
 
+      const profile = await prisma.profile.findUnique({
+        where: {
+          username: participant.summonerName,
+        },
+      });
       // Looks for player info
       const player = await prisma.rankedInformation.findUnique({
         where: {
@@ -639,7 +652,7 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
         console.error("Player not found");
         continue;
       }
-      if (!playerRanked) {
+      if (!player && !playerRanked) {
         console.error("Player ranked not found");
         continue;
       }
@@ -647,7 +660,6 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
         console.error("Champion not found");
         continue;
       }
-      console.log(participant.summonerName, uniqueParticipant);
 
       if (!uniqueParticipant) {
         await prisma.playerMatchStats.create({
@@ -839,14 +851,19 @@ async function updateUser(summonerName) {
 }
 
 async function getPlayerChamps(summonerId) {
-  console.log(summonerId);
   const playerRanked = await prisma.RankedInformation.findUnique({
     where: { summonerId: summonerId },
     select: {
       playerMatchStats: true,
     },
   });
-  console.log(playerRanked);
   if (!playerRanked) return null;
   return playerRanked.playerMatchStats;
+}
+
+async function getMatchInformation(matchId) {
+  const matchInfo = await prisma.match.findUnique({
+    where: { id: matchId },
+  });
+  return matchInfo;
 }

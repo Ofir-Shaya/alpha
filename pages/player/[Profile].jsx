@@ -9,6 +9,7 @@ import {
   Loading,
   Image,
   Button,
+  Row,
 } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -21,6 +22,17 @@ const romanHash = {
   // C: 100,
   // D: 500,
   // M: 1000,
+};
+const summonersHash = {
+  21: "SummonerBarrier",
+  1: "SummonerBoost",
+  14: "SummonerDot",
+  3: "SummonerExhaust",
+  4: "SummonerFlash",
+  6: "SummonerHaste",
+  7: "SummonerHeal",
+  11: "SummonerSmite",
+  12: "SummonerTeleport",
 };
 
 const romanToInt = (roman) => {
@@ -57,6 +69,22 @@ const calcWinPerc = (wins, losses) => {
   return ((wins / total) * 100).toFixed(1);
 };
 
+const epochTimeConvertor = (epochValue) => {
+  const now = new Date().getTime();
+  const timePassed = Math.floor((now - epochValue) / 1000);
+
+  if (timePassed < 60 * 60) {
+    const minutesPassed = Math.floor(timePassed / 60);
+    return `${minutesPassed} minute${minutesPassed === 1 ? "" : "s"} ago`;
+  } else if (timePassed < 60 * 60 * 24) {
+    const hoursPassed = Math.floor(timePassed / (60 * 60));
+    return `${hoursPassed} hour${hoursPassed === 1 ? "" : "s"} ago`;
+  } else {
+    const daysPassed = Math.floor(timePassed / (60 * 60 * 24));
+    return `${daysPassed} day${daysPassed === 1 ? "" : "s"} ago`;
+  }
+};
+
 const Profile = () => {
   const router = useRouter();
   const { Profile, server } = router.query;
@@ -65,29 +93,30 @@ const Profile = () => {
   const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
   // const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
   const [playerChamps, setPlayerChamps] = useState(null);
+  const [matchInformation, setMatchInformation] = useState(null);
 
   // Getting info of player searched
   useEffect(() => {
     const fetchPlayer = async () => {
-      if (Profile)
-        try {
-          const response = await fetch(
-            `/api/lolapi?user=${Profile}&func=searchPlayer`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
+      if (!Profile) return;
+      try {
+        const response = await fetch(
+          `/api/lolapi?user=${Profile}&func=searchPlayer`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-          if (response.ok) {
-            const data = await response.json();
-            setPlayer(data);
-          } else console.log("Error fetching player search.");
-        } catch (error) {
-          console.error(error);
-        }
+        if (response.ok) {
+          const data = await response.json();
+          setPlayer(data);
+        } else console.log("Error fetching player search.");
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchPlayer();
   }, [Profile]);
@@ -95,24 +124,23 @@ const Profile = () => {
   // Getting ranked info
   useEffect(() => {
     const pullRankedInfo = async () => {
-      if (player) {
-        try {
-          const response = await fetch(
-            `/api/lolapi?summonerName=${player.username}&func=getRankedInformation`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setPlayerRanked(data);
-          } else console.error("Error pulling player ranked.");
-        } catch (error) {
-          console.error(error);
-        }
+      if (!player) return;
+      try {
+        const response = await fetch(
+          `/api/lolapi?summonerName=${player.username}&func=getRankedInformation`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setPlayerRanked(data);
+        } else console.error("Error pulling player ranked.");
+      } catch (error) {
+        console.error(error);
       }
     };
     pullRankedInfo();
@@ -120,46 +148,57 @@ const Profile = () => {
 
   // Update soloq and flexq rank
   useEffect(() => {
-    if (playerRanked) {
-      if (playerRanked.queueType === "RANKED_SOLO_5x5") {
-        setPlayerRankedSolo(playerRanked);
-      } else
-        for (let index = 0; index < playerRanked.length; index++) {
-          if (playerRanked[index].queueType === "RANKED_SOLO_5x5") {
-            setPlayerRankedSolo(playerRanked[index]);
-          }
-          // if (playerRanked[index].queueType === "RANKED_FLEX_SR") {
-          //   setPlayerRankedFlex(playerRanked[index]);
-          // }
+    if (!playerRanked) return;
+    if (playerRanked.queueType === "RANKED_SOLO_5x5") {
+      setPlayerRankedSolo(playerRanked);
+    } else
+      for (let index = 0; index < playerRanked.length; index++) {
+        if (playerRanked[index].queueType === "RANKED_SOLO_5x5") {
+          setPlayerRankedSolo(playerRanked[index]);
         }
-    }
+        // if (playerRanked[index].queueType === "RANKED_FLEX_SR") {
+        //   setPlayerRankedFlex(playerRanked[index]);
+        // }
+      }
   }, [playerRanked]);
 
   useEffect(() => {
     const pullPlayerChamps = async () => {
-      if (playerRanked) {
-        try {
-          const response = await fetch(
-            `/api/lolapi?summonerId=${playerRanked.summonerId}&func=getPlayerChamps`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setPlayerChamps(data);
-            console.log(data);
-          } else console.error("Error fetching player champs.");
-        } catch (error) {
-          console.error(error);
-        }
+      if (!playerRanked) return;
+      try {
+        const response = await fetch(
+          `/api/lolapi?summonerId=${playerRanked.summonerId}&func=getPlayerChamps`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setPlayerChamps(data);
+        } else console.error("Error fetching player champs.");
+      } catch (error) {
+        console.error(error);
       }
     };
     pullPlayerChamps();
   }, [playerRanked]);
+
+  useEffect(() => {
+    async function fetchMatchesWithInfo() {
+      if (!playerChamps) return;
+      const matchesWithInfo = await Promise.all(
+        playerChamps.map(async (match) => {
+          const matchInfo = await getMatchInformation(match.matchId);
+          return { ...match, ...matchInfo };
+        })
+      );
+      setMatchInformation(matchesWithInfo);
+    }
+    fetchMatchesWithInfo();
+  }, [playerChamps]);
 
   // Update ranked info
   const updateRankedInformation = async () => {
@@ -313,6 +352,258 @@ const Profile = () => {
     );
   };
 
+  const getMatchInformation = async (matchId) => {
+    try {
+      const response = await fetch(
+        `/api/lolapi?match=${matchId}&func=getMatchInformation`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const LatestPlayed = () => {
+    if (!matchInformation) return <Loading />;
+
+    console.log(matchInformation);
+    const champsOverview = (
+      <Container>
+        {matchInformation.map((match, index) => {
+          return (
+            <Card
+              key={index + "card-left"}
+              width="100%"
+              variant="bordered"
+              css={{
+                backgroundColor: match.win
+                  ? "rgba(0,180,0,0.1)"
+                  : "rgba(180,0,0,0.1)",
+                display: "flex",
+                flexDirection: "row",
+              }}
+            >
+              <Card
+                className="match-details"
+                css={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "30%",
+                  backgroundColor: "transparent",
+                  textAlign: "center",
+                }}
+              >
+                <Text b>{match.queueId === 420 ? "Ranked Solo/Duo" : ""}</Text>
+                <Text>{match.gameDuration}</Text>
+                <Text>{epochTimeConvertor(match.gameCreation)}</Text>
+                <Container
+                  display="flex"
+                  css={{ flexDirection: "row", justifyContent: "space-evenly" }}
+                >
+                  <Text
+                    b
+                    color={
+                      match.win ? "rgba(0,180,0,0.3)" : "rgba(180,0,0,0.3)"
+                    }
+                  >
+                    {match.win ? "WIN" : "LOSE"}
+                  </Text>
+                  <Text>{match.gameDuration}</Text>
+                </Container>
+              </Card>
+
+              <Card
+                className="champion-details"
+                css={{
+                  display: "flex",
+                  flexDirection: "row",
+                  width: "30%",
+                  backgroundColor: "transparent",
+                  textAlign: "center",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Container
+                  css={{
+                    position: "relative",
+                    margin: "$0",
+                    padding: "$0",
+                    width: "fit-content",
+                  }}
+                >
+                  <Image
+                    width={64}
+                    height={64}
+                    src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${match.championName}.png`}
+                    containerCss={{
+                      margin: "$0",
+                      padding: "$0",
+                      width: "fit-content",
+                    }}
+                  />
+                  <p style={{ position: "absolute", bottom: "0", right: "0" }}>
+                    18
+                  </p>
+                </Container>
+                <Container css={{ margin: "$0", padding: "$0" }}>
+                  <Image
+                    width={22}
+                    height={22}
+                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                      summonersHash[match.spell1Id]
+                    }.png`}
+                    containerCss={{ margin: "$0", padding: "$0" }}
+                  />
+                  <Image
+                    width={22}
+                    height={22}
+                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                      summonersHash[match.spell2Id]
+                    }.png`}
+                    containerCss={{ margin: "$0", padding: "$0" }}
+                  />
+                </Container>
+              </Card>
+              <Card
+                className="player-stats"
+                css={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "30%",
+                  backgroundColor: "transparent",
+                  textAlign: "center",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Container>
+                  <Text b>{match.kills}</Text>
+                  <span color="#5f5f7b">/</span>
+                  <Text b color="$error">
+                    {match.deaths}
+                  </Text>
+                  <span color="#5f5f7b">/</span>
+                  <Text b>{match.assists}</Text>
+                </Container>
+                <Container>
+                  <Text>
+                    {(match.kills + match.assists) / match.deaths} KDA
+                  </Text>
+                </Container>
+                <Container>
+                  <Text>100 CS (7)</Text>
+                </Container>
+                <Container>
+                  <Text>{match.visionScore} vision</Text>
+                </Container>
+              </Card>
+              <Card
+                css={{
+                  display: "flex",
+                  flexDirection: "row",
+                  width: "30%",
+                  backgroundColor: "transparent",
+                  textAlign: "center",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Container css={{ margin: "$0", padding: "$0" }}>
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                  {match.item1 ? (
+                    <Image
+                      width={22}
+                      height={22}
+                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                        summonersHash[match.spell1Id]
+                      }.png`}
+                      containerCss={{ margin: "$0", padding: "$0" }}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </Container>
+              </Card>
+            </Card>
+          );
+        })}
+      </Container>
+    );
+    return champsOverview;
+  };
+
   return (
     <>
       <MyNavbar />
@@ -379,7 +670,6 @@ const Profile = () => {
                 display="flex"
                 direction="column"
                 css={{
-                  backgroundColor: "$secondary",
                   borderRadius: "18px",
                   margin: "$10",
                 }}
@@ -468,7 +758,7 @@ const Profile = () => {
                 display="flex"
                 direction="column"
                 css={{
-                  backgroundColor: "$secondary",
+                  
                   borderRadius: "18px",
                   margin: "$10",
                 }}
@@ -558,12 +848,18 @@ const Profile = () => {
               display="flex"
               direction="column"
               css={{
-                backgroundColor: "$secondary",
                 borderRadius: "18px",
                 margin: "$10",
               }}
             >
               <Text h4>Champion Stats</Text>
+              {matchInformation ? (
+                <Container>
+                  <LatestPlayed />
+                </Container>
+              ) : (
+                <Loading />
+              )}
             </Grid>
           </Grid.Container>
         </Container>
