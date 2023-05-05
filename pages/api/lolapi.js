@@ -749,3 +749,10 @@ async function createParticipant(participant, matchData) {
     },
   });
 }
+
+async function getMatchInformation(matchId) {
+  const matchInfo = await prisma.match.findUnique({
+    where: { id: matchId },
+  });
+  return matchInfo;
+}

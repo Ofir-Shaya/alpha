@@ -123,7 +123,7 @@ const Profile = () => {
   const [playerChamps, setPlayerChamps] = useState(null);
   const [matchInformation, setMatchInformation] = useState(null);
 
-  // Getting info of player searched
+  // Getting info of player searched -> when profile changed
   useEffect(() => {
     const fetchPlayer = async () => {
       if (!Profile) return;
@@ -149,7 +149,7 @@ const Profile = () => {
     fetchPlayer();
   }, [Profile]);
 
-  // Getting ranked info
+  // Getting ranked info -> when player changed
   useEffect(() => {
     const pullRankedInfo = async () => {
       if (!player) return;
@@ -174,7 +174,7 @@ const Profile = () => {
     pullRankedInfo();
   }, [player]);
 
-  // Update soloq and flexq rank
+  // Update soloq and flexq rank -> when player ranked changed
   useEffect(() => {
     if (!playerRanked) return;
     if (playerRanked.queueType === "RANKED_SOLO_5x5") {
@@ -190,6 +190,7 @@ const Profile = () => {
       }
   }, [playerRanked]);
 
+  // getting player matches -> when player ranked changed
   useEffect(() => {
     const pullPlayerChamps = async () => {
       if (!playerRanked) return;
@@ -214,6 +215,7 @@ const Profile = () => {
     pullPlayerChamps();
   }, [playerRanked]);
 
+  // getting more information about player matches -> when player matches changed
   useEffect(() => {
     async function fetchMatchesWithInfo() {
       if (!playerChamps) return;
@@ -401,9 +403,8 @@ const Profile = () => {
   };
 
   const LatestPlayed = () => {
-    if (!matchInformation) return <Loading />;
+    if (!matchInformation.gameCreation) return <Loading />;
 
-    console.log(matchInformation);
     const champsOverview = (
       <Container>
         {matchInformation.map((match, index) => {
@@ -539,7 +540,6 @@ const Profile = () => {
                   </Text>
                 </Container>
                 <Container>
-                  {console.log(match)}
                   <Text>
                     {match.creepScore !== 0 &&
                     typeof match.gameDuration === "string" ? (
@@ -994,12 +994,10 @@ const Profile = () => {
               }}
             >
               <Text h4>Champion Stats</Text>
-              {matchInformation ? (
+              {matchInformation && (
                 <Container>
                   <LatestPlayed />
                 </Container>
-              ) : (
-                <Loading />
               )}
             </Grid>
           </Grid.Container>
