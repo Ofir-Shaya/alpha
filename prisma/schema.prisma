@@ -48,10 +48,10 @@ model RankedInformation {
 model PlayerMatchStats {
   matchId                          String
   playerId                         String
-  win                              Boolean
-  championName                     String
-  spell1Id                         Int
-  spell2Id                         Int
+  win                              Boolean?
+  championName                     String?
+  spell1Id                         Int?
+  spell2Id                         Int?
   item0                            Int?
   item1                            Int?
   item2                            Int?
@@ -59,36 +59,38 @@ model PlayerMatchStats {
   item4                            Int?
   item5                            Int?
   item6                            Int?
-  kills                            Int
-  deaths                           Int
-  assists                          Int
-  doubleKills                      Int
-  tripleKills                      Int
-  quadraKills                      Int
-  pentaKills                       Int
-  totalDamageDealtToChampions      Int
-  totalHeal                        Int
-  totalHealsOnTeammates            Int
-  damageDealtToObjectives          Int
-  damageDealtToTurrets             Int
+  kills                            Int?
+  deaths                           Int?
+  assists                          Int?
+  doubleKills                      Int?
+  tripleKills                      Int?
+  quadraKills                      Int?
+  pentaKills                       Int?
+  totalDamageDealtToChampions      Int?
+  totalHeal                        Int?
+  totalHealsOnTeammates            Int?
+  damageDealtToObjectives          Int?
+  damageDealtToTurrets             Int?
   visionScore                      Int?
-  timeCCingOthers                  Int
-  totalDamageTaken                 Int
-  goldEarned                       Int
-  wardsPlaced                      Int
-  wardsKilled                      Int
-  firstBloodKill                   Boolean
-  firstTowerKill                   Boolean
-  firstInhibitorKill               Boolean
-  firstBaronKill                   Boolean
-  firstDragonKill                  Boolean
-  firstRiftHeraldKill              Boolean
-  completeSupportQuestInTime       Boolean  
+  timeCCingOthers                  Int?
+  totalDamageTaken                 Int?
+  goldEarned                       Int?
+  wardsPlaced                      Int?
+  wardsKilled                      Int?
+  champLevel                       Int?
+  creepScore                       Int?
+  sightWardsBoughtInGame	         Int?
+  mainRune                         Int?
+  secondaryRune                    Int?
+  firstBloodKill                   Boolean?
+  firstTowerKill                   Boolean?
+  firstInhibitorKill               Boolean?
+  firstBaronKill                   Boolean?
+  firstDragonKill                  Boolean?
+  firstRiftHeraldKill              Boolean?
+  completeSupportQuestInTime       Boolean?  
   player                           RankedInformation     @relation(fields: [playerId], references: [summonerId])
   match                            Match                 @relation(fields: [matchId], references: [id])
-  champLevel                       Int
-  creepScore                       Int?
-
 
   @@index([playerId])
   @@index([matchId])

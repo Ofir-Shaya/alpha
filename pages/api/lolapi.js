@@ -77,6 +77,17 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getAllMatches":
+        data = await getAllMatches();
+        res.status(200).json(data);
+
+        break;
+      case "updatePlayerMatchInfo":
+        data = await updatePlayerMatchInfo(req.query.matchId);
+        res.status(200).json(data);
+
+        break;
+
       default:
         console.error("bad query func");
         break;
@@ -267,10 +278,10 @@ async function playerMastery(summonerId) {
   }
 }
 
-async function get5MatchesIdByPuuid(puuid, startIndex) {
+async function get10MatchesIdByPuuid(puuid, startIndex) {
   try {
     const response = await axios.get(
-      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=5`,
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=10`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -290,10 +301,10 @@ async function getAllMatchesByPuuid(puuid) {
   let matchIds;
   try {
     do {
-      matchIds = await get5MatchesIdByPuuid(puuid, startIndex);
+      matchIds = await get10MatchesIdByPuuid(puuid, startIndex);
       matchesArray.push(...matchIds);
       startIndex += matchIds.length;
-    } while (matchIds.length === 5);
+    } while (matchIds.length === 10);
     return matchesArray;
   } catch (error) {
     console.error(error);
@@ -344,7 +355,7 @@ async function updateAllUsersOfMatches(matchesArray) {
             gameVersion: matchData.info.gameVersion,
             gameMode: matchData.info.gameMode,
             mapId: matchData.info.mapId,
-            gameCreation: matchData.info,
+            gameCreation: matchData.info.gameCreation,
             gameDuration: fmtMSS(matchData.info.gameDuration),
           },
         });
@@ -394,56 +405,8 @@ async function updateAllUsersOfMatches(matchesArray) {
           continue;
         }
         if (!playerRanked) {
-          console.error("Player ranked not found");
-          continue;
-        }
-        if (!champion) {
-          console.error("Champion not found");
-          continue;
-        }
-        console.log(participant.summonerName, uniqueParticipant);
-        if (!uniqueParticipant) {
           await prisma.playerMatchStats.create({
             data: {
-              win: participant.win,
-              championName: participant.championName,
-              spell1Id: participant.summoner1Id,
-              spell2Id: participant.summoner2Id,
-              item0: participant.item0,
-              item1: participant.item1,
-              item2: participant.item2,
-              item3: participant.item3,
-              item4: participant.item4,
-              item5: participant.item5,
-              item6: participant.item6,
-              kills: participant.kills,
-              deaths: participant.deaths,
-              assists: participant.assists,
-              doubleKills: participant.doubleKills,
-              tripleKills: participant.tripleKills,
-              quadraKills: participant.quadraKills,
-              pentaKills: participant.pentaKills,
-              totalDamageDealtToChampions:
-                participant.totalDamageDealtToChampions,
-              totalHeal: participant.totalHeal,
-              totalHealsOnTeammates: participant.totalHealsOnTeammates,
-              damageDealtToObjectives: participant.damageDealtToObjectives,
-              damageDealtToTurrets: participant.damageDealtToTurrets,
-              visionScore: participant.visionScore,
-              timeCCingOthers: participant.timeCCingOthers,
-              totalDamageTaken: participant.totalDamageTaken,
-              goldEarned: participant.goldEarned,
-              wardsPlaced: participant.wardsPlaced,
-              wardsKilled: participant.wardsKilled,
-              firstBloodKill: participant.firstBloodKill,
-              firstTowerKill: participant.firstTowerKill,
-              firstInhibitorKill: Boolean(participant.firstInhibitorKill),
-              firstBaronKill: Boolean(participant.firstBaronKill),
-              firstDragonKill: Boolean(participant.firstDragonKill),
-              firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
-              completeSupportQuestInTime: Boolean(
-                participant.completeSupportQuestInTime
-              ),
               match: {
                 connect: {
                   id: matchData.metadata.matchId,
@@ -456,104 +419,18 @@ async function updateAllUsersOfMatches(matchesArray) {
               },
             },
           });
+
+          await updateChamp(champion, participant);
+
+          continue;
+        }
+
+        if (!uniqueParticipant) {
+          await createParticipant(participant, matchData);
         }
 
         // Update Champion statistics
-
-        await prisma.champions.update({
-          where: {
-            id: champion.id,
-          },
-          data: {
-            gamesPlayed: {
-              increment: 1,
-            },
-            wins: {
-              increment: participant.win ? 1 : 0,
-            },
-            losses: {
-              increment: participant.win ? 0 : 1,
-            },
-            kills: {
-              increment: participant.kills,
-            },
-            deaths: {
-              increment: participant.deaths,
-            },
-            assists: {
-              increment: participant.assists,
-            },
-            killingSprees: {
-              increment: participant.killingSprees,
-            },
-            doubleKills: {
-              increment: participant.doubleKills,
-            },
-            tripleKills: {
-              increment: participant.tripleKills,
-            },
-            quadraKills: {
-              increment: participant.quadraKills,
-            },
-            pentaKills: {
-              increment: participant.pentaKills,
-            },
-            totalDamageDealtToChampions: {
-              increment: participant.totalDamageDealtToChampions,
-            },
-            totalHeal: {
-              increment: participant.totalHeal,
-            },
-            totalUnitsHealed: {
-              increment: participant.totalUnitsHealed,
-            },
-            damageDealtToObjectives: {
-              increment: participant.damageDealtToObjectives,
-            },
-            damageDealtToTurrets: {
-              increment: participant.damageDealtToTurrets,
-            },
-            visionScore: {
-              increment: participant.visionScore,
-            },
-            timeCCingOthers: {
-              increment: participant.timeCCingOthers,
-            },
-            totalDamageTaken: {
-              increment: participant.totalDamageTaken,
-            },
-            goldEarned: {
-              increment: participant.goldEarned,
-            },
-            wardsPlaced: {
-              increment: participant.wardsPlaced,
-            },
-            wardsKilled: {
-              increment: participant.wardsKilled,
-            },
-            firstBloodKill: {
-              increment: participant.firstBloodKill ? 1 : 0,
-            },
-            firstTowerKill: {
-              increment: participant.firstTowerKill ? 1 : 0,
-            },
-            firstInhibitorKill: {
-              increment: participant.firstInhibitorKill ? 1 : 0,
-            },
-            firstBaronKill: {
-              increment: participant.firstBaronKill ? 1 : 0,
-            },
-            firstDragonKill: {
-              increment: participant.firstDragonKill ? 1 : 0,
-            },
-            firstRiftHeraldKill: {
-              increment: participant.firstRiftHeraldKill ? 1 : 0,
-            },
-            completeSupportQuestInTime: {
-              increment: participant.completeSupportQuestInTime ? 1 : 0,
-            },
-          },
-        });
+        await updateChamp(champion, participant);
       }
     }
   } catch (error) {
@@ -589,7 +466,7 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
             gameVersion: matchData.info.gameVersion,
             gameMode: matchData.info.gameMode,
             mapId: matchData.info.mapId,
-            gameCreation: matchdata.info.gameCreation,
+            gameCreation: matchData.info.gameCreation,
             gameDuration: fmtMSS(matchData.info.gameDuration),
           },
         });
@@ -662,157 +539,12 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
       }
 
       if (!uniqueParticipant) {
-        await prisma.playerMatchStats.create({
-          data: {
-            win: participant.win,
-            championName: participant.championName,
-            spell1Id: participant.summoner1Id,
-            spell2Id: participant.summoner2Id,
-            item0: participant.item0,
-            item1: participant.item1,
-            item2: participant.item2,
-            item3: participant.item3,
-            item4: participant.item4,
-            item5: participant.item5,
-            item6: participant.item6,
-            kills: participant.kills,
-            deaths: participant.deaths,
-            assists: participant.assists,
-            doubleKills: participant.doubleKills,
-            tripleKills: participant.tripleKills,
-            quadraKills: participant.quadraKills,
-            pentaKills: participant.pentaKills,
-            totalDamageDealtToChampions:
-              participant.totalDamageDealtToChampions,
-            totalHeal: participant.totalHeal,
-            totalHealsOnTeammates: participant.totalHealsOnTeammates,
-            damageDealtToObjectives: participant.damageDealtToObjectives,
-            damageDealtToTurrets: participant.damageDealtToTurrets,
-            visionScore: participant.visionScore,
-            timeCCingOthers: participant.timeCCingOthers,
-            totalDamageTaken: participant.totalDamageTaken,
-            goldEarned: participant.goldEarned,
-            wardsPlaced: participant.wardsPlaced,
-            wardsKilled: participant.wardsKilled,
-            firstBloodKill: participant.firstBloodKill,
-            firstTowerKill: participant.firstTowerKill,
-            firstInhibitorKill: Boolean(participant.firstInhibitorKill),
-            firstBaronKill: Boolean(participant.firstBaronKill),
-            firstDragonKill: Boolean(participant.firstDragonKill),
-            firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
-            completeSupportQuestInTime: Boolean(
-              participant.completeSupportQuestInTime
-            ),
-            player: {
-              connect: {
-                summonerId: participant.summonerId,
-              },
-            },
-            match: {
-              connect: {
-                id: matchData.metadata.matchId,
-              },
-            },
-          },
-        });
+        await createParticipant(participant, matchData);
       }
 
       // Update Champion statistics
 
-      await prisma.champions.update({
-        where: {
-          id: champion.id,
-        },
-        data: {
-          gamesPlayed: {
-            increment: 1,
-          },
-          wins: {
-            increment: participant.win ? 1 : 0,
-          },
-          losses: {
-            increment: participant.win ? 0 : 1,
-          },
-          kills: {
-            increment: participant.kills,
-          },
-          deaths: {
-            increment: participant.deaths,
-          },
-          assists: {
-            increment: participant.assists,
-          },
-          killingSprees: {
-            increment: participant.killingSprees,
-          },
-          doubleKills: {
-            increment: participant.doubleKills,
-          },
-          tripleKills: {
-            increment: participant.tripleKills,
-          },
-          quadraKills: {
-            increment: participant.quadraKills,
-          },
-          pentaKills: {
-            increment: participant.pentaKills,
-          },
-          totalDamageDealtToChampions: {
-            increment: participant.totalDamageDealtToChampions,
-          },
-          totalHeal: {
-            increment: participant.totalHeal,
-          },
-          totalUnitsHealed: {
-            increment: participant.totalUnitsHealed,
-          },
-          damageDealtToObjectives: {
-            increment: participant.damageDealtToObjectives,
-          },
-          damageDealtToTurrets: {
-            increment: participant.damageDealtToTurrets,
-          },
-          visionScore: {
-            increment: participant.visionScore,
-          },
-          timeCCingOthers: {
-            increment: participant.timeCCingOthers,
-          },
-          totalDamageTaken: {
-            increment: participant.totalDamageTaken,
-          },
-          goldEarned: {
-            increment: participant.goldEarned,
-          },
-          wardsPlaced: {
-            increment: participant.wardsPlaced,
-          },
-          wardsKilled: {
-            increment: participant.wardsKilled,
-          },
-          firstBloodKill: {
-            increment: participant.firstBloodKill ? 1 : 0,
-          },
-          firstTowerKill: {
-            increment: participant.firstTowerKill ? 1 : 0,
-          },
-          firstInhibitorKill: {
-            increment: participant.firstInhibitorKill ? 1 : 0,
-          },
-          firstBaronKill: {
-            increment: participant.firstBaronKill ? 1 : 0,
-          },
-          firstDragonKill: {
-            increment: participant.firstDragonKill ? 1 : 0,
-          },
-          firstRiftHeraldKill: {
-            increment: participant.firstRiftHeraldKill ? 1 : 0,
-          },
-          completeSupportQuestInTime: {
-            increment: participant.completeSupportQuestInTime ? 1 : 0,
-          },
-        },
-      });
+      await updateChamp(champion, participant);
     }
   } catch (error) {
     console.error(error);
@@ -837,7 +569,7 @@ async function updateUser(summonerName) {
   }
   console.log("Player Ranked Found:", playerRanked);
 
-  const last10Matches = await get5MatchesIdByPuuid(player.puuid, 0);
+  const last10Matches = await get10MatchesIdByPuuid(player.puuid, 0);
   if (!last10Matches) {
     console.error("Player matches not found");
     return;
@@ -861,9 +593,159 @@ async function getPlayerChamps(summonerId) {
   return playerRanked.playerMatchStats;
 }
 
-async function getMatchInformation(matchId) {
-  const matchInfo = await prisma.match.findUnique({
-    where: { id: matchId },
+async function updateChamp(champion, participant) {
+  await prisma.champions.update({
+    where: {
+      id: champion.id,
+    },
+    data: {
+      gamesPlayed: {
+        increment: 1,
+      },
+      wins: {
+        increment: participant.win ? 1 : 0,
+      },
+      losses: {
+        increment: participant.win ? 0 : 1,
+      },
+      kills: {
+        increment: participant.kills,
+      },
+      deaths: {
+        increment: participant.deaths,
+      },
+      assists: {
+        increment: participant.assists,
+      },
+      killingSprees: {
+        increment: participant.killingSprees,
+      },
+      doubleKills: {
+        increment: participant.doubleKills,
+      },
+      tripleKills: {
+        increment: participant.tripleKills,
+      },
+      quadraKills: {
+        increment: participant.quadraKills,
+      },
+      pentaKills: {
+        increment: participant.pentaKills,
+      },
+      totalDamageDealtToChampions: {
+        increment: participant.totalDamageDealtToChampions,
+      },
+      totalHeal: {
+        increment: participant.totalHeal,
+      },
+      totalUnitsHealed: {
+        increment: participant.totalUnitsHealed,
+      },
+      damageDealtToObjectives: {
+        increment: participant.damageDealtToObjectives,
+      },
+      damageDealtToTurrets: {
+        increment: participant.damageDealtToTurrets,
+      },
+      visionScore: {
+        increment: participant.visionScore,
+      },
+      timeCCingOthers: {
+        increment: participant.timeCCingOthers,
+      },
+      totalDamageTaken: {
+        increment: participant.totalDamageTaken,
+      },
+      goldEarned: {
+        increment: participant.goldEarned,
+      },
+      wardsPlaced: {
+        increment: participant.wardsPlaced,
+      },
+      wardsKilled: {
+        increment: participant.wardsKilled,
+      },
+      firstBloodKill: {
+        increment: participant.firstBloodKill ? 1 : 0,
+      },
+      firstTowerKill: {
+        increment: participant.firstTowerKill ? 1 : 0,
+      },
+      firstInhibitorKill: {
+        increment: participant.firstInhibitorKill ? 1 : 0,
+      },
+      firstBaronKill: {
+        increment: participant.firstBaronKill ? 1 : 0,
+      },
+      firstDragonKill: {
+        increment: participant.firstDragonKill ? 1 : 0,
+      },
+      firstRiftHeraldKill: {
+        increment: participant.firstRiftHeraldKill ? 1 : 0,
+      },
+      completeSupportQuestInTime: {
+        increment: participant.completeSupportQuestInTime ? 1 : 0,
+      },
+    },
   });
-  return matchInfo;
+}
+
+async function createParticipant(participant, matchData) {
+  await prisma.playerMatchStats.create({
+    data: {
+      win: participant.win,
+      championName: participant.championName,
+      spell1Id: participant.summoner1Id,
+      spell2Id: participant.summoner2Id,
+      item0: participant.item0,
+      item1: participant.item1,
+      item2: participant.item2,
+      item3: participant.item3,
+      item4: participant.item4,
+      item5: participant.item5,
+      item6: participant.item6,
+      kills: participant.kills,
+      deaths: participant.deaths,
+      assists: participant.assists,
+      doubleKills: participant.doubleKills,
+      tripleKills: participant.tripleKills,
+      quadraKills: participant.quadraKills,
+      pentaKills: participant.pentaKills,
+      totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+      totalHeal: participant.totalHeal,
+      totalHealsOnTeammates: participant.totalHealsOnTeammates,
+      damageDealtToObjectives: participant.damageDealtToObjectives,
+      damageDealtToTurrets: participant.damageDealtToTurrets,
+      visionScore: participant.visionScore,
+      champLevel: participant.champLevel,
+      creepScore: participant.totalMinionsKilled,
+      sightWardsBoughtInGame: participant.sightWardsBoughtInGame,
+      mainRune: participant.perks.styles[0].selections[0].perk,
+      secondaryRune: participant.perks.styles[1].style,
+      timeCCingOthers: participant.timeCCingOthers,
+      totalDamageTaken: participant.totalDamageTaken,
+      goldEarned: participant.goldEarned,
+      wardsPlaced: participant.wardsPlaced,
+      wardsKilled: participant.wardsKilled,
+      firstBloodKill: participant.firstBloodKill,
+      firstTowerKill: participant.firstTowerKill,
+      firstInhibitorKill: Boolean(participant.firstInhibitorKill),
+      firstBaronKill: Boolean(participant.firstBaronKill),
+      firstDragonKill: Boolean(participant.firstDragonKill),
+      firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
+      completeSupportQuestInTime: Boolean(
+        participant.completeSupportQuestInTime
+      ),
+      player: {
+        connect: {
+          summonerId: participant.summonerId,
+        },
+      },
+      match: {
+        connect: {
+          id: matchData.metadata.matchId,
+        },
+      },
+    },
+  });
 }

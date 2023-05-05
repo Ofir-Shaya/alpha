@@ -34,6 +34,34 @@ const summonersHash = {
   11: "SummonerSmite",
   12: "SummonerTeleport",
 };
+const runeHash = {
+  8000: "Precision",
+  8005: "PressTheAttack",
+  8008: "LethalTempo",
+  8010: "Conqueror",
+  8021: "FleetFootwork",
+
+  8100: "Domination",
+  8112: "Electrocute",
+  8124: "Predator",
+  8128: "DarkHarvest",
+  9923: "HailOfBlades",
+
+  8200: "Sorcery",
+  8214: "SummonAery",
+  8229: "ArcaneComet",
+  8230: "PhaseRush",
+
+  8300: "Inspiration",
+  8351: "GlacialAugment",
+  8360: "UnsealedSpellbook",
+  8369: "FirstStrike",
+
+  8400: "Resolve",
+  8437: "GraspOfTheUndying",
+  8439: "Aftershock",
+  8465: "Guardian",
+};
 
 const romanToInt = (roman) => {
   let accumulator = 0;
@@ -403,7 +431,6 @@ const Profile = () => {
                 }}
               >
                 <Text b>{match.queueId === 420 ? "Ranked Solo/Duo" : ""}</Text>
-                <Text>{match.gameDuration}</Text>
                 <Text>{epochTimeConvertor(match.gameCreation)}</Text>
                 <Container
                   display="flex"
@@ -460,7 +487,7 @@ const Profile = () => {
                   <Image
                     width={22}
                     height={22}
-                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                    src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
                       summonersHash[match.spell1Id]
                     }.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
@@ -468,7 +495,7 @@ const Profile = () => {
                   <Image
                     width={22}
                     height={22}
-                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
+                    src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
                       summonersHash[match.spell2Id]
                     }.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
@@ -499,11 +526,35 @@ const Profile = () => {
                 </Container>
                 <Container>
                   <Text>
-                    {(match.kills + match.assists) / match.deaths} KDA
+                    {match.deaths !== 0 ? (
+                      <>
+                        {Math.round(
+                          ((match.kills + match.assists) / match.deaths) * 10
+                        ) / 10}{" "}
+                        KDA
+                      </>
+                    ) : (
+                      <> {match.kills + match.assists} KDA</>
+                    )}
                   </Text>
                 </Container>
                 <Container>
-                  <Text>100 CS (7)</Text>
+                  {console.log(match)}
+                  <Text>
+                    {match.creepScore !== 0 &&
+                    typeof match.gameDuration === "string" ? (
+                      <>
+                        {match.creepScore} (
+                        {Math.floor(
+                          match.creepScore /
+                            Number(match.gameDuration.slice(0, 2))
+                        )}
+                        )
+                      </>
+                    ) : (
+                      <> {match.creepScore}(0)</>
+                    )}
+                  </Text>
                 </Container>
                 <Container>
                   <Text>{match.visionScore} vision</Text>
@@ -521,78 +572,168 @@ const Profile = () => {
                   alignItems: "center",
                 }}
               >
-                <Container css={{ margin: "$0", padding: "$0" }}>
-                  {match.item1 ? (
+                <Container
+                  css={{
+                    margin: "$0",
+                    padding: "$0",
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {match.item1 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item1}.png
+                      `}
+                      containerCss={{
+                        width: "22px",
+                        height: "22px",
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
-                  {match.item1 ? (
+
+                  {match.item2 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item2}.png
+                      `}
+                      containerCss={{
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
-                  {match.item1 ? (
+                  {match.item3 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item3}.png
+                      `}
+                      containerCss={{
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
-                  {match.item1 ? (
+                  {match.item4 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item4}.png
+                      `}
+                      containerCss={{
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
-                  {match.item1 ? (
+                  {match.item5 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item5}.png
+                      `}
+                      containerCss={{
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
-                  {match.item1 ? (
+
+                  {match.item6 !== 0 ? (
                     <Image
                       width={22}
                       height={22}
-                      src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/spell/${
-                        summonersHash[match.spell1Id]
-                      }.png`}
-                      containerCss={{ margin: "$0", padding: "$0" }}
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item6}.png
+                      `}
+                      containerCss={{
+                        margin: "$0",
+                        padding: "$0",
+                        borderRadius: "$squared",
+                        flexBasis: "33.333333%",
+                      }}
                     />
                   ) : (
-                    <></>
+                    <Container
+                      width={22}
+                      height={22}
+                      css={{
+                        backgroundColor: match.win
+                          ? "rgba(0,180,0,0.2)"
+                          : "rgba(180,0,0,0.2)",
+                        flexBasis: "33.333333%",
+                      }}
+                    ></Container>
                   )}
                 </Container>
               </Card>
