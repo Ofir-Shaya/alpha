@@ -281,7 +281,7 @@ async function playerMastery(summonerId) {
 async function get10MatchesIdByPuuid(puuid, startIndex) {
   try {
     const response = await axios.get(
-      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=10`,
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=5`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -400,7 +400,7 @@ async function updateAllUsersOfMatches(matchesArray) {
           },
         });
 
-        if (!newProfile) {
+        if (!profile && !newProfile) {
           console.error("Player not found");
           continue;
         }
@@ -576,8 +576,8 @@ async function updateUser(summonerName) {
   }
   console.log("Player Matches Found:", last10Matches);
 
-  await updateOneUserFromMatches(last10Matches, summonerName);
-  // await updateAllUsersOfMatches(last10Matches);
+  // await updateOneUserFromMatches(last10Matches, summonerName);
+  await updateAllUsersOfMatches(last10Matches);
   console.log(summonerName + " Profile was updated.");
   return playerRanked;
 }
@@ -719,7 +719,6 @@ async function createParticipant(participant, matchData) {
       visionScore: participant.visionScore,
       champLevel: participant.champLevel,
       creepScore: participant.totalMinionsKilled,
-      sightWardsBoughtInGame: participant.sightWardsBoughtInGame,
       mainRune: participant.perks.styles[0].selections[0].perk,
       secondaryRune: participant.perks.styles[1].style,
       timeCCingOthers: participant.timeCCingOthers,
@@ -753,6 +752,13 @@ async function createParticipant(participant, matchData) {
 async function getMatchInformation(matchId) {
   const matchInfo = await prisma.match.findUnique({
     where: { id: matchId },
+    select: {
+      playerMatchStats: {
+        playerId: true,
+        championName: true,
+      },
+    },
   });
+  console.log(matchInfo);
   return matchInfo;
 }

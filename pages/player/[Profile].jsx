@@ -34,34 +34,34 @@ const summonersHash = {
   11: "SummonerSmite",
   12: "SummonerTeleport",
 };
-const runeHash = {
-  8000: "Precision",
-  8005: "PressTheAttack",
-  8008: "LethalTempo",
-  8010: "Conqueror",
-  8021: "FleetFootwork",
+// const runeHash = {
+//   8000: "Precision",
+//   8005: "PressTheAttack",
+//   8008: "LethalTempo",
+//   8010: "Conqueror",
+//   8021: "FleetFootwork",
 
-  8100: "Domination",
-  8112: "Electrocute",
-  8124: "Predator",
-  8128: "DarkHarvest",
-  9923: "HailOfBlades",
+//   8100: "Domination",
+//   8112: "Electrocute",
+//   8124: "Predator",
+//   8128: "DarkHarvest",
+//   9923: "HailOfBlades",
 
-  8200: "Sorcery",
-  8214: "SummonAery",
-  8229: "ArcaneComet",
-  8230: "PhaseRush",
+//   8200: "Sorcery",
+//   8214: "SummonAery",
+//   8229: "ArcaneComet",
+//   8230: "PhaseRush",
 
-  8300: "Inspiration",
-  8351: "GlacialAugment",
-  8360: "UnsealedSpellbook",
-  8369: "FirstStrike",
+//   8300: "Inspiration",
+//   8351: "GlacialAugment",
+//   8360: "UnsealedSpellbook",
+//   8369: "FirstStrike",
 
-  8400: "Resolve",
-  8437: "GraspOfTheUndying",
-  8439: "Aftershock",
-  8465: "Guardian",
-};
+//   8400: "Resolve",
+//   8437: "GraspOfTheUndying",
+//   8439: "Aftershock",
+//   8465: "Guardian",
+// };
 
 const romanToInt = (roman) => {
   let accumulator = 0;
@@ -222,9 +222,11 @@ const Profile = () => {
       const matchesWithInfo = await Promise.all(
         playerChamps.map(async (match) => {
           const matchInfo = await getMatchInformation(match.matchId);
+
           return { ...match, ...matchInfo };
         })
       );
+      console.log(matchesWithInfo);
       setMatchInformation(matchesWithInfo);
     }
     fetchMatchesWithInfo();
@@ -403,8 +405,6 @@ const Profile = () => {
   };
 
   const LatestPlayed = () => {
-    if (!matchInformation.gameCreation) return <Loading />;
-
     const champsOverview = (
       <Container>
         {matchInformation.map((match, index) => {
@@ -454,7 +454,7 @@ const Profile = () => {
                 css={{
                   display: "flex",
                   flexDirection: "row",
-                  width: "30%",
+                  width: "10%",
                   backgroundColor: "transparent",
                   textAlign: "center",
                   justifyContent: "center",
@@ -471,9 +471,7 @@ const Profile = () => {
                   }}
                 >
                   <Image
-                    width={64}
-                    height={64}
-                    src={`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${match.championName}.png`}
+                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${match.championName}.png`}
                     containerCss={{
                       margin: "$0",
                       padding: "$0",
@@ -481,7 +479,7 @@ const Profile = () => {
                     }}
                   />
                   <p style={{ position: "absolute", bottom: "0", right: "0" }}>
-                    18
+                    {match.sightWardsBoughtInGame}
                   </p>
                 </Container>
                 <Container css={{ margin: "$0", padding: "$0" }}>
@@ -499,6 +497,20 @@ const Profile = () => {
                     src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
                       summonersHash[match.spell2Id]
                     }.png`}
+                    containerCss={{ margin: "$0", padding: "$0" }}
+                  />
+                </Container>
+                <Container css={{ margin: "$0", padding: "$0" }}>
+                  <Image
+                    width={22}
+                    height={22}
+                    src={`https://opgg-static.akamaized.net/meta/images/lol/perk/${match.mainRune}.png`}
+                    containerCss={{ margin: "$0", padding: "$0" }}
+                  />
+                  <Image
+                    width={22}
+                    height={22}
+                    src={`https://opgg-static.akamaized.net/meta/images/lol/perkStyle/${match.secondaryRune}.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
                   />
                 </Container>

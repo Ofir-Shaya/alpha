@@ -79,7 +79,6 @@ model PlayerMatchStats {
   wardsKilled                      Int?
   champLevel                       Int?
   creepScore                       Int?
-  sightWardsBoughtInGame	         Int?
   mainRune                         Int?
   secondaryRune                    Int?
   firstBloodKill                   Boolean?
