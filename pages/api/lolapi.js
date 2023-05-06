@@ -773,32 +773,14 @@ async function getMatchInformation(matchId) {
       include: {
         players: {
           select: {
-            playerMatchStats: {
+            playerId: true,
+            championName: true,
+            teamId: true,
+            player: {
               select: {
-                playerId: true,
-                championName: true,
-                teamId: true,
-                include: {
-                  player: true,
-                  player: {
-                    select: {
-                      RankedInformation: {
-                        select: {
-                          include: {
-                            profile: true,
-                            profile: {
-                              select: {
-                                Profile: {
-                                  select: {
-                                    username: true,
-                                  },
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
+                profile: {
+                  select: {
+                    username: true,
                   },
                 },
               },

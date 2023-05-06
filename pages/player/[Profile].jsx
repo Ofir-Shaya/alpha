@@ -410,7 +410,7 @@ const Profile = () => {
         {matchInformation.map((match, index) => {
           return (
             <Card
-              key={index + "card-left"}
+              key={index + "card"}
               width="100%"
               variant="bordered"
               css={{
@@ -426,7 +426,6 @@ const Profile = () => {
                 css={{
                   display: "flex",
                   flexDirection: "column",
-                  width: "30%",
                   backgroundColor: "transparent",
                   textAlign: "center",
                 }}
@@ -453,7 +452,6 @@ const Profile = () => {
                 css={{
                   display: "flex",
                   flexDirection: "row",
-                  width: "10%",
                   backgroundColor: "transparent",
                   textAlign: "center",
                   justifyContent: "center",
@@ -519,7 +517,6 @@ const Profile = () => {
                 css={{
                   display: "flex",
                   flexDirection: "column",
-                  width: "30%",
                   backgroundColor: "transparent",
                   textAlign: "center",
                   justifyContent: "center",
@@ -576,7 +573,6 @@ const Profile = () => {
                 css={{
                   display: "flex",
                   flexDirection: "row",
-                  width: "30%",
                   backgroundColor: "transparent",
                   textAlign: "center",
                   justifyContent: "center",
@@ -753,45 +749,91 @@ const Profile = () => {
                 className="teams"
                 css={{ display: "flex", flexDirection: "row" }}
               >
-                <Card
+                {console.log(match.player)}
+                <Container
                   className="blue-team"
                   css={{ display: "flex", flexDirection: "column" }}
                 >
                   {match.players.map((player) => {
-                    player.teamId === 100 && (
-                      <Container
-                        css={{
-                          display: "flex",
-                          flexDirection: "row",
-                          margin: "$0",
-                          padding: "$0",
-                        }}
-                      >
-                        <Image
-                          height={"14px"}
-                          width={"14px"}
-                          containerCss={{
-                            height: "14px",
-                            width: "14px",
-                            marginRight: "$2",
+                    return (
+                      player.teamId === 100 && (
+                        <Container
+                          css={{
+                            display: "flex",
+                            flexDirection: "row",
+                            margin: "$0",
+                            padding: "$0",
                           }}
-                          src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
-                        />
-
-                        <NextLink
-                          href={"/player/" + player.playerId + "?server=EUNE"}
                         >
-                          <NextUiLink>{player.playerId}</NextUiLink>
-                        </NextLink>
-                      </Container>
+                          <Image
+                            height={"14px"}
+                            width={"14px"}
+                            containerCss={{
+                              height: "14px",
+                              width: "14px",
+                              marginRight: "$2",
+                            }}
+                            src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
+                          />
+
+                          <NextLink
+                            href={
+                              "/player/" +
+                              player.player.profile.username +
+                              "?server=EUNE"
+                            }
+                          >
+                            <NextUiLink>
+                              {player.player.profile.username}
+                            </NextUiLink>
+                          </NextLink>
+                        </Container>
+                      )
                     );
                   })}
-                </Card>
-
-                <Card
+                </Container>
+                <Container
                   className="red-team"
                   css={{ display: "flex", flexDirection: "column" }}
-                ></Card>
+                >
+                  {match.players.map((player) => {
+                    return (
+                      player.teamId === 200 && (
+                        <Container
+                          css={{
+                            display: "flex",
+                            flexDirection: "row",
+                            margin: "$0",
+                            padding: "$0",
+                          }}
+                        >
+                          <Image
+                            height={"14px"}
+                            width={"14px"}
+                            containerCss={{
+                              height: "14px",
+                              width: "14px",
+                              marginRight: "$2",
+                            }}
+                            src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
+                          />
+
+                          <NextLink
+                            href={
+                              "/player/" +
+                              player.player.profile.username +
+                              "?server=EUNE"
+                            }
+                          >
+                            <NextUiLink>
+                              {player.player.profile.username}
+                            </NextUiLink>
+                          </NextLink>
+                        </Container>
+                      )
+                    );
+                  })}
+                </Container>
               </Card>
             </Card>
           );
