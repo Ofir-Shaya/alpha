@@ -1,6 +1,5 @@
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { headers } from "@/next.config";
 import {
   Container,
   Grid,
@@ -9,8 +8,9 @@ import {
   Loading,
   Image,
   Button,
-  Row,
+  Link as NextUiLink,
 } from "@nextui-org/react";
+import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -448,7 +448,6 @@ const Profile = () => {
                   <Text>{match.gameDuration}</Text>
                 </Container>
               </Card>
-
               <Card
                 className="champion-details"
                 css={{
@@ -479,7 +478,7 @@ const Profile = () => {
                     }}
                   />
                   <p style={{ position: "absolute", bottom: "0", right: "0" }}>
-                    {match.sightWardsBoughtInGame}
+                    {match.champLevel}
                   </p>
                 </Container>
                 <Container css={{ margin: "$0", padding: "$0" }}>
@@ -573,6 +572,7 @@ const Profile = () => {
                 </Container>
               </Card>
               <Card
+                className="champion-items"
                 css={{
                   display: "flex",
                   flexDirection: "row",
@@ -748,6 +748,50 @@ const Profile = () => {
                     ></Container>
                   )}
                 </Container>
+              </Card>
+              <Card
+                className="teams"
+                css={{ display: "flex", flexDirection: "row" }}
+              >
+                <Card
+                  className="blue-team"
+                  css={{ display: "flex", flexDirection: "column" }}
+                >
+                  {match.players.map((player) => {
+                    player.teamId === 100 && (
+                      <Container
+                        css={{
+                          display: "flex",
+                          flexDirection: "row",
+                          margin: "$0",
+                          padding: "$0",
+                        }}
+                      >
+                        <Image
+                          height={"14px"}
+                          width={"14px"}
+                          containerCss={{
+                            height: "14px",
+                            width: "14px",
+                            marginRight: "$2",
+                          }}
+                          src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
+                        />
+
+                        <NextLink
+                          href={"/player/" + player.playerId + "?server=EUNE"}
+                        >
+                          <NextUiLink>{player.playerId}</NextUiLink>
+                        </NextLink>
+                      </Container>
+                    );
+                  })}
+                </Card>
+
+                <Card
+                  className="red-team"
+                  css={{ display: "flex", flexDirection: "column" }}
+                ></Card>
               </Card>
             </Card>
           );

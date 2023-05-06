@@ -407,6 +407,8 @@ async function updateAllUsersOfMatches(matchesArray) {
         if (!playerRanked) {
           await prisma.playerMatchStats.create({
             data: {
+              championName: participant.championName,
+              teamId: participant.teamId,
               match: {
                 connect: {
                   id: matchData.metadata.matchId,
@@ -530,8 +532,22 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
         continue;
       }
       if (!player && !playerRanked) {
-        console.error("Player ranked not found");
-        continue;
+        await prisma.playerMatchStats.create({
+          data: {
+            championName: participant.championName,
+            teamId: participant.teamId,
+            match: {
+              connect: {
+                id: matchData.metadata.matchId,
+              },
+            },
+            player: {
+              connect: {
+                summonerId: participant.summonerId,
+              },
+            },
+          },
+        });
       }
       if (!champion) {
         console.error("Champion not found");
@@ -695,6 +711,7 @@ async function createParticipant(participant, matchData) {
     data: {
       win: participant.win,
       championName: participant.championName,
+      teamId: participant.teamId,
       spell1Id: participant.summoner1Id,
       spell2Id: participant.summoner2Id,
       item0: participant.item0,
@@ -750,15 +767,48 @@ async function createParticipant(participant, matchData) {
 }
 
 async function getMatchInformation(matchId) {
-  const matchInfo = await prisma.match.findUnique({
-    where: { id: matchId },
-    select: {
-      playerMatchStats: {
-        playerId: true,
-        championName: true,
+  try {
+    const matchInfo = await prisma.match.findUnique({
+      where: { id: matchId },
+      include: {
+        players: {
+          select: {
+            playerMatchStats: {
+              select: {
+                playerId: true,
+                championName: true,
+                teamId: true,
+                include: {
+                  player: true,
+                  player: {
+                    select: {
+                      RankedInformation: {
+                        select: {
+                          include: {
+                            profile: true,
+                            profile: {
+                              select: {
+                                Profile: {
+                                  select: {
+                                    username: true,
+                                  },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
-    },
-  });
-  console.log(matchInfo);
-  return matchInfo;
+    });
+    return matchInfo;
+  } catch (error) {
+    console.error(error);
+  }
 }

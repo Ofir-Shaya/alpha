@@ -48,8 +48,9 @@ model RankedInformation {
 model PlayerMatchStats {
   matchId                          String
   playerId                         String
+  championName                     String
+  teamId                           Int
   win                              Boolean?
-  championName                     String?
   spell1Id                         Int?
   spell2Id                         Int?
   item0                            Int?
