@@ -422,11 +422,15 @@ const Profile = () => {
               width="100%"
               variant="bordered"
               css={{
-                backgroundColor: match.win
-                  ? "rgba(0,180,0,0.1)"
-                  : "rgba(180,0,0,0.1)",
+                backgroundColor: match.win ? "rgba(8,166,255,0.3)" : "#45192b",
                 display: "flex",
                 flexDirection: "row",
+                borderRadius: "0",
+                "&:hover": {
+                  backgroundColor: match.win
+                    ? "rgba(8,166,255,0.4)"
+                    : "#511b2e",
+                },
               }}
             >
               <Card
@@ -768,6 +772,7 @@ const Profile = () => {
                   padding: 0,
                   margin: 0,
                   borderRadius: "0",
+                  backgroundColor: "transparent",
                 }}
               >
                 <Container
@@ -790,6 +795,7 @@ const Profile = () => {
                             padding: "0",
                             flexWrap: "nowrap",
                             marginLeft: "auto",
+                            overflow: "hidden",
                           }}
                         >
                           <Image
@@ -800,6 +806,9 @@ const Profile = () => {
                               width: "14px",
                               alignItems: "center",
                               flexDirection: "row",
+                              display: "flex",
+                              alignSelf: "center",
+                              margin: "0",
                             }}
                             src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
                           />
@@ -813,8 +822,9 @@ const Profile = () => {
                           >
                             <NextUiLink
                               css={{
-                                fontSize: "$xs",
+                                fontSize: "10px",
                                 textAlign: "center",
+                                overflow: "hidden",
                                 "&:hover": { textDecoration: "underline" },
                               }}
                             >
@@ -856,6 +866,9 @@ const Profile = () => {
                               width: "14px",
                               alignItems: "center",
                               flexDirection: "row",
+                              display: "flex",
+                              alignSelf: "center",
+                              margin: "0",
                             }}
                             src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
                           />
@@ -869,8 +882,9 @@ const Profile = () => {
                           >
                             <NextUiLink
                               css={{
-                                fontSize: "$xs",
+                                fontSize: "10px",
                                 textAlign: "center",
+                                overflow: "hidden",
                                 "&:hover": { textDecoration: "underline" },
                               }}
                             >
@@ -889,6 +903,27 @@ const Profile = () => {
       </Container>
     );
     return champsOverview;
+  };
+
+  const getPlayerChampionOverview = async () => {
+    try {
+      const response = await fetch(
+        `/api/lolapi?playerId=${playerRanked.summonerId}&func=getPlayerChampionOverview`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        return data;
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -933,6 +968,13 @@ const Profile = () => {
                     css={{ width: "fit-content", marginLeft: "$10" }}
                   >
                     Update
+                  </Button>
+                  <Button
+                    auto
+                    onPress={getPlayerChampionOverview}
+                    css={{ width: "fit-content", marginLeft: "$10" }}
+                  >
+                    test
                   </Button>
                 </>
               ) : (
@@ -1131,21 +1173,25 @@ const Profile = () => {
               </Grid> */}
             </Grid.Container>
             <Grid
-              xs={8}
               display="flex"
               direction="column"
               css={{
                 borderRadius: "18px",
                 margin: "$10",
                 maxWidth: "100%",
+                justifyContent: "center",
               }}
             >
-              <Text h4>Champion Stats</Text>
-              {matchInformation && (
-                <Container fluid>
-                  <LatestPlayed />
-                </Container>
-              )}
+              <Grid.Container>
+                <Text h4 css={{ textAlign: "center" }}>
+                  Matches Overview
+                </Text>
+                {matchInformation && (
+                  <Container>
+                    <LatestPlayed />
+                  </Container>
+                )}
+              </Grid.Container>
             </Grid>
           </Grid.Container>
         </Container>

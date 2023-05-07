@@ -87,7 +87,11 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getPlayerChampionOverview":
+        data = await getPlayerChampionOverview(req.query.playerId);
+        res.status(200).json(data);
 
+        break;
       default:
         console.error("bad query func");
         break;
@@ -790,6 +794,29 @@ async function getMatchInformation(matchId) {
       },
     });
     return matchInfo;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getPlayerChampionOverview(playerId) {
+  try {
+    const championStats = await prisma.playerMatchStats.groupBy({
+      by: ["championName"],
+      where: { playerId: playerId },
+      includes: {
+        championName: true,
+        win: true,
+        kills: true,
+        deaths: true,
+        assists: true,
+        _count: true,
+      },
+    });
+
+    console.log(championStats);
+
+    return championStats;
   } catch (error) {
     console.error(error);
   }
