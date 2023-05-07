@@ -406,7 +406,15 @@ const Profile = () => {
 
   const LatestPlayed = () => {
     const champsOverview = (
-      <Container>
+      <Container
+        fluid
+        css={{
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+          border: "1px solid blue",
+        }}
+      >
         {matchInformation.map((match, index) => {
           return (
             <Card
@@ -457,6 +465,7 @@ const Profile = () => {
                   justifyContent: "center",
                   alignContent: "center",
                   alignItems: "center",
+                  width: "90",
                 }}
               >
                 <Container
@@ -464,7 +473,6 @@ const Profile = () => {
                     position: "relative",
                     margin: "$0",
                     padding: "$0",
-                    width: "fit-content",
                   }}
                 >
                   <Image
@@ -472,7 +480,7 @@ const Profile = () => {
                     containerCss={{
                       margin: "$0",
                       padding: "$0",
-                      width: "fit-content",
+                      objectFit: "",
                     }}
                   />
                   <p style={{ position: "absolute", bottom: "0", right: "0" }}>
@@ -582,32 +590,34 @@ const Profile = () => {
               >
                 <Container
                   css={{
-                    margin: "$0",
-                    padding: "$0",
+                    margin: "0",
+                    padding: "0",
                     display: "flex",
                     flexDirection: "row",
                     flexWrap: "wrap",
+                    width: "66px",
                   }}
                 >
                   {match.item1 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item1}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
                         width: "22px",
                         height: "22px",
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -619,21 +629,22 @@ const Profile = () => {
 
                   {match.item2 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item2}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -644,21 +655,22 @@ const Profile = () => {
                   )}
                   {match.item3 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item3}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -669,21 +681,22 @@ const Profile = () => {
                   )}
                   {match.item4 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item4}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -694,21 +707,22 @@ const Profile = () => {
                   )}
                   {match.item5 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item5}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -720,21 +734,22 @@ const Profile = () => {
 
                   {match.item6 !== 0 ? (
                     <Image
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item6}.png
                       `}
+                      css={{ margin: "0", padding: "0" }}
                       containerCss={{
-                        margin: "$0",
-                        padding: "$0",
+                        margin: "0",
+                        padding: "0",
                         borderRadius: "$squared",
                         flexBasis: "33.333333%",
                       }}
                     />
                   ) : (
                     <Container
-                      width={22}
-                      height={22}
+                      width={"22px"}
+                      height={"22px"}
                       css={{
                         backgroundColor: match.win
                           ? "rgba(0,180,0,0.2)"
@@ -747,12 +762,21 @@ const Profile = () => {
               </Card>
               <Card
                 className="teams"
-                css={{ display: "flex", flexDirection: "row" }}
+                css={{
+                  display: "flex",
+                  flexDirection: "row",
+                  padding: 0,
+                  margin: 0,
+                  borderRadius: "0",
+                }}
               >
-                {console.log(match.player)}
                 <Container
                   className="blue-team"
-                  css={{ display: "flex", flexDirection: "column" }}
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "0",
+                  }}
                 >
                   {match.players.map((player) => {
                     return (
@@ -761,8 +785,11 @@ const Profile = () => {
                           css={{
                             display: "flex",
                             flexDirection: "row",
-                            margin: "$0",
-                            padding: "$0",
+                            paddingLeft: "0",
+                            paddingRight: "0",
+                            padding: "0",
+                            flexWrap: "nowrap",
+                            marginLeft: "auto",
                           }}
                         >
                           <Image
@@ -771,7 +798,8 @@ const Profile = () => {
                             containerCss={{
                               height: "14px",
                               width: "14px",
-                              marginRight: "$2",
+                              alignItems: "center",
+                              flexDirection: "row",
                             }}
                             src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
                           />
@@ -783,7 +811,13 @@ const Profile = () => {
                               "?server=EUNE"
                             }
                           >
-                            <NextUiLink>
+                            <NextUiLink
+                              css={{
+                                fontSize: "$xs",
+                                textAlign: "center",
+                                "&:hover": { textDecoration: "underline" },
+                              }}
+                            >
                               {player.player.profile.username}
                             </NextUiLink>
                           </NextLink>
@@ -794,7 +828,11 @@ const Profile = () => {
                 </Container>
                 <Container
                   className="red-team"
-                  css={{ display: "flex", flexDirection: "column" }}
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: "0",
+                  }}
                 >
                   {match.players.map((player) => {
                     return (
@@ -803,8 +841,11 @@ const Profile = () => {
                           css={{
                             display: "flex",
                             flexDirection: "row",
-                            margin: "$0",
-                            padding: "$0",
+                            paddingLeft: "0",
+                            paddingRight: "0",
+                            padding: "0",
+                            flexWrap: "nowrap",
+                            marginLeft: "auto",
                           }}
                         >
                           <Image
@@ -813,7 +854,8 @@ const Profile = () => {
                             containerCss={{
                               height: "14px",
                               width: "14px",
-                              marginRight: "$2",
+                              alignItems: "center",
+                              flexDirection: "row",
                             }}
                             src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
                           />
@@ -825,7 +867,13 @@ const Profile = () => {
                               "?server=EUNE"
                             }
                           >
-                            <NextUiLink>
+                            <NextUiLink
+                              css={{
+                                fontSize: "$xs",
+                                textAlign: "center",
+                                "&:hover": { textDecoration: "underline" },
+                              }}
+                            >
                               {player.player.profile.username}
                             </NextUiLink>
                           </NextLink>
@@ -1089,11 +1137,12 @@ const Profile = () => {
               css={{
                 borderRadius: "18px",
                 margin: "$10",
+                maxWidth: "100%",
               }}
             >
               <Text h4>Champion Stats</Text>
               {matchInformation && (
-                <Container>
+                <Container fluid>
                   <LatestPlayed />
                 </Container>
               )}
