@@ -285,7 +285,7 @@ async function playerMastery(summonerId) {
 async function get10MatchesIdByPuuid(puuid, startIndex) {
   try {
     const response = await axios.get(
-      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=5`,
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=4`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -596,8 +596,8 @@ async function updateUser(summonerName) {
   }
   console.log("Player Matches Found:", last10Matches);
 
-  // await updateOneUserFromMatches(last10Matches, summonerName);
-  await updateAllUsersOfMatches(last10Matches);
+  await updateOneUserFromMatches(last10Matches, summonerName);
+  // await updateAllUsersOfMatches(last10Matches);
   console.log(summonerName + " Profile was updated.");
   return playerRanked;
 }

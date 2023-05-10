@@ -440,6 +440,7 @@ const Profile = () => {
                   flexDirection: "column",
                   backgroundColor: "transparent",
                   textAlign: "center",
+                  justifyContent: "center",
                 }}
               >
                 <Text b>{match.queueId === 420 ? "Ranked Solo/Duo" : ""}</Text>
