@@ -50,7 +50,7 @@ model PlayerMatchStats {
   playerId                         String
   championName                     String
   teamId                           Int
-  win                              Boolean?
+  win                              Int?
   spell1Id                         Int?
   spell2Id                         Int?
   item0                            Int?

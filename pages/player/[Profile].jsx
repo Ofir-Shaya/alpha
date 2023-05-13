@@ -94,7 +94,7 @@ const romanToInt = (roman) => {
 
 const calcWinPerc = (wins, losses) => {
   const total = wins + losses;
-  return ((wins / total) * 100).toFixed(1);
+  return ((wins / total) * 100).toFixed(0);
 };
 
 const epochTimeConvertor = (epochValue) => {
@@ -122,6 +122,7 @@ const Profile = () => {
   // const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
   const [playerChamps, setPlayerChamps] = useState(null);
   const [matchInformation, setMatchInformation] = useState(null);
+  const [champInformation, setChampInformation] = useState(null);
 
   // Getting info of player searched -> when profile changed
   useEffect(() => {
@@ -232,6 +233,31 @@ const Profile = () => {
     fetchMatchesWithInfo();
   }, [playerChamps]);
 
+  useEffect(() => {
+    async function getPlayerChampionOverview() {
+      try {
+        if (!playerRanked) return;
+        const response = await fetch(
+          `/api/lolapi?playerId=${playerRanked.summonerId}&func=getPlayerChampionOverview`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setChampInformation(data);
+          return data;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getPlayerChampionOverview();
+  }, [playerChamps]);
+
   // Update ranked info
   const updateRankedInformation = async () => {
     try {
@@ -252,52 +278,6 @@ const Profile = () => {
       console.error(error);
     }
   };
-
-  // useless func
-  // const getMatchesInformation = async () => {
-  //   if (player) {
-  //     try {
-  //       const response = await fetch(
-  //         `/api/lolapi?puuid=${player.puuid}&func=getAllMatchesByPuuid`,
-  //         {
-  //           method: "GET",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         setMatchesArray(data);
-  //       } else console.log("error fetching data");
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  // };
-
-  // useless func
-  // const updateUserMatches = async () => {
-  //   try {
-  //     const testArray = [matchesArray.slice(0, 1)];
-  //     const response = await fetch(
-  //       `
-  //     /api/lolapi?matches=${testArray}&func=updateUserMatches`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log(data);
-  //     } else console.log("error fetching player");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
 
   // summoner Icon component builder
   const SummonerIcon = () => {
@@ -405,20 +385,19 @@ const Profile = () => {
   };
 
   const LatestPlayed = () => {
-    const champsOverview = (
+    const matchesOverview = (
       <Container
         fluid
         css={{
           justifyContent: "center",
           alignContent: "center",
           alignItems: "center",
-          border: "1px solid blue",
         }}
       >
         {matchInformation.map((match, index) => {
           return (
             <Card
-              key={index + "card"}
+              key={index + "match-card"}
               width="100%"
               variant="bordered"
               css={{
@@ -903,28 +882,155 @@ const Profile = () => {
         })}
       </Container>
     );
-    return champsOverview;
+    return matchesOverview;
   };
 
-  const getPlayerChampionOverview = async () => {
-    try {
-      const response = await fetch(
-        `/api/lolapi?playerId=${playerRanked.summonerId}&func=getPlayerChampionOverview`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        return data;
-      }
-    } catch (error) {
-      console.error(error);
-    }
+  const ChampsPlayed = () => {
+    const champsOverview = (
+      <Container
+        fluid
+        css={{
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+        }}
+      >
+        {champInformation.map((champ, index) => {
+          return (
+            <Card
+              key={index + "champ-card"}
+              width="100%"
+              variant="bordered"
+              css={{
+                backgroundColor: "#191937",
+                display: "flex",
+                flexDirection: "row",
+                borderRadius: "0",
+                "&:hover": {
+                  backgroundColor: "#0d0d22",
+                },
+              }}
+            >
+              <Container
+                className="champion-face"
+                css={{
+                  display: "flex",
+                  width: "fit-content",
+                  alignItems: "center",
+                  padding: 0,
+                }}
+              >
+                <Image
+                  src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${champ.championName}.png`}
+                  height={48}
+                  width={48}
+                  containerCss={{
+                    margin: "$0",
+                    padding: "$0",
+                    objectFit: "",
+                  }}
+                />
+              </Container>
+              <Container
+                className="champion-stats"
+                css={{ display: "flex", flexDirection: "row", padding: 0 }}
+              >
+                <Container
+                  className="column-1"
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: 0,
+                    width: "auto",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text>{champ.championName}</Text>
+                </Container>
+                <Container
+                  className="column-2"
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: 0,
+                    width: "auto",
+                  }}
+                >
+                  <Container
+                    css={{
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: 0,
+                      width: "auto",
+                    }}
+                  >
+                    <Text>
+                      {champ._sum.deaths !== 0 ? (
+                        <>
+                          {Math.round(
+                            ((champ._sum.kills + champ._sum.assists) /
+                              champ._sum.deaths) *
+                              10
+                          ) / 10}{" "}
+                          KDA
+                        </>
+                      ) : (
+                        <> {champ._sum.kills + champ._sum.assists} KDA</>
+                      )}
+                    </Text>
+                  </Container>
+                  <Container
+                    css={{
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: 0,
+                      width: "auto",
+                    }}
+                  >
+                    <Text>
+                      {champ._sum.kills}{" "}
+                      <span style={{ color: "#25254b" }}>/</span>{" "}
+                      {champ._sum.deaths}{" "}
+                      <span style={{ color: "#25254b" }}>/</span>{" "}
+                      {champ._sum.assists}
+                    </Text>
+                  </Container>
+                </Container>
+                <Container
+                  className="column-3"
+                  css={{
+                    display: "flex",
+                    flexDirection: "column",
+                    padding: 0,
+                    width: "auto",
+                  }}
+                >
+                  <Container
+                    css={{
+                      display: "flex",
+                      flexDirection: "column",
+                      padding: 0,
+                      width: "auto",
+                    }}
+                  >
+                    <Text h6>
+                      {calcWinPerc(
+                        champ._sum.win,
+                        champ._count.matchId - champ._sum.win
+                      )}
+                      %
+                    </Text>
+                  </Container>
+                  <Text>{champ._count.matchId + " games"}</Text>
+                </Container>
+              </Container>
+            </Card>
+          );
+        })}
+      </Container>
+    );
+
+    return champsOverview;
   };
 
   return (
@@ -935,7 +1041,11 @@ const Profile = () => {
         direction="row"
         wrap="noWrap"
         fluid
-        css={{ margin: 0, padding: 0 }}
+        css={{
+          margin: 0,
+          padding: 0,
+          backgroundColor: "#262b5a",
+        }}
       >
         <MySidebar />
         <Container css={{ marginTop: "$10" }}>
@@ -946,7 +1056,6 @@ const Profile = () => {
             direction="row"
             css={{
               paddingTop: "20px",
-              border: "2px solid #414165",
               borderRadius: "10px",
             }}
           >
@@ -959,7 +1068,7 @@ const Profile = () => {
                 <Loading />
               )}
             </Grid>
-            <Grid xs={9} direction="column">
+            <Grid xs={2} direction="column">
               {player ? (
                 <>
                   <SummonerProfileHeader />
@@ -969,13 +1078,6 @@ const Profile = () => {
                     css={{ width: "fit-content", marginLeft: "$10" }}
                   >
                     Update
-                  </Button>
-                  <Button
-                    auto
-                    onPress={getPlayerChampionOverview}
-                    css={{ width: "fit-content", marginLeft: "$10" }}
-                  >
-                    test
                   </Button>
                 </>
               ) : (
@@ -987,21 +1089,25 @@ const Profile = () => {
             className="summoner-profile-overview"
             gap={0}
             justify="start"
-            direction="column"
+            direction="row"
             css={{
               paddingTop: "20px",
-              border: "2px solid #414165",
               borderRadius: "10px",
             }}
           >
-            <Grid.Container className="rank-block" direction="column">
-              <Grid
-                xs={3}
+            <Grid
+              className="column-1"
+              css={{ display: "flex", flexDirection: "column", gap: "$10" }}
+              xs={3}
+            >
+              <Container
                 display="flex"
                 direction="column"
                 css={{
                   borderRadius: "18px",
-                  margin: "$10",
+                  justifyContent: "start",
+                  backgroundColor: "#191937",
+                  height: "fit-content",
                 }}
               >
                 <Container className="queue-container">
@@ -1082,117 +1188,52 @@ const Profile = () => {
                 ) : (
                   ""
                 )}
-              </Grid>
-              {/* <Grid
-                xs={3}
+              </Container>
+              <Container
                 display="flex"
                 direction="column"
                 css={{
-                  
                   borderRadius: "18px",
-                  margin: "$10",
+                  justifyContent: "start",
+                  backgroundColor: "#191937",
+                  height: "fit-content",
                 }}
               >
-                <Container className="queue-container">
-                  <Text h4 css={{ width: "100%" }}>
-                    Ranked Flex
-                  </Text>
-                </Container>
-
-                {playerRankedFlex ? (
-                  <Container
-                    display="flex"
-                    direction="row"
-                    css={{
-                      flexWrap: "nowrap",
-                      paddingLeft: "10px",
-                      paddingRight: "10px",
-                    }}
-                  >
-                    <Container
-                      css={{
-                        margin: 0,
-                        padding: 0,
-                        display: "flex",
-                        alignContent: "center",
-                        justifyContent: "flex-start",
-                        width: "68px",
-                      }}
-                    >
-                      <Image
-                        width={68}
-                        height={68}
-                        src={`https://static.bigbrain.gg/assets/lol/s12_rank_icons/${playerRankedFlex.tier.toLowerCase()}.png`}
-                        alt={playerRankedFlex.tier + "icon"}
-                        containerCss={{ margin: 0 }}
-                      />
+                {champInformation && (
+                  <>
+                    <Text h4 css={{ textAlign: "center" }}>
+                      Champions Overview:
+                    </Text>
+                    <Container css={{ padding: "$2" }}>
+                      <ChampsPlayed />
                     </Container>
-                    <Container
-                      fluid
-                      display="flex"
-                      direction="column"
-                      css={{ margin: "0", padding: "0" }}
-                    >
-                      <Container
-                        display="flex"
-                        direction="row"
-                        justify="space-between"
-                        alignItems="center"
-                        css={{ padding: "0" }}
-                      >
-                        <Text b>
-                          {playerRankedFlex.tier.charAt(0) +
-                            playerRankedFlex.tier.substring(1).toLowerCase() +
-                            " " +
-                            romanToInt(playerRankedFlex.rank)}
-                        </Text>
-                        <Text>
-                          {playerRankedFlex.wins}W {playerRankedFlex.losses}L
-                        </Text>
-                      </Container>
-                      <Container
-                        display="flex"
-                        direction="row"
-                        justify="space-between"
-                        alignItems="center"
-                        css={{ padding: "0" }}
-                      >
-                        <Text>{playerRankedFlex.leaguePoints} LP</Text>
-                        <Text>
-                          {calcWinPerc(
-                            playerRankedFlex.wins,
-                            playerRankedFlex.losses
-                          )}
-                          % Win Rate
-                        </Text>
-                      </Container>
-                    </Container>
-                  </Container>
-                ) : (
-                  ""
+                  </>
                 )}
-              </Grid> */}
-            </Grid.Container>
+              </Container>
+            </Grid>
+
             <Grid
               display="flex"
               direction="column"
+              xs={8}
               css={{
                 borderRadius: "18px",
-                margin: "$10",
-                maxWidth: "100%",
                 justifyContent: "center",
+                backgroundColor: "#191937",
+                marginInlineStart: "$5",
               }}
             >
-              <Grid.Container>
-                <Text h4 css={{ textAlign: "center" }}>
-                  Matches Overview
-                </Text>
-                {matchInformation && (
+              {matchInformation && (
+                <>
+                  <Text h4 css={{ textAlign: "center" }}>
+                    Matches Overview:
+                  </Text>
+
                   <Container>
                     <LatestPlayed />
                   </Container>
-                )}
-              </Grid.Container>
+                </>
+              )}
             </Grid>
           </Grid.Container>
         </Container>

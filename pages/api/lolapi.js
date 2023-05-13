@@ -282,10 +282,10 @@ async function playerMastery(summonerId) {
   }
 }
 
-async function get10MatchesIdByPuuid(puuid, startIndex) {
+async function get5MatchesIdByPuuid(puuid, startIndex) {
   try {
     const response = await axios.get(
-      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=4`,
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=5`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -305,10 +305,10 @@ async function getAllMatchesByPuuid(puuid) {
   let matchIds;
   try {
     do {
-      matchIds = await get10MatchesIdByPuuid(puuid, startIndex);
+      matchIds = await get5MatchesIdByPuuid(puuid, startIndex);
       matchesArray.push(...matchIds);
       startIndex += matchIds.length;
-    } while (matchIds.length === 10);
+    } while (matchIds.length === 5);
     return matchesArray;
   } catch (error) {
     console.error(error);
@@ -408,7 +408,7 @@ async function updateAllUsersOfMatches(matchesArray) {
           console.error("Player not found");
           continue;
         }
-        if (!playerRanked) {
+        if (!player && !playerRanked) {
           await prisma.playerMatchStats.create({
             data: {
               championName: participant.championName,
@@ -431,12 +431,11 @@ async function updateAllUsersOfMatches(matchesArray) {
           continue;
         }
 
-        if (!uniqueParticipant) {
+        if (uniqueParticipant === null) {
           await createParticipant(participant, matchData);
-        }
-
-        // Update Champion statistics
-        await updateChamp(champion, participant);
+          // Update Champion statistics
+          await updateChamp(champion, participant);
+        } else continue;
       }
     }
   } catch (error) {
@@ -560,11 +559,11 @@ async function updateOneUserFromMatches(matchesArray, summonerName) {
 
       if (!uniqueParticipant) {
         await createParticipant(participant, matchData);
+
+        // Update Champion statistics
+
+        await updateChamp(champion, participant);
       }
-
-      // Update Champion statistics
-
-      await updateChamp(champion, participant);
     }
   } catch (error) {
     console.error(error);
@@ -589,15 +588,16 @@ async function updateUser(summonerName) {
   }
   console.log("Player Ranked Found:", playerRanked);
 
-  const last10Matches = await get10MatchesIdByPuuid(player.puuid, 0);
-  if (!last10Matches) {
+  const last5Matches = await get5MatchesIdByPuuid(player.puuid, 0);
+
+  if (!last5Matches) {
     console.error("Player matches not found");
     return;
   }
-  console.log("Player Matches Found:", last10Matches);
+  console.log("Player Matches Found:", last5Matches);
 
-  await updateOneUserFromMatches(last10Matches, summonerName);
-  // await updateAllUsersOfMatches(last10Matches);
+  // await updateOneUserFromMatches(last5Matches, summonerName);
+  await updateAllUsersOfMatches(last5Matches);
   console.log(summonerName + " Profile was updated.");
   return playerRanked;
 }
@@ -713,7 +713,7 @@ async function updateChamp(champion, participant) {
 async function createParticipant(participant, matchData) {
   await prisma.playerMatchStats.create({
     data: {
-      win: participant.win,
+      win: participant.win ? 1 : 0,
       championName: participant.championName,
       teamId: participant.teamId,
       spell1Id: participant.summoner1Id,
@@ -804,17 +804,16 @@ async function getPlayerChampionOverview(playerId) {
     const championStats = await prisma.playerMatchStats.groupBy({
       by: ["championName"],
       where: { playerId: playerId },
-      includes: {
-        championName: true,
-        win: true,
-        kills: true,
-        deaths: true,
-        assists: true,
-        _count: true,
+      select: {
+        _count: {
+          select: {
+            matchId: true,
+          },
+        },
       },
+      _sum: { kills: true, deaths: true, assists: true, win: true },
+      orderBy: [{ _count: { matchId: "desc" } }],
     });
-
-    console.log(championStats);
 
     return championStats;
   } catch (error) {
