@@ -637,12 +637,6 @@ async function updateChamp(champion, participant) {
       assists: {
         increment: participant.assists,
       },
-      killingSprees: {
-        increment: participant.killingSprees,
-      },
-      doubleKills: {
-        increment: participant.doubleKills,
-      },
       tripleKills: {
         increment: participant.tripleKills,
       },
@@ -658,9 +652,7 @@ async function updateChamp(champion, participant) {
       totalHeal: {
         increment: participant.totalHeal,
       },
-      totalUnitsHealed: {
-        increment: participant.totalUnitsHealed,
-      },
+
       damageDealtToObjectives: {
         increment: participant.damageDealtToObjectives,
       },
@@ -728,13 +720,11 @@ async function createParticipant(participant, matchData) {
       kills: participant.kills,
       deaths: participant.deaths,
       assists: participant.assists,
-      doubleKills: participant.doubleKills,
       tripleKills: participant.tripleKills,
       quadraKills: participant.quadraKills,
       pentaKills: participant.pentaKills,
       totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
       totalHeal: participant.totalHeal,
-      totalHealsOnTeammates: participant.totalHealsOnTeammates,
       damageDealtToObjectives: participant.damageDealtToObjectives,
       damageDealtToTurrets: participant.damageDealtToTurrets,
       visionScore: participant.visionScore,

@@ -13,7 +13,200 @@ import {
 } from "@nextui-org/react";
 
 const Tierlist = () => {
+  const initialColumns = [
+    {
+      key: "champion-rank",
+      textValue: "Rank",
+    },
+    {
+      key: "champion-key",
+      textValue: "Champion",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-winrate",
+      textValue: "Winrate",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-pickrate",
+      textValue: "Pickrate",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-gold-earned",
+      textValue: "Gold Earned",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-level",
+      textValue: "Level",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-cs",
+      textValue: "CS",
+      allowsSorting: true,
+    },
+    {
+      key: "champion-matches",
+      textValue: "Matches",
+      allowsSorting: true,
+    },
+  ];
+
+  const [columns, setColumns] = useState(initialColumns);
   const collator = useCollator({ numeric: true });
+
+  const handleCombatButton = () => {
+    let combatColumns = [
+      {
+        key: "champion-kills",
+        textValue: "Kills",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-deaths",
+        textValue: "Deaths",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-assists",
+        textValue: "Assists",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-triplekills",
+        textValue: "Triple Kill",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-quadrakills",
+        textValue: "Quadra Kill",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-pentakills",
+        textValue: "Pentakill",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-total-damage",
+        textValue: "Total Damage",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-cc-other",
+        textValue: "CC Other Duration",
+        allowsSorting: true,
+      },
+    ];
+    let newColumns = [...columns];
+    newColumns = combatColumns.filter((column) =>
+      columns.every((col) => col.key !== column.key)
+    );
+    newColumns = [...initialColumns, ...newColumns];
+    setColumns([...newColumns]);
+  };
+
+  const handleObjectiveButton = () => {
+    let objectiveColumns = [
+      {
+        key: "champion-damage-objectives",
+        textValue: "Objectives Damage",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-turrets-damage",
+        textValue: "Turrets Damage",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-first-blood",
+        textValue: "First Blood",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-triplekills",
+        textValue: "First Tower",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-total-damage",
+        textValue: "First Dragon",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-first-rift",
+        textValue: "First Herald",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-quadrakills",
+        textValue: "First Inhibitor",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-pentakills",
+        textValue: "First Baron",
+        allowsSorting: true,
+      },
+    ];
+    let newColumns = [...columns];
+    newColumns = objectiveColumns.filter((column) =>
+      columns.every((col) => col.key !== column.key)
+    );
+    newColumns = [...initialColumns, ...newColumns];
+    setColumns([...newColumns]);
+  };
+
+  const handleSupportButton = () => {
+    let supportColumns = [
+      {
+        key: "champion-heals",
+        textValue: "Heals",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-assists",
+        textValue: "Assists",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-wards-placed",
+        textValue: "Wards Placed",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-wards-killed",
+        textValue: "Wards Killed",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-vision-score",
+        textValue: "Vision Score",
+        allowsSorting: true,
+      },
+      {
+        key: "champion-cc-other",
+        textValue: "CC Other Duration",
+        allowsSorting: true,
+      },
+
+      {
+        key: "champion-support-quest18",
+        textValue: "Support Quest <18M",
+        allowsSorting: true,
+      },
+    ];
+
+    let newColumns = [...columns];
+    newColumns = supportColumns.filter((column) =>
+      columns.every((col) => col.key !== column.key)
+    );
+    newColumns = [...initialColumns, ...newColumns];
+    setColumns([...newColumns]);
+  };
 
   async function load({ signal }) {
     // const res = await fetch("https://swapi.py4e.com/api/people/?search", {
@@ -74,10 +267,15 @@ const Tierlist = () => {
                 alignContent: "center",
               }}
             >
-              <Button light>ALL </Button>
-              <Button light>Combat </Button>
-              <Button light>Support </Button>
-              <Button light>First % </Button>
+              <Button light onPress={handleCombatButton}>
+                Combat{" "}
+              </Button>
+              <Button light onPress={handleSupportButton}>
+                Support{" "}
+              </Button>
+              <Button light onPress={handleObjectiveButton}>
+                Objectives{" "}
+              </Button>
             </Container>
             <Table
               aria-label="tier list table"
@@ -85,81 +283,15 @@ const Tierlist = () => {
               sortDescriptor={list.sortDescriptor}
               onSortChange={list.sort}
             >
-              <Table.Header>
-                <Table.Column key="champ-rank">Rank</Table.Column>
-                <Table.Column key="champion" allowsSorting>
-                  Champion
-                </Table.Column>
-                <Table.Column key="champ-winrate" allowsSorting>
-                  Win Rate %
-                </Table.Column>
-                <Table.Column key="champ-pickrate" allowsSorting>
-                  Pick Rate %
-                </Table.Column>
-                <Table.Column key="champ-gold-earned" allowsSorting>
-                  Gold earned
-                </Table.Column>
-                {/* Combat related */}
-                <Table.Column key="champ-kills" allowsSorting>
-                  Kills
-                </Table.Column>
-                <Table.Column key="champ-deaths" allowsSorting>
-                  Deaths
-                </Table.Column>
-                <Table.Column key="champ-assists" allowsSorting>
-                  Assists
-                </Table.Column>
-                <Table.Column key="champ-damage" allowsSorting>
-                  Damage Dealt
-                </Table.Column>
-                <Table.Column key="champ-damage-taken" allowsSorting>
-                  Damage Taken
-                </Table.Column>
-                <Table.Column key="champ-cc-other" allowsSorting>
-                  Time CC Others
-                </Table.Column>
-                <Table.Column key="champ-objectives-damage" allowsSorting>
-                  Objective Damage
-                </Table.Column>
-                {/* Support related */}
-                <Table.Column key="champ-heals" allowsSorting>
-                  Heals
-                </Table.Column>
-                <Table.Column key="champ-vision-score" allowsSorting>
-                  Vision Score
-                </Table.Column>
-                <Table.Column key="champ-ward-placed" allowsSorting>
-                  Ward Placed
-                </Table.Column>
-                <Table.Column key="champ-ward-killed" allowsSorting>
-                  Ward Killed
-                </Table.Column>
-                <Table.Column key="champ-cc-other" allowsSorting>
-                  Time CC Others
-                </Table.Column>
-                <Table.Column key="champ-complete-support" allowsSorting>
-                  {"Support Quest < 18M"}
-                </Table.Column>
-                {/* First related */}
-                <Table.Column key="champ-first-blood" allowsSorting>
-                  First Blood %
-                </Table.Column>
-                <Table.Column key="champ-first-tower" allowsSorting>
-                  First Tower %
-                </Table.Column>
-                <Table.Column key="champ-first-inhib" allowsSorting>
-                  First Inhibitor %
-                </Table.Column>
-                <Table.Column key="champ-first-baron" allowsSorting>
-                  First Baron %
-                </Table.Column>
-                <Table.Column key="champ-first-dragon" allowsSorting>
-                  First Dragon %
-                </Table.Column>
-
-                <Table.Column key="champ-matches" allowsSorting>
-                  Matches
-                </Table.Column>
+              <Table.Header columns={columns}>
+                {(column) => (
+                  <Table.Column
+                    key={column.key}
+                    allowsSorting={column.allowsSorting}
+                  >
+                    {column.textValue}
+                  </Table.Column>
+                )}
               </Table.Header>
               <Table.Body></Table.Body>
             </Table>
