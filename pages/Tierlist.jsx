@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
 import {
-  useTheme,
-  Image,
   Container,
   Text,
   Button,
@@ -15,207 +13,279 @@ import {
 const Tierlist = () => {
   const initialColumns = [
     {
-      key: "champion-rank",
-      textValue: "Rank",
-    },
-    {
-      key: "champion-key",
+      key: "name",
       textValue: "Champion",
       allowsSorting: true,
     },
     {
-      key: "champion-winrate",
+      key: "winRatio",
       textValue: "Winrate",
       allowsSorting: true,
     },
     {
-      key: "champion-pickrate",
+      key: "pickRatio",
       textValue: "Pickrate",
       allowsSorting: true,
     },
     {
-      key: "champion-gold-earned",
+      key: "avgGoldEarned",
       textValue: "Gold Earned",
       allowsSorting: true,
     },
     {
-      key: "champion-level",
-      textValue: "Level",
-      allowsSorting: true,
-    },
-    {
-      key: "champion-cs",
-      textValue: "CS",
-      allowsSorting: true,
-    },
-    {
-      key: "champion-matches",
+      key: "gamesPlayed",
       textValue: "Matches",
       allowsSorting: true,
     },
   ];
-
-  const [columns, setColumns] = useState(initialColumns);
-  const collator = useCollator({ numeric: true });
+  const emptyColumns = [];
 
   const handleCombatButton = () => {
-    let combatColumns = [
+    const combatColumns = [
       {
-        key: "champion-kills",
+        key: "name",
+        textValue: "Champion",
+        allowsSorting: true,
+      },
+      {
+        key: "winRatio",
+        textValue: "Winrate",
+        allowsSorting: true,
+      },
+      {
+        key: "pickRatio",
+        textValue: "Pickrate",
+        allowsSorting: true,
+      },
+      {
+        key: "avgGoldEarned",
+        textValue: "Gold Earned",
+        allowsSorting: true,
+      },
+      {
+        key: "avgKills",
         textValue: "Kills",
         allowsSorting: true,
       },
       {
-        key: "champion-deaths",
+        key: "avgDeaths",
         textValue: "Deaths",
         allowsSorting: true,
       },
       {
-        key: "champion-assists",
+        key: "avgAssists",
         textValue: "Assists",
         allowsSorting: true,
       },
       {
-        key: "champion-triplekills",
+        key: "tripleKills",
         textValue: "Triple Kill",
         allowsSorting: true,
       },
       {
-        key: "champion-quadrakills",
+        key: "quadraKills",
         textValue: "Quadra Kill",
         allowsSorting: true,
       },
       {
-        key: "champion-pentakills",
+        key: "pentaKills",
         textValue: "Pentakill",
         allowsSorting: true,
       },
       {
-        key: "champion-total-damage",
+        key: "avgTotalDamageDealtToChampions",
         textValue: "Total Damage",
         allowsSorting: true,
       },
       {
-        key: "champion-cc-other",
+        key: "avgTimeCCingOthers",
         textValue: "CC Other Duration",
         allowsSorting: true,
       },
+      {
+        key: "gamesPlayed",
+        textValue: "Matches",
+        allowsSorting: true,
+      },
     ];
-    let newColumns = [...columns];
-    newColumns = combatColumns.filter((column) =>
-      columns.every((col) => col.key !== column.key)
-    );
-    newColumns = [...initialColumns, ...newColumns];
-    setColumns([...newColumns]);
+
+    if (selectedColumns.length !== combatColumns.length)
+      setSelectedColumns([...emptyColumns, ...combatColumns]);
+    else {
+      setSelectedColumns([...initialColumns]);
+    }
   };
 
   const handleObjectiveButton = () => {
-    let objectiveColumns = [
+    const objectiveColumns = [
       {
-        key: "champion-damage-objectives",
+        key: "name",
+        textValue: "Champion",
+        allowsSorting: true,
+      },
+      {
+        key: "winRatio",
+        textValue: "Winrate",
+        allowsSorting: true,
+      },
+      {
+        key: "pickRatio",
+        textValue: "Pickrate",
+        allowsSorting: true,
+      },
+      {
+        key: "avgGoldEarned",
+        textValue: "Gold Earned",
+        allowsSorting: true,
+      },
+      {
+        key: "avgDamageDealtToObjectives",
         textValue: "Objectives Damage",
         allowsSorting: true,
       },
       {
-        key: "champion-turrets-damage",
+        key: "avgDamageDealtToTurrets",
         textValue: "Turrets Damage",
         allowsSorting: true,
       },
       {
-        key: "champion-first-blood",
+        key: "avgFirstBloodKill",
         textValue: "First Blood",
         allowsSorting: true,
       },
       {
-        key: "champion-triplekills",
+        key: "avgFirstTowerKill",
         textValue: "First Tower",
         allowsSorting: true,
       },
       {
-        key: "champion-total-damage",
+        key: "avgFirstDragonKill",
         textValue: "First Dragon",
         allowsSorting: true,
       },
       {
-        key: "champion-first-rift",
+        key: "avgFirstRiftHeraldKill",
         textValue: "First Herald",
         allowsSorting: true,
       },
       {
-        key: "champion-quadrakills",
+        key: "avgFirstInhibitorKill",
         textValue: "First Inhibitor",
         allowsSorting: true,
       },
       {
-        key: "champion-pentakills",
+        key: "avgFirstBaronKill",
         textValue: "First Baron",
         allowsSorting: true,
       },
+      {
+        key: "gamesPlayed",
+        textValue: "Matches",
+        allowsSorting: true,
+      },
     ];
-    let newColumns = [...columns];
-    newColumns = objectiveColumns.filter((column) =>
-      columns.every((col) => col.key !== column.key)
-    );
-    newColumns = [...initialColumns, ...newColumns];
-    setColumns([...newColumns]);
+    if (selectedColumns.length !== objectiveColumns.length)
+      setSelectedColumns([...emptyColumns, ...objectiveColumns]);
+    else {
+      setSelectedColumns([...initialColumns]);
+    }
   };
 
   const handleSupportButton = () => {
-    let supportColumns = [
+    const supportColumns = [
       {
-        key: "champion-heals",
+        key: "name",
+        textValue: "Champion",
+        allowsSorting: true,
+      },
+      {
+        key: "winRatio",
+        textValue: "Winrate",
+        allowsSorting: true,
+      },
+      {
+        key: "pickRatio",
+        textValue: "Pickrate",
+        allowsSorting: true,
+      },
+      {
+        key: "avgGoldEarned",
+        textValue: "Gold Earned",
+        allowsSorting: true,
+      },
+      {
+        key: "avgTotalHeal",
         textValue: "Heals",
         allowsSorting: true,
       },
       {
-        key: "champion-assists",
+        key: "avgAssists",
         textValue: "Assists",
         allowsSorting: true,
       },
       {
-        key: "champion-wards-placed",
+        key: "avgWardsPlaced",
         textValue: "Wards Placed",
         allowsSorting: true,
       },
       {
-        key: "champion-wards-killed",
+        key: "avgWardsKilled",
         textValue: "Wards Killed",
         allowsSorting: true,
       },
       {
-        key: "champion-vision-score",
+        key: "avgVisionScore",
         textValue: "Vision Score",
         allowsSorting: true,
       },
       {
-        key: "champion-cc-other",
+        key: "avgTimeCCingOthers",
         textValue: "CC Other Duration",
         allowsSorting: true,
       },
 
       {
-        key: "champion-support-quest18",
+        key: "avgCompleteSupportQuestInTime",
         textValue: "Support Quest <18M",
         allowsSorting: true,
       },
+      {
+        key: "gamesPlayed",
+        textValue: "Matches",
+        allowsSorting: true,
+      },
     ];
-
-    let newColumns = [...columns];
-    newColumns = supportColumns.filter((column) =>
-      columns.every((col) => col.key !== column.key)
-    );
-    newColumns = [...initialColumns, ...newColumns];
-    setColumns([...newColumns]);
+    if (selectedColumns.length !== supportColumns.length)
+      setSelectedColumns([...emptyColumns, ...supportColumns]);
+    else {
+      setSelectedColumns([...initialColumns]);
+    }
   };
 
-  async function load({ signal }) {
-    // const res = await fetch("https://swapi.py4e.com/api/people/?search", {
-    //   signal,
-    // });
-    // const json = await res.json();
-    // return {
-    //   items: json.results,
-    // };
+  const collator = useCollator({ numeric: true });
+  const [selectedColumns, setSelectedColumns] = useState(initialColumns);
+  const [tableData, setTableData] = useState(null);
+  const rowIndex = useRef(0);
+
+  async function load() {
+    try {
+      const res = await fetch("/api/lolapi?func=getChampionsTable", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+
+        return {
+          items: data,
+          cursor: data.next,
+        };
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   async function sort({ items, sortDescriptor }) {
@@ -232,7 +302,16 @@ const Tierlist = () => {
     };
   }
 
-  const list = useAsyncList({ load, sort });
+  const list = useAsyncList({ load });
+
+  useEffect(() => {
+    const pullChampionsInfo = async () => {
+      const data = await load();
+      setTableData(data);
+    };
+    pullChampionsInfo();
+    console.log(tableData);
+  }, []);
 
   return (
     <>
@@ -279,21 +358,72 @@ const Tierlist = () => {
             </Container>
             <Table
               aria-label="tier list table"
-              css={{ minWidth: "100%", height: "calc($space$14 * 10)" }}
+              css={{
+                minWidth: "100%",
+                height: "calc($space$15 * 15)",
+                backgroundColor: "#191937",
+              }}
               sortDescriptor={list.sortDescriptor}
               onSortChange={list.sort}
             >
-              <Table.Header columns={columns}>
+              <Table.Header columns={selectedColumns}>
                 {(column) => (
                   <Table.Column
                     key={column.key}
                     allowsSorting={column.allowsSorting}
+                    css={{
+                      textAlign: "center",
+                      color: column.key === "winRatio" ? "White" : "#cddcfe",
+                      backgroundColor: "#191937",
+                      fontSize: column.key === "winRatio" && "1rem",
+                      textDecorationLine:
+                        column.key === "winRatio" && "underline",
+                      textDecorationColor: "#3273fa",
+                      "&:hover": {
+                        backgroundColor: "#191937",
+                        color: column.key === "winRatio" ? "White" : "#cddcfe",
+                      },
+                    }}
                   >
                     {column.textValue}
                   </Table.Column>
                 )}
               </Table.Header>
-              <Table.Body></Table.Body>
+              {tableData ? (
+                <Table.Body
+                  items={tableData?.items || []}
+                  loadingState={list.loadingState}
+                  onLoadMore={list.loadMore}
+                >
+                  {(item) => {
+                    rowIndex.current += 1;
+                    return (
+                      <Table.Row
+                        key={item.id + "-champ"}
+                        css={{
+                          backgroundColor:
+                            rowIndex.current % 2 === 0 ? "#191937" : "#11112a",
+                          borderRadius: "10px",
+                        }}
+                      >
+                        {(columnKey) => (
+                          <Table.Cell
+                            css={{
+                              backgroundColor:
+                                columnKey === "winRatio" &&
+                                "rgba(37,37,75,.75)",
+                            }}
+                          >
+                            {item[columnKey]}
+                          </Table.Cell>
+                        )}
+                      </Table.Row>
+                    );
+                  }}
+                </Table.Body>
+              ) : (
+                <Table.Body></Table.Body>
+              )}
             </Table>
           </Container>
         </Container>

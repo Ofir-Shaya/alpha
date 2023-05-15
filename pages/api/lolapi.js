@@ -92,6 +92,12 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
+      case "getChampionsTable":
+        data = await getChampionsTable();
+        res.status(200).json(data);
+
+        break;
+
       default:
         console.error("bad query func");
         break;
@@ -233,7 +239,7 @@ async function getPlayerRankedInfo(summonerName) {
         });
       }
     }
-    console.log(playerRankedArray[soloqIndex]);
+    console.log(playerRankedArray);
     return playerRankedArray[soloqIndex];
   } catch (error) {
     if (error.response && error.response.status === 404) {
@@ -282,10 +288,10 @@ async function playerMastery(summonerId) {
   }
 }
 
-async function get5MatchesIdByPuuid(puuid, startIndex) {
+async function get3MatchesIdByPuuid(puuid, startIndex) {
   try {
     const response = await axios.get(
-      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=5`,
+      `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?startTime=1673395201&queue=420&type=ranked&start=${startIndex}&count=3`,
       {
         headers: {
           "X-Riot-Token": process.env.API_KEY,
@@ -305,10 +311,10 @@ async function getAllMatchesByPuuid(puuid) {
   let matchIds;
   try {
     do {
-      matchIds = await get5MatchesIdByPuuid(puuid, startIndex);
+      matchIds = await get3MatchesIdByPuuid(puuid, startIndex);
       matchesArray.push(...matchIds);
       startIndex += matchIds.length;
-    } while (matchIds.length === 5);
+    } while (matchIds.length === 3);
     return matchesArray;
   } catch (error) {
     console.error(error);
@@ -588,16 +594,16 @@ async function updateUser(summonerName) {
   }
   console.log("Player Ranked Found:", playerRanked);
 
-  const last5Matches = await get5MatchesIdByPuuid(player.puuid, 0);
+  const last3Matches = await get3MatchesIdByPuuid(player.puuid, 0);
 
-  if (!last5Matches) {
+  if (!last3Matches) {
     console.error("Player matches not found");
     return;
   }
-  console.log("Player Matches Found:", last5Matches);
+  console.log("Player Matches Found:", last3Matches);
 
-  // await updateOneUserFromMatches(last5Matches, summonerName);
-  await updateAllUsersOfMatches(last5Matches);
+  // await updateOneUserFromMatches(last3Matches, summonerName);
+  await updateAllUsersOfMatches(last3Matches);
   console.log(summonerName + " Profile was updated.");
   return playerRanked;
 }
@@ -738,13 +744,15 @@ async function createParticipant(participant, matchData) {
       wardsPlaced: participant.wardsPlaced,
       wardsKilled: participant.wardsKilled,
       firstBloodKill: participant.firstBloodKill,
-      firstTowerKill: participant.firstTowerKill,
+      firstTowerKill: Boolean(
+        participant.firstTowerKill || Boolean(participant.firstTowerAssist)
+      ),
       firstInhibitorKill: Boolean(participant.firstInhibitorKill),
       firstBaronKill: Boolean(participant.firstBaronKill),
       firstDragonKill: Boolean(participant.firstDragonKill),
       firstRiftHeraldKill: Boolean(participant.firstRiftHeraldKill),
       completeSupportQuestInTime: Boolean(
-        participant.completeSupportQuestInTime
+        participant.challenges.completeSupportQuestInTime
       ),
       player: {
         connect: {
@@ -806,6 +814,151 @@ async function getPlayerChampionOverview(playerId) {
     });
 
     return championStats;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getChampionsTable() {
+  try {
+    const champions = await prisma.Champions.findMany({});
+
+    let totalNumberOfGames = 0;
+
+    let championsWithStats = champions.map((champion) => {
+      totalNumberOfGames += champion.gamesPlayed;
+
+      const pickRatio =
+        champion.gamesPlayed > 0
+          ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(0) + "%"
+          : "0%";
+
+      return {
+        ...champion,
+        winRatio:
+          champion.gamesPlayed > 0
+            ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(0) + "%"
+            : "0%",
+        avgKills:
+          champion.gamesPlayed > 0
+            ? (champion.kills / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgDeaths:
+          champion.gamesPlayed > 0
+            ? (champion.deaths / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgAssists:
+          champion.gamesPlayed > 0
+            ? (champion.assists / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgTotalDamageDealtToChampions:
+          champion.gamesPlayed > 0
+            ? (
+                champion.totalDamageDealtToChampions / champion.gamesPlayed
+              ).toFixed(0)
+            : 0,
+        avgTotalHeal:
+          champion.gamesPlayed > 0
+            ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgDamageDealtToObjectives:
+          champion.gamesPlayed > 0
+            ? (champion.damageDealtToObjectives / champion.gamesPlayed).toFixed(
+                0
+              )
+            : 0,
+        avgDamageDealtToTurrets:
+          champion.gamesPlayed > 0
+            ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgVisionScore:
+          champion.gamesPlayed > 0
+            ? (champion.visionScore / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgTimeCCingOthers:
+          champion.gamesPlayed > 0
+            ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgTotalDamageTaken:
+          champion.gamesPlayed > 0
+            ? (champion.totalDamageTaken / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgGoldEarned:
+          champion.gamesPlayed > 0
+            ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgWardsPlaced:
+          champion.gamesPlayed > 0
+            ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgWardsKilled:
+          champion.gamesPlayed > 0
+            ? (champion.wardsKilled / champion.gamesPlayed).toFixed(0)
+            : 0,
+        avgFirstBloodKill:
+          champion.gamesPlayed > 0
+            ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
+                1
+              ) + "%"
+            : "0%",
+        avgFirstTowerKill:
+          champion.gamesPlayed > 0
+            ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
+                1
+              ) + "%"
+            : "0%",
+        avgFirstInhibitorKill:
+          champion.gamesPlayed > 0
+            ? (
+                (champion.firstInhibitorKill / champion.gamesPlayed) *
+                100
+              ).toFixed(0) + "%"
+            : "0%",
+        avgFirstBaronKill:
+          champion.gamesPlayed > 0
+            ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
+                1
+              ) + "%"
+            : "0%",
+        avgFirstDragonKill:
+          champion.gamesPlayed > 0
+            ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
+                1
+              ) + "%"
+            : "0%",
+        avgFirstRiftHeraldKill:
+          champion.gamesPlayed > 0
+            ? (
+                (champion.firstRiftHeraldKill / champion.gamesPlayed) *
+                100
+              ).toFixed(0) + "%"
+            : "0%",
+        avgCompleteSupportQuestInTime:
+          champion.gamesPlayed > 0
+            ? (
+                (champion.completeSupportQuestInTime / champion.gamesPlayed) *
+                100
+              ).toFixed(0) + "%"
+            : "0%",
+        pickRatio: pickRatio,
+      };
+    });
+
+    championsWithStats.sort((a, b) => {
+      // Parse the winRatio values as numbers for proper comparison
+      const winRatioA = parseFloat(a.winRatio);
+      const winRatioB = parseFloat(b.winRatio);
+
+      if (winRatioA < winRatioB) {
+        return 1; // Sort in descending order
+      } else if (winRatioA > winRatioB) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+
+    return championsWithStats;
   } catch (error) {
     console.error(error);
   }
