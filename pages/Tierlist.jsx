@@ -6,8 +6,9 @@ import {
   Text,
   Button,
   Table,
-  useAsyncList,
   useCollator,
+  useAsyncList,
+  Image,
 } from "@nextui-org/react";
 
 const Tierlist = () => {
@@ -262,56 +263,104 @@ const Tierlist = () => {
     }
   };
 
-  const collator = useCollator({ numeric: true });
+  let collator = useCollator();
   const [selectedColumns, setSelectedColumns] = useState(initialColumns);
   const [tableData, setTableData] = useState(null);
   const rowIndex = useRef(0);
 
-  async function load() {
-    try {
-      const res = await fetch("/api/lolapi?func=getChampionsTable", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
+  let list = useAsyncList({
+    initialSortDescriptor: "descending",
+    async load({ signal, cursor }) {
+      try {
+        const res = await fetch(
+          cursor || "/api/lolapi?func=getChampionsTable",
+          {
+            signal,
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
 
-        return {
-          items: data,
-          cursor: data.next,
-        };
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function sort({ items, sortDescriptor }) {
-    return {
-      items: items.sort((a, b) => {
-        let first = a[sortDescriptor.column];
-        let second = b[sortDescriptor.column];
-        let cmp = collator.compare(first, second);
-        if (sortDescriptor.direction === "descending") {
-          cmp *= -1;
+          return {
+            items: data,
+            cursor: data.next,
+          };
         }
-        return cmp;
-      }),
-    };
-  }
+      } catch (error) {
+        console.error(error);
+      }
+    },
 
-  const list = useAsyncList({ load });
+    async sort({ items, sortDescriptor }) {
+      return {
+        items: items.sort((a, b) => {
+          // Check if column values contain a percentage symbol
+          let newA;
+          let newB;
+          if (a[sortDescriptor.column].includes("%"))
+            newA = parseFloat(a[sortDescriptor.column].slice(0, -1));
+          else newA = parseFloat(a[sortDescriptor.column]);
+          if (b[sortDescriptor.column].includes("%"))
+            newB = parseFloat(b[sortDescriptor.column].slice(0, -1));
+          else newB = parseFloat(b[sortDescriptor.column]);
+          console.log(newA, newB, sortDescriptor);
+          // Compare the items by the sorted column
+          let cmp = newA - newB;
+          console.log(cmp);
+          // Flip the direction if descending order is specified.
+          if (sortDescriptor.direction === "descending") {
+            cmp *= -1;
+          }
 
-  useEffect(() => {
-    const pullChampionsInfo = async () => {
-      const data = await load();
-      setTableData(data);
-    };
-    pullChampionsInfo();
-    console.log(tableData);
-  }, []);
+          return cmp;
+        }),
+      };
+    },
+  });
+
+  const renderCell = (item, columnKey) => {
+    const cellValue = item[columnKey];
+    switch (columnKey) {
+      case "name":
+        return (
+          <Container
+            css={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              textAlign: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${cellValue}.png`}
+              containerCss={{
+                width: "48px",
+                height: "48px",
+                margin: "$0",
+                padding: "$0",
+                objectFit: "contain",
+              }}
+            />
+            <Text css={{ margin: "auto" }}>{cellValue}</Text>
+          </Container>
+        );
+      default:
+        return (
+          <Text>
+            {String(cellValue).endsWith(".0")
+              ? cellValue.slice(0, -2)
+              : String(cellValue).endsWith(".0%")
+              ? cellValue.slice(0, -3) + "%"
+              : cellValue}
+          </Text>
+        );
+    }
+  };
 
   return (
     <>
@@ -389,9 +438,9 @@ const Tierlist = () => {
                   </Table.Column>
                 )}
               </Table.Header>
-              {tableData ? (
+              {list ? (
                 <Table.Body
-                  items={tableData?.items || []}
+                  items={list?.items || []}
                   loadingState={list.loadingState}
                   onLoadMore={list.loadMore}
                 >
@@ -414,7 +463,7 @@ const Tierlist = () => {
                                 "rgba(37,37,75,.75)",
                             }}
                           >
-                            {item[columnKey]}
+                            {renderCell(item, columnKey)}
                           </Table.Cell>
                         )}
                       </Table.Row>

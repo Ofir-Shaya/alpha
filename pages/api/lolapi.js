@@ -822,34 +822,34 @@ async function getPlayerChampionOverview(playerId) {
 async function getChampionsTable() {
   try {
     const champions = await prisma.Champions.findMany({});
-
     let totalNumberOfGames = 0;
+    champions.map((champion) => {
+      totalNumberOfGames += champion.gamesPlayed;
+    });
 
     let championsWithStats = champions.map((champion) => {
-      totalNumberOfGames += champion.gamesPlayed;
-
       const pickRatio =
         champion.gamesPlayed > 0
-          ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(0) + "%"
+          ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
           : "0%";
 
       return {
         ...champion,
         winRatio:
           champion.gamesPlayed > 0
-            ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(0) + "%"
+            ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
             : "0%",
         avgKills:
           champion.gamesPlayed > 0
-            ? (champion.kills / champion.gamesPlayed).toFixed(0)
+            ? (champion.kills / champion.gamesPlayed).toFixed(1)
             : 0,
         avgDeaths:
           champion.gamesPlayed > 0
-            ? (champion.deaths / champion.gamesPlayed).toFixed(0)
+            ? (champion.deaths / champion.gamesPlayed).toFixed(1)
             : 0,
         avgAssists:
           champion.gamesPlayed > 0
-            ? (champion.assists / champion.gamesPlayed).toFixed(0)
+            ? (champion.assists / champion.gamesPlayed).toFixed(1)
             : 0,
         avgTotalDamageDealtToChampions:
           champion.gamesPlayed > 0
@@ -873,7 +873,7 @@ async function getChampionsTable() {
             : 0,
         avgVisionScore:
           champion.gamesPlayed > 0
-            ? (champion.visionScore / champion.gamesPlayed).toFixed(0)
+            ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
             : 0,
         avgTimeCCingOthers:
           champion.gamesPlayed > 0
@@ -889,11 +889,11 @@ async function getChampionsTable() {
             : 0,
         avgWardsPlaced:
           champion.gamesPlayed > 0
-            ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(0)
+            ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(1)
             : 0,
         avgWardsKilled:
           champion.gamesPlayed > 0
-            ? (champion.wardsKilled / champion.gamesPlayed).toFixed(0)
+            ? (champion.wardsKilled / champion.gamesPlayed).toFixed(1)
             : 0,
         avgFirstBloodKill:
           champion.gamesPlayed > 0
@@ -912,7 +912,7 @@ async function getChampionsTable() {
             ? (
                 (champion.firstInhibitorKill / champion.gamesPlayed) *
                 100
-              ).toFixed(0) + "%"
+              ).toFixed(1) + "%"
             : "0%",
         avgFirstBaronKill:
           champion.gamesPlayed > 0
@@ -931,14 +931,14 @@ async function getChampionsTable() {
             ? (
                 (champion.firstRiftHeraldKill / champion.gamesPlayed) *
                 100
-              ).toFixed(0) + "%"
+              ).toFixed(1) + "%"
             : "0%",
         avgCompleteSupportQuestInTime:
           champion.gamesPlayed > 0
             ? (
                 (champion.completeSupportQuestInTime / champion.gamesPlayed) *
                 100
-              ).toFixed(0) + "%"
+              ).toFixed(1) + "%"
             : "0%",
         pickRatio: pickRatio,
       };
