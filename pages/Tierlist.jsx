@@ -276,7 +276,7 @@ const Tierlist = () => {
     async load({ cursor }) {
       try {
         const res = await fetch(
-          `/api/lolapi?func=getChampionsTable&cursor=${cursor}`,
+          cursor || `/api/lolapi?func=getChampionsTable&id=null`,
           {
             method: "GET",
             headers: {
@@ -287,7 +287,6 @@ const Tierlist = () => {
 
         if (res.ok) {
           const data = await res.json();
-          console.log(data);
           return {
             items: data.items,
             cursor: data.next,

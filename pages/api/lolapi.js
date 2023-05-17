@@ -93,7 +93,7 @@ async function handleGET(req, res) {
 
         break;
       case "getChampionsTable":
-        data = await getChampionsTable(req.query.cursor);
+        data = await getChampionsTable(req.query.id);
         res.status(200).json(data);
 
         break;
@@ -819,23 +819,32 @@ async function getPlayerChampionOverview(playerId) {
   }
 }
 
-async function getChampionsTable(cursor) {
+async function getChampionsTable({ cursor = null }) {
   try {
+    console.log(cursor);
     const pageSize = 20;
-    let whereCondition = {};
-    if (cursor && cursor !== "null")
-      whereCondition = {
-        id: {
-          gt: Number(cursor),
+    let champions;
+    if (cursor && (cursor !== "null" || cursor !== "undefined")) {
+      champions = await prisma.Champions.findMany({
+        take: pageSize + 1,
+
+        skip: 1,
+        cursor: {
+          id: cursor,
         },
-      };
-    const champions = await prisma.Champions.findMany({
-      take: pageSize + 1,
-      where: whereCondition,
-      orderBy: {
-        id: "asc",
-      },
-    });
+
+        orderBy: {
+          id: "asc",
+        },
+      });
+    } else {
+      champions = await prisma.Champions.findMany({
+        take: pageSize + 1,
+        orderBy: {
+          id: "asc",
+        },
+      });
+    }
 
     let totalNumberOfGames = 0;
     champions.map((champion) => {
@@ -977,12 +986,12 @@ async function getChampionsTable(cursor) {
     let nextCursor;
     if (championsWithStats.length > pageSize) {
       // If there are more items than the page size, set the next cursor
-      nextCursor = championsWithStats[pageSize].id;
+      nextCursor = `/api/lolapi?func=getChampionsTable&id=${championsWithStats[pageSize].id}`;
       // Assuming 'id' is the unique, sequential column
       championsWithStats = championsWithStats.slice(0, pageSize);
       // Trim the extra item
     }
-
+    console.log(nextCursor);
     return {
       items: championsWithStats,
       cursor: nextCursor, // Include the next cursor in the response
