@@ -93,7 +93,7 @@ async function handleGET(req, res) {
 
         break;
       case "getChampionsTable":
-        data = await getChampionsTable();
+        data = await getChampionsTable(req.query.cursor);
         res.status(200).json(data);
 
         break;
@@ -819,23 +819,38 @@ async function getPlayerChampionOverview(playerId) {
   }
 }
 
-async function getChampionsTable() {
+async function getChampionsTable(cursor) {
   try {
-    const champions = await prisma.Champions.findMany({});
+    const pageSize = 20;
+    let whereCondition = {};
+    if (cursor && cursor !== "null")
+      whereCondition = {
+        id: {
+          gt: Number(cursor),
+        },
+      };
+    const champions = await prisma.Champions.findMany({
+      take: pageSize + 1,
+      where: whereCondition,
+      orderBy: {
+        id: "asc",
+      },
+    });
+
     let totalNumberOfGames = 0;
     champions.map((champion) => {
       totalNumberOfGames += champion.gamesPlayed;
     });
 
     let championsWithStats = champions.map((champion) => {
-      const pickRatio =
+      const pickRate =
         champion.gamesPlayed > 0
           ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
           : "0%";
 
       return {
         ...champion,
-        winRatio:
+        winRate:
           champion.gamesPlayed > 0
             ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
             : "0%",
@@ -940,25 +955,38 @@ async function getChampionsTable() {
                 100
               ).toFixed(1) + "%"
             : "0%",
-        pickRatio: pickRatio,
+        pickRate: pickRate,
       };
     });
 
     championsWithStats.sort((a, b) => {
-      // Parse the winRatio values as numbers for proper comparison
-      const winRatioA = parseFloat(a.winRatio);
-      const winRatioB = parseFloat(b.winRatio);
+      // Parse the winRate values as numbers for proper comparison
+      const winRateA = parseFloat(a.winRate);
+      const winRateB = parseFloat(b.winRate);
 
-      if (winRatioA < winRatioB) {
+      if (winRateA < winRateB) {
         return 1; // Sort in descending order
-      } else if (winRatioA > winRatioB) {
+      } else if (winRateA > winRateB) {
         return -1;
       } else {
         return 0;
       }
     });
 
-    return championsWithStats;
+    // Check if there is a next page
+    let nextCursor;
+    if (championsWithStats.length > pageSize) {
+      // If there are more items than the page size, set the next cursor
+      nextCursor = championsWithStats[pageSize].id;
+      // Assuming 'id' is the unique, sequential column
+      championsWithStats = championsWithStats.slice(0, pageSize);
+      // Trim the extra item
+    }
+
+    return {
+      items: championsWithStats,
+      cursor: nextCursor, // Include the next cursor in the response
+    };
   } catch (error) {
     console.error(error);
   }

@@ -19,12 +19,12 @@ const Tierlist = () => {
       allowsSorting: true,
     },
     {
-      key: "winRatio",
+      key: "winRate",
       textValue: "Winrate",
       allowsSorting: true,
     },
     {
-      key: "pickRatio",
+      key: "pickRate",
       textValue: "Pickrate",
       allowsSorting: true,
     },
@@ -49,12 +49,12 @@ const Tierlist = () => {
         allowsSorting: true,
       },
       {
-        key: "winRatio",
+        key: "winRate",
         textValue: "Winrate",
         allowsSorting: true,
       },
       {
-        key: "pickRatio",
+        key: "pickRate",
         textValue: "Pickrate",
         allowsSorting: true,
       },
@@ -125,12 +125,12 @@ const Tierlist = () => {
         allowsSorting: true,
       },
       {
-        key: "winRatio",
+        key: "winRate",
         textValue: "Winrate",
         allowsSorting: true,
       },
       {
-        key: "pickRatio",
+        key: "pickRate",
         textValue: "Pickrate",
         allowsSorting: true,
       },
@@ -200,12 +200,12 @@ const Tierlist = () => {
         allowsSorting: true,
       },
       {
-        key: "winRatio",
+        key: "winRate",
         textValue: "Winrate",
         allowsSorting: true,
       },
       {
-        key: "pickRatio",
+        key: "pickRate",
         textValue: "Pickrate",
         allowsSorting: true,
       },
@@ -269,54 +269,72 @@ const Tierlist = () => {
   const rowIndex = useRef(0);
 
   let list = useAsyncList({
-    initialSortDescriptor: "descending",
-    async load({ signal, cursor }) {
+    initialSortDescriptor: {
+      column: "winRate",
+      direction: "descending",
+    },
+    async load({ cursor }) {
       try {
         const res = await fetch(
-          cursor || "/api/lolapi?func=getChampionsTable",
+          `/api/lolapi?func=getChampionsTable&cursor=${cursor}`,
           {
-            signal,
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
           }
         );
+
         if (res.ok) {
           const data = await res.json();
-
+          console.log(data);
           return {
-            items: data,
+            items: data.items,
             cursor: data.next,
           };
+        } else {
+          throw new Error("Failed to fetch data. Status: " + res.status);
         }
       } catch (error) {
         console.error(error);
+        throw new Error("An error occurred while loading data.");
       }
     },
 
     async sort({ items, sortDescriptor }) {
       return {
         items: items.sort((a, b) => {
+          console.log(a["name"], b["name"]);
+          console.log(a[sortDescriptor.column], b[sortDescriptor.column]);
           // Check if column values contain a percentage symbol
           let newA;
           let newB;
-          if (a[sortDescriptor.column].includes("%"))
-            newA = parseFloat(a[sortDescriptor.column].slice(0, -1));
-          else newA = parseFloat(a[sortDescriptor.column]);
-          if (b[sortDescriptor.column].includes("%"))
-            newB = parseFloat(b[sortDescriptor.column].slice(0, -1));
-          else newB = parseFloat(b[sortDescriptor.column]);
-          console.log(newA, newB, sortDescriptor);
-          // Compare the items by the sorted column
-          let cmp = newA - newB;
-          console.log(cmp);
-          // Flip the direction if descending order is specified.
-          if (sortDescriptor.direction === "descending") {
-            cmp *= -1;
-          }
+          try {
+            if (
+              a[sortDescriptor.column] !== 0 &&
+              a[sortDescriptor.column].includes("%")
+            )
+              newA = Number(a[sortDescriptor.column].slice(0, -1));
+            else newA = Number(a[sortDescriptor.column]);
+            if (
+              b[sortDescriptor.column] !== 0 &&
+              b[sortDescriptor.column].includes("%")
+            )
+              newB = Number(b[sortDescriptor.column].slice(0, -1));
+            else newB = Number(b[sortDescriptor.column]);
+            console.log(newA, newB);
+            // Compare the items by the sorted column
+            let cmp = newA - newB;
+            console.log(cmp);
+            // Flip the direction if descending order is specified.
+            if (sortDescriptor.direction === "descending") {
+              cmp *= -1;
+            }
 
-          return cmp;
+            return cmp;
+          } catch (error) {
+            console.error(error);
+          }
         }),
       };
     },
@@ -422,15 +440,23 @@ const Tierlist = () => {
                     allowsSorting={column.allowsSorting}
                     css={{
                       textAlign: "center",
-                      color: column.key === "winRatio" ? "White" : "#cddcfe",
+                      color:
+                        column.key === list.sortDescriptor.column
+                          ? "White"
+                          : "#cddcfe",
                       backgroundColor: "#191937",
-                      fontSize: column.key === "winRatio" && "1rem",
+                      fontSize:
+                        column.key === list.sortDescriptor.column && "1rem",
                       textDecorationLine:
-                        column.key === "winRatio" && "underline",
+                        column.key === list.sortDescriptor.column &&
+                        "underline",
                       textDecorationColor: "#3273fa",
                       "&:hover": {
                         backgroundColor: "#191937",
-                        color: column.key === "winRatio" ? "White" : "#cddcfe",
+                        color:
+                          column.key === list.sortDescriptor.column
+                            ? "White"
+                            : "#cddcfe",
                       },
                     }}
                   >
@@ -448,6 +474,7 @@ const Tierlist = () => {
                     rowIndex.current += 1;
                     return (
                       <Table.Row
+                        aria-label="table row"
                         key={item.id + "-champ"}
                         css={{
                           backgroundColor:
@@ -459,7 +486,7 @@ const Tierlist = () => {
                           <Table.Cell
                             css={{
                               backgroundColor:
-                                columnKey === "winRatio" &&
+                                columnKey === list.sortDescriptor.column &&
                                 "rgba(37,37,75,.75)",
                             }}
                           >
