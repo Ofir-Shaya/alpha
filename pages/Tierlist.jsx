@@ -266,78 +266,101 @@ const Tierlist = () => {
   let collator = useCollator();
   const [selectedColumns, setSelectedColumns] = useState(initialColumns);
   const [tableData, setTableData] = useState(null);
+  const [sortByChanged, setSortByChanged] = useState(false);
   const rowIndex = useRef(0);
 
-  let list = useAsyncList({
-    initialSortDescriptor: {
-      column: "winRate",
-      direction: "descending",
-    },
-    async load({ cursor }) {
-      try {
-        const res = await fetch(
-          cursor || `/api/lolapi?func=getChampionsTable&id=null`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+  const handleSortChange = (newSortDescriptor) => {
+    console.log("handleSort");
+    list.sort(newSortDescriptor);
+    setSortByChanged(true);
+    console.log(sortByChanged);
+  };
 
-        if (res.ok) {
-          const data = await res.json();
-          return {
-            items: data.items,
-            cursor: data.next,
-          };
-        } else {
-          throw new Error("Failed to fetch data. Status: " + res.status);
+  // Change sortByChanged back to false after transistion completed.
+  useEffect(() => {
+    let timeoutId;
+
+    if (sortByChanged) {
+      console.log("sortbyUseEffect");
+      console.log(sortByChanged);
+      timeoutId = setTimeout(() => {
+        setSortByChanged(false);
+      }, 1500); // Adjust the delay as needed
+    }
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [sortByChanged]);
+
+  const initialSortDescriptor = {
+    column: "winRate",
+    direction: "descending",
+  };
+
+  async function load({ cursor }) {
+    try {
+      const res = await fetch(
+        cursor || `/api/lolapi?func=getChampionsTable&cursor=null`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      } catch (error) {
-        console.error(error);
-        throw new Error("An error occurred while loading data.");
-      }
-    },
+      );
 
-    async sort({ items, sortDescriptor }) {
-      return {
-        items: items.sort((a, b) => {
-          console.log(a["name"], b["name"]);
-          console.log(a[sortDescriptor.column], b[sortDescriptor.column]);
-          // Check if column values contain a percentage symbol
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          items: data.items,
+          cursor: data.cursor,
+        };
+      } else {
+        throw new Error("Failed to fetch data. Status: " + res.status);
+      }
+    } catch (error) {
+      console.error(error);
+      throw new Error("An error occurred while loading data.");
+    }
+  }
+
+  async function sort({ items, sortDescriptor }) {
+    return {
+      items: items.sort((a, b) => {
+        // Check if column values contain a percentage symbol
+        try {
           let newA;
           let newB;
-          try {
-            if (
-              a[sortDescriptor.column] !== 0 &&
-              a[sortDescriptor.column].includes("%")
-            )
-              newA = Number(a[sortDescriptor.column].slice(0, -1));
-            else newA = Number(a[sortDescriptor.column]);
-            if (
-              b[sortDescriptor.column] !== 0 &&
-              b[sortDescriptor.column].includes("%")
-            )
-              newB = Number(b[sortDescriptor.column].slice(0, -1));
-            else newB = Number(b[sortDescriptor.column]);
-            console.log(newA, newB);
-            // Compare the items by the sorted column
-            let cmp = newA - newB;
-            console.log(cmp);
-            // Flip the direction if descending order is specified.
-            if (sortDescriptor.direction === "descending") {
-              cmp *= -1;
-            }
-
-            return cmp;
-          } catch (error) {
-            console.error(error);
+          console.log(sortDescriptor.column);
+          if (
+            a[sortDescriptor.column] !== 0 &&
+            a[sortDescriptor.column].includes("%")
+          )
+            newA = Number(a[sortDescriptor.column].slice(0, -1));
+          else newA = Number(a[sortDescriptor.column]);
+          if (
+            b[sortDescriptor.column] !== 0 &&
+            b[sortDescriptor.column].includes("%")
+          )
+            newB = Number(b[sortDescriptor.column].slice(0, -1));
+          else newB = Number(b[sortDescriptor.column]);
+          // Compare the items by the sorted column
+          let cmp = newA - newB;
+          // Flip the direction if descending order is specified.
+          if (sortDescriptor.direction === "descending") {
+            cmp *= -1;
           }
-        }),
-      };
-    },
-  });
+
+          return cmp;
+        } catch (error) {
+          console.error(error);
+        }
+      }),
+    };
+  }
+
+  const list = useAsyncList({ load, sort, initialSortDescriptor });
 
   const renderCell = (item, columnKey) => {
     const cellValue = item[columnKey];
@@ -422,6 +445,7 @@ const Tierlist = () => {
                 Objectives{" "}
               </Button>
             </Container>
+
             <Table
               aria-label="tier list table"
               css={{
@@ -430,7 +454,7 @@ const Tierlist = () => {
                 backgroundColor: "#191937",
               }}
               sortDescriptor={list.sortDescriptor}
-              onSortChange={list.sort}
+              onSortChange={handleSortChange}
             >
               <Table.Header columns={selectedColumns}>
                 {(column) => (
@@ -479,6 +503,9 @@ const Tierlist = () => {
                           backgroundColor:
                             rowIndex.current % 2 === 0 ? "#191937" : "#11112a",
                           borderRadius: "10px",
+                          transition: sortByChanged
+                            ? "background-color 0.3s ease-in-out"
+                            : "none",
                         }}
                       >
                         {(columnKey) => (

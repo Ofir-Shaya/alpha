@@ -93,7 +93,7 @@ async function handleGET(req, res) {
 
         break;
       case "getChampionsTable":
-        data = await getChampionsTable(req.query.id);
+        data = await getChampionsTable(req.query.cursor);
         res.status(200).json(data);
 
         break;
@@ -819,18 +819,17 @@ async function getPlayerChampionOverview(playerId) {
   }
 }
 
-async function getChampionsTable({ cursor = null }) {
+async function getChampionsTable(cursor = null) {
   try {
-    console.log(cursor);
     const pageSize = 20;
     let champions;
-    if (cursor && (cursor !== "null" || cursor !== "undefined")) {
+    if (cursor && cursor !== "null" && cursor !== null) {
       champions = await prisma.Champions.findMany({
         take: pageSize + 1,
 
         skip: 1,
         cursor: {
-          id: cursor,
+          id: Number(cursor),
         },
 
         orderBy: {
@@ -986,12 +985,11 @@ async function getChampionsTable({ cursor = null }) {
     let nextCursor;
     if (championsWithStats.length > pageSize) {
       // If there are more items than the page size, set the next cursor
-      nextCursor = `/api/lolapi?func=getChampionsTable&id=${championsWithStats[pageSize].id}`;
+      nextCursor = `/api/lolapi?func=getChampionsTable&cursor=${championsWithStats[pageSize].id}`;
       // Assuming 'id' is the unique, sequential column
       championsWithStats = championsWithStats.slice(0, pageSize);
       // Trim the extra item
     }
-    console.log(nextCursor);
     return {
       items: championsWithStats,
       cursor: nextCursor, // Include the next cursor in the response
