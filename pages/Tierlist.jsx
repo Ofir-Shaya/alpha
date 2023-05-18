@@ -270,10 +270,8 @@ const Tierlist = () => {
   const rowIndex = useRef(0);
 
   const handleSortChange = (newSortDescriptor) => {
-    console.log("handleSort");
     list.sort(newSortDescriptor);
     setSortByChanged(true);
-    console.log(sortByChanged);
   };
 
   // Change sortByChanged back to false after transistion completed.
@@ -281,8 +279,6 @@ const Tierlist = () => {
     let timeoutId;
 
     if (sortByChanged) {
-      console.log("sortbyUseEffect");
-      console.log(sortByChanged);
       timeoutId = setTimeout(() => {
         setSortByChanged(false);
       }, 1500); // Adjust the delay as needed
@@ -404,6 +400,7 @@ const Tierlist = () => {
 
   return (
     <>
+      {console.log(list)}
       <MyNavbar />
       <Container
         display="flex"
