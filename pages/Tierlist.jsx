@@ -1,15 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import {
-  Container,
-  Text,
-  Button,
-  Table,
-  useCollator,
-  useAsyncList,
-  Image,
-} from "@nextui-org/react";
+import { Container, Text, Button, Table, Image } from "@nextui-org/react";
+import { useAsyncList } from "react-stately";
 
 const Tierlist = () => {
   const initialColumns = [
@@ -263,9 +256,9 @@ const Tierlist = () => {
     }
   };
 
-  let collator = useCollator();
   const [selectedColumns, setSelectedColumns] = useState(initialColumns);
   const rowIndex = useRef(0);
+  const tableRef = useRef(null);
 
   const initialSortDescriptor = {
     column: "winRate",
@@ -313,6 +306,7 @@ const Tierlist = () => {
             }
             return cmp;
           }
+
           // Check if column values contain a percentage symbol
           let newA;
           let newB;
@@ -328,6 +322,7 @@ const Tierlist = () => {
           )
             newB = Number(b[sortDescriptor.column].slice(0, -1));
           else newB = Number(b[sortDescriptor.column]);
+
           // Compare the items by the sorted column
           let cmp = newA - newB;
           // Flip the direction if descending order is specified.
@@ -344,6 +339,12 @@ const Tierlist = () => {
   }
 
   const list = useAsyncList({ load, sort, initialSortDescriptor });
+
+  useEffect(() => {
+    if (tableRef.current && list.sortDescriptor) {
+      tableRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [list.sortDescriptor]);
 
   const renderCell = (item, columnKey) => {
     const cellValue = item[columnKey];
@@ -404,7 +405,7 @@ const Tierlist = () => {
       >
         <MySidebar />
         <Container fluid css={{ display: "flex", flexDirection: "column" }}>
-          <Container>
+          <Container css={{ marginBlockEnd: "$15" }}>
             <Text h2> LoL Tier List</Text>
             <Text h3> for All Roles, All Ranks.</Text>
           </Container>
@@ -416,6 +417,7 @@ const Tierlist = () => {
                 textAlign: "center",
                 justifyContent: "center",
                 alignContent: "center",
+                marginBlockEnd: "$15",
               }}
             >
               <Button light onPress={handleCombatButton}>
@@ -438,6 +440,7 @@ const Tierlist = () => {
               }}
               sortDescriptor={list.sortDescriptor}
               onSortChange={list.sort}
+              ref={tableRef}
             >
               <Table.Header columns={selectedColumns}>
                 {(column) => (
