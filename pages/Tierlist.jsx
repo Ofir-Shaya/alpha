@@ -265,29 +265,7 @@ const Tierlist = () => {
 
   let collator = useCollator();
   const [selectedColumns, setSelectedColumns] = useState(initialColumns);
-  const [tableData, setTableData] = useState(null);
-  const [sortByChanged, setSortByChanged] = useState(false);
   const rowIndex = useRef(0);
-
-  const handleSortChange = (newSortDescriptor) => {
-    list.sort(newSortDescriptor);
-    setSortByChanged(true);
-  };
-
-  // Change sortByChanged back to false after transistion completed.
-  useEffect(() => {
-    let timeoutId;
-
-    if (sortByChanged) {
-      timeoutId = setTimeout(() => {
-        setSortByChanged(false);
-      }, 1500); // Adjust the delay as needed
-    }
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [sortByChanged]);
 
   const initialSortDescriptor = {
     column: "winRate",
@@ -324,11 +302,20 @@ const Tierlist = () => {
   async function sort({ items, sortDescriptor }) {
     return {
       items: items.sort((a, b) => {
-        // Check if column values contain a percentage symbol
         try {
+          // handles comparing between strings
+          if (sortDescriptor.column === "name") {
+            let cmp = a[sortDescriptor.column].localeCompare(
+              b[sortDescriptor.column]
+            );
+            if (sortDescriptor.direction === "descending") {
+              cmp *= -1;
+            }
+            return cmp;
+          }
+          // Check if column values contain a percentage symbol
           let newA;
           let newB;
-          console.log(sortDescriptor.column);
           if (
             a[sortDescriptor.column] !== 0 &&
             a[sortDescriptor.column].includes("%")
@@ -400,7 +387,6 @@ const Tierlist = () => {
 
   return (
     <>
-      {console.log(list)}
       <MyNavbar />
       <Container
         display="flex"
@@ -451,7 +437,7 @@ const Tierlist = () => {
                 backgroundColor: "#191937",
               }}
               sortDescriptor={list.sortDescriptor}
-              onSortChange={handleSortChange}
+              onSortChange={list.sort}
             >
               <Table.Header columns={selectedColumns}>
                 {(column) => (
@@ -500,9 +486,6 @@ const Tierlist = () => {
                           backgroundColor:
                             rowIndex.current % 2 === 0 ? "#191937" : "#11112a",
                           borderRadius: "10px",
-                          transition: sortByChanged
-                            ? "background-color 0.3s ease-in-out"
-                            : "none",
                         }}
                       >
                         {(columnKey) => (
