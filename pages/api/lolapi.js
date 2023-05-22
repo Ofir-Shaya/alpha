@@ -97,7 +97,10 @@ async function handleGET(req, res) {
         res.status(200).json(data);
 
         break;
-
+      case "getAllChampions":
+        data = await getAllChampions();
+        res.status(200).json(data);
+        break;
       default:
         console.error("bad query func");
         break;
@@ -997,4 +1000,16 @@ async function getChampionsTable(cursor = null) {
   } catch (error) {
     console.error(error);
   }
+}
+
+async function getAllChampions() {
+  const champions = await prisma.Champions.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  console.log(champions);
+  return champions;
 }

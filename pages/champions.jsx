@@ -15,6 +15,53 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 const Champions = () => {
+  const [allChampions, setAllChampions] = useState(null);
+
+  useEffect(() => {
+    async function fetchAllChampions() {
+      try {
+        const response = await fetch(`/api/lolapi?&func=getAllChampions`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAllChampions(data);
+        } else console.error("Error fetching champs.");
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchAllChampions();
+    console.log(allChampions);
+  }, []);
+
+  useEffect(() => {
+    const displayAllChampions = () => {
+      if (allChampions === null) return;
+      return (
+        <Container css={{ backgroundColor: "Red" }}>
+          {(champion) => {
+            <Grid
+              xs={2}
+              id={champion.id}
+              justify="center"
+              alignContent="center"
+              alignItems="center"
+            >
+              <Image
+                src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${champion.name}.png`}
+              />
+              <Text b>{champion.name}</Text>
+            </Grid>;
+          }}
+        </Container>
+      );
+    };
+  }, [allChampions]);
+
   return (
     <>
       <MyNavbar />
@@ -55,12 +102,23 @@ const Champions = () => {
               height: "fit-content",
               flexDirection: "column",
               flexWrap: "wrap",
+              marginBottom: "$2",
             }}
           >
-            <Text>Champions</Text>
+            <Text
+              h4
+              css={{
+                textDecoration: "underline",
+                textDecorationColor: "#3273fa",
+              }}
+            >
+              Champions
+            </Text>
           </Container>
           <Container>
-            <Grid.Container></Grid.Container>
+            <Grid.Container gap={2} justify="center">
+              {displayAllChampions()}
+            </Grid.Container>
           </Container>
         </Container>
       </Container>
