@@ -1,20 +1,13 @@
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import {
-  Container,
-  Grid,
-  Text,
-  Card,
-  Loading,
-  Image,
-  Button,
-  Link as NextUiLink,
-} from "@nextui-org/react";
-import NextLink from "next/link";
+import { Container } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 
 const Champion = () => {
+  const router = useRouter();
+  const { Champion } = router.query;
+  console.log(Champion);
+
   return (
     <>
       <MyNavbar />
@@ -30,7 +23,9 @@ const Champion = () => {
         }}
       >
         <MySidebar />
-        <Container css={{ marginTop: "$10" }}></Container>
+        <Container css={{ marginTop: "$10" }}>
+          <Container className="splash-art"></Container>
+        </Container>
       </Container>
     </>
   );

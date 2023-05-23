@@ -1,0 +1,63 @@
+figure {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Shine */
+.hover-ani:hover {
+  .p {
+    font-weight: 500;
+  }
+}
+.hover-ani figure {
+  position: relative;
+}
+.hover-ani figure::before {
+  position: absolute;
+  top: 0;
+  left: -75%;
+  z-index: 2;
+  display: block;
+  content: "";
+  width: 50%;
+  height: 100%;
+  background: -webkit-linear-gradient(
+    left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-transform: skewX(-25deg);
+  transform: skewX(-25deg);
+  -webkit-transition: background-color 0.74s;
+  transition: background-color 0.74s;
+}
+.hover-ani figure:hover::before {
+  -webkit-animation: shine 0.74s forwards;
+  animation: shine 0.74s forwards;
+}
+
+@-webkit-keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
+.hover-bg {
+  background-color: transparent;
+}
+.hover-bg:hover {
+  transition-delay: 0.14s;
+  background-color: rgba(255, 255, 255, 0.4);
+}

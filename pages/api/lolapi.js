@@ -1008,8 +1008,10 @@ async function getAllChampions() {
       id: true,
       name: true,
     },
+    orderBy: {
+      name: "asc",
+    },
   });
 
-  console.log(champions);
   return champions;
 }

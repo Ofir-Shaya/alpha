@@ -1,66 +1,93 @@
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import {
-  Container,
-  Grid,
-  Text,
-  Card,
-  Loading,
-  Image,
-  Button,
-  Link as NextUiLink,
-} from "@nextui-org/react";
-import NextLink from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { Container, Text, Button, Table, Image, Link } from "@nextui-org/react";
+import { useAsyncList } from "react-stately";
 
 const Champions = () => {
-  const [allChampions, setAllChampions] = useState(null);
+  async function load() {
+    try {
+      const response = await fetch(`/api/lolapi?&func=getAllChampions`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-  useEffect(() => {
-    async function fetchAllChampions() {
-      try {
-        const response = await fetch(`/api/lolapi?&func=getAllChampions`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setAllChampions(data);
-        } else console.error("Error fetching champs.");
-      } catch (error) {
-        console.error(error);
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          items: data,
+        };
+      } else {
+        throw new Error("Failed to fetch data. Status: " + response.status);
       }
+    } catch (error) {
+      console.error(error);
+      throw new Error("An error occurred while loading data.");
     }
-    fetchAllChampions();
-    console.log(allChampions);
-  }, []);
+  }
 
-  useEffect(() => {
-    const displayAllChampions = () => {
-      if (allChampions === null) return;
-      return (
-        <Container css={{ backgroundColor: "Red" }}>
-          {(champion) => {
-            <Grid
-              xs={2}
-              id={champion.id}
-              justify="center"
-              alignContent="center"
-              alignItems="center"
-            >
-              <Image
-                src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${champion.name}.png`}
-              />
-              <Text b>{champion.name}</Text>
-            </Grid>;
+  const allChampions = useAsyncList({ load });
+
+  const renderCell = (item) => {
+    return (
+      <Container
+        className="hover-ani"
+        css={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          textAlign: "center",
+          alignItems: "center",
+          cursor: "pointer",
+        }}
+      >
+        <Link
+          href={`/champions/${item}`}
+          css={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-start",
+            textAlign: "center",
+            alignItems: "center",
+            cursor: "pointer",
           }}
-        </Container>
-      );
-    };
-  }, [allChampions]);
+        >
+          <figure>
+            <Image
+              src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${item}.png`}
+              containerCss={{
+                margin: "$0",
+                padding: "$0",
+                objectFit: "contain",
+              }}
+            />
+            <Container
+              className="hover-bg"
+              css={{
+                top: 0,
+                position: "absolute",
+                width: "120px",
+                height: "120px",
+                backgroundColor: "white",
+                opacity: "0.2",
+                zIndex: "$4",
+              }}
+            ></Container>
+          </figure>
+
+          <Text
+            className="p"
+            css={{
+              margin: "auto",
+            }}
+          >
+            {item.replace(/([A-Z])/g, " $1").trim()}
+          </Text>
+        </Link>
+      </Container>
+    );
+  };
 
   return (
     <>
@@ -104,21 +131,61 @@ const Champions = () => {
               flexWrap: "wrap",
               marginBottom: "$2",
             }}
-          >
-            <Text
-              h4
+          ></Container>
+          <Container>
+            <Table
+              aria-label="tier list table"
               css={{
-                textDecoration: "underline",
-                textDecorationColor: "#3273fa",
+                minWidth: "100%",
+                height: "calc($space$15 * 15)",
+                backgroundColor: "#191937",
               }}
             >
-              Champions
-            </Text>
-          </Container>
-          <Container>
-            <Grid.Container gap={2} justify="center">
-              {displayAllChampions()}
-            </Grid.Container>
+              <Table.Header>
+                <Table.Column
+                  key="champions-table-column"
+                  css={{ backgroundColor: "transparent" }}
+                >
+                  <Text
+                    h4
+                    css={{
+                      textDecoration: "underline",
+                      textDecorationColor: "#3273fa",
+                    }}
+                  >
+                    Champions
+                  </Text>
+                </Table.Column>
+              </Table.Header>
+              {allChampions ? (
+                <Table.Body
+                  items={allChampions?.items || []}
+                  loadingState={allChampions.loadingState}
+                  css={{
+                    display: "flex",
+                    flexDirection: "row",
+                    textAlign: "center",
+                    flexWrap: "wrap",
+                    alignItems: "flex-start",
+                    alignContent: "flex-start",
+                    justifyContent: "center",
+                  }}
+                >
+                  {(item) => {
+                    return (
+                      <Table.Row
+                        aria-label="table-row"
+                        key={item.id + item.name}
+                      >
+                        <Table.Cell>{renderCell(item.name)}</Table.Cell>
+                      </Table.Row>
+                    );
+                  }}
+                </Table.Body>
+              ) : (
+                <Table.Body></Table.Body>
+              )}
+            </Table>
           </Container>
         </Container>
       </Container>

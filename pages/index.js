@@ -7,7 +7,6 @@ import Link from "next/link";
 
 export default function Home() {
   const [player, setPlayer] = useState(null);
-  const [mastery, setMastery] = useState(null);
 
   const [searchInput, setSearchInput] = useState();
 
@@ -26,23 +25,6 @@ export default function Home() {
       .then((data) => {
         setPlayer(data);
       });
-  };
-
-  const playerMastery = async (summonerId) => {
-    // await fetch(`/api/lolapi?func=playerMastery&id=${summonerId}`, {
-    //   method: "GET",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
-    //   .then((res) => res.ok && res.json())
-    //   .then((data) => {
-    //     setMastery(data);
-    //   });
-  };
-
-  const updateLocalStorage = (key, data) => {
-    localStorage.setItem(key, JSON.stringify(data));
   };
 
   return (
