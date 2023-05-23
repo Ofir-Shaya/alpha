@@ -101,6 +101,11 @@ async function handleGET(req, res) {
         data = await getAllChampions();
         res.status(200).json(data);
         break;
+
+      case "detailedChampion":
+        data = await detailedChampion(req.query.championName);
+        res.status(200).json(data);
+        break;
       default:
         console.error("bad query func");
         break;
@@ -587,7 +592,6 @@ async function updateUser(summonerName) {
     console.error("Player not found");
     return;
   }
-  console.log("Player Found:", player);
   // Create player info if doesn't exist
   const playerRanked = await getRankedInformation(player.username);
 
@@ -595,7 +599,6 @@ async function updateUser(summonerName) {
     console.error("Player ranked not found");
     return;
   }
-  console.log("Player Ranked Found:", playerRanked);
 
   const last3Matches = await get3MatchesIdByPuuid(player.puuid, 0);
 
@@ -603,7 +606,6 @@ async function updateUser(summonerName) {
     console.error("Player matches not found");
     return;
   }
-  console.log("Player Matches Found:", last3Matches);
 
   // await updateOneUserFromMatches(last3Matches, summonerName);
   await updateAllUsersOfMatches(last3Matches);
@@ -853,7 +855,7 @@ async function getChampionsTable(cursor = null) {
       totalNumberOfGames += champion.gamesPlayed;
     });
 
-    let championsWithStats = champions.map((champion) => {
+    let championWithStats = champions.map((champion) => {
       const pickRate =
         champion.gamesPlayed > 0
           ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
@@ -970,7 +972,7 @@ async function getChampionsTable(cursor = null) {
       };
     });
 
-    championsWithStats.sort((a, b) => {
+    championWithStats.sort((a, b) => {
       // Parse the winRate values as numbers for proper comparison
       const winRateA = parseFloat(a.winRate);
       const winRateB = parseFloat(b.winRate);
@@ -986,15 +988,15 @@ async function getChampionsTable(cursor = null) {
 
     // Check if there is a next page
     let nextCursor;
-    if (championsWithStats.length > pageSize) {
+    if (championWithStats.length > pageSize) {
       // If there are more items than the page size, set the next cursor
-      nextCursor = `/api/lolapi?func=getChampionsTable&cursor=${championsWithStats[pageSize].id}`;
+      nextCursor = `/api/lolapi?func=getChampionsTable&cursor=${championWithStats[pageSize].id}`;
       // Assuming 'id' is the unique, sequential column
-      championsWithStats = championsWithStats.slice(0, pageSize);
+      championWithStats = championWithStats.slice(0, pageSize);
       // Trim the extra item
     }
     return {
-      items: championsWithStats,
+      items: championWithStats,
       cursor: nextCursor, // Include the next cursor in the response
     };
   } catch (error) {
@@ -1014,4 +1016,134 @@ async function getAllChampions() {
   });
 
   return champions;
+}
+
+async function detailedChampion(championName) {
+  console.log(championName);
+  const champion = await prisma.Champions.findUnique({
+    where: {
+      name: championName,
+    },
+  });
+  console.log(champion);
+  // let totalNumberOfGames = 0;
+  // champion.map((champion) => {
+  //   totalNumberOfGames += champion.gamesPlayed;
+  // });
+
+  // let championWithStats = champion.map((champion) => {
+  //   const pickRate =
+  //     champion.gamesPlayed > 0
+  //       ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
+  //       : "0%";
+
+  //   return {
+  //     ...champion,
+  //     winRate:
+  //       champion.gamesPlayed > 0
+  //         ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
+  //         : "0%",
+  //     avgKills:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.kills / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgDeaths:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.deaths / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgAssists:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.assists / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgTotalDamageDealtToChampions:
+  //       champion.gamesPlayed > 0
+  //         ? (
+  //             champion.totalDamageDealtToChampions / champion.gamesPlayed
+  //           ).toFixed(0)
+  //         : 0,
+  //     avgTotalHeal:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgDamageDealtToObjectives:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.damageDealtToObjectives / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgDamageDealtToTurrets:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgVisionScore:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgTimeCCingOthers:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgTotalDamageTaken:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.totalDamageTaken / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgGoldEarned:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
+  //         : 0,
+  //     avgWardsPlaced:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgWardsKilled:
+  //       champion.gamesPlayed > 0
+  //         ? (champion.wardsKilled / champion.gamesPlayed).toFixed(1)
+  //         : 0,
+  //     avgFirstBloodKill:
+  //       champion.gamesPlayed > 0
+  //         ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
+  //             1
+  //           ) + "%"
+  //         : "0%",
+  //     avgFirstTowerKill:
+  //       champion.gamesPlayed > 0
+  //         ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
+  //             1
+  //           ) + "%"
+  //         : "0%",
+  //     avgFirstInhibitorKill:
+  //       champion.gamesPlayed > 0
+  //         ? (
+  //             (champion.firstInhibitorKill / champion.gamesPlayed) *
+  //             100
+  //           ).toFixed(1) + "%"
+  //         : "0%",
+  //     avgFirstBaronKill:
+  //       champion.gamesPlayed > 0
+  //         ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
+  //             1
+  //           ) + "%"
+  //         : "0%",
+  //     avgFirstDragonKill:
+  //       champion.gamesPlayed > 0
+  //         ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
+  //             1
+  //           ) + "%"
+  //         : "0%",
+  //     avgFirstRiftHeraldKill:
+  //       champion.gamesPlayed > 0
+  //         ? (
+  //             (champion.firstRiftHeraldKill / champion.gamesPlayed) *
+  //             100
+  //           ).toFixed(1) + "%"
+  //         : "0%",
+  //     avgCompleteSupportQuestInTime:
+  //       champion.gamesPlayed > 0
+  //         ? (
+  //             (champion.completeSupportQuestInTime / champion.gamesPlayed) *
+  //             100
+  //           ).toFixed(1) + "%"
+  //         : "0%",
+  //     pickRate: pickRate,
+  //   };
+  // });
+  return champion;
 }

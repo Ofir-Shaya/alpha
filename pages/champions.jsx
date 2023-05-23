@@ -6,7 +6,7 @@ import { useAsyncList } from "react-stately";
 const Champions = () => {
   async function load() {
     try {
-      const response = await fetch(`/api/lolapi?&func=getAllChampions`, {
+      const response = await fetch(`/api/lolapi?func=getAllChampions`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

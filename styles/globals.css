@@ -57,7 +57,14 @@ figure {
 .hover-bg {
   background-color: transparent;
 }
+
 .hover-bg:hover {
   transition-delay: 0.14s;
   background-color: rgba(255, 255, 255, 0.4);
+}
+
+.splash-art {
+  background-repeat: no-repeat;
+  background-size: 1014px 570px;
+  background-position: 50% -60px;
 }
