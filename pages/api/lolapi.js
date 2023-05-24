@@ -106,6 +106,12 @@ async function handleGET(req, res) {
         data = await detailedChampion(req.query.championName);
         res.status(200).json(data);
         break;
+
+      case "championItems":
+        data = await championItems(req.query.championName);
+        res.status(200).json(data);
+        break;
+
       default:
         console.error("bad query func");
         break;
@@ -1140,6 +1146,78 @@ async function detailedChampion(championName) {
     };
 
     return championWithStats;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function championItems(championName) {
+  try {
+    const playerMatchStats = await prisma.PlayerMatchStats.findMany({
+      where: {
+        championName: championName,
+      },
+      select: {
+        item0: true,
+        item1: true,
+        item2: true,
+        item3: true,
+        item4: true,
+        item5: true,
+        item6: true,
+      },
+    });
+
+    const itemsToRemove = [
+      1083, 1054, 1055, 1056, 3363, 3340, 2055, 3862, 3854, 3858, 2033, 2138,
+      2139, 2140,
+    ]; // Replace with the item IDs you want to remove
+
+    const filteredPlayerMatchStats = playerMatchStats.map((player) => {
+      const filteredItems = [
+        player.item0,
+        player.item1,
+        player.item2,
+        player.item3,
+        player.item4,
+        player.item5,
+        player.item6,
+      ].filter((itemId) => !itemsToRemove.includes(itemId));
+
+      return { ...player, ...filteredItems };
+    });
+
+    console.log(filteredPlayerMatchStats);
+
+    const itemCounts = {};
+
+    playerMatchStats.forEach((player) => {
+      const items = [
+        player.item0,
+        player.item1,
+        player.item2,
+        player.item3,
+        player.item4,
+        player.item5,
+        player.item6,
+      ];
+
+      items.forEach((itemId) => {
+        if (itemId && itemId !== 0) {
+          if (itemCounts[itemId]) {
+            itemCounts[itemId]++;
+          } else {
+            itemCounts[itemId] = 1;
+          }
+        }
+      });
+    });
+
+    const sortedItems = Object.entries(itemCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8);
+
+    return sortedItems;
   } catch (error) {
     console.error(error);
   }
