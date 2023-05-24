@@ -1065,7 +1065,17 @@ const Profile = () => {
                   <SummonerIcon />
                 </>
               ) : (
-                <Loading />
+                <Container
+                  css={{
+                    margin: "auto",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Loading />
+                </Container>
               )}
             </Grid>
             <Grid xs={2} direction="column">
@@ -1081,7 +1091,17 @@ const Profile = () => {
                   </Button>
                 </>
               ) : (
-                <Loading />
+                <Container
+                  css={{
+                    margin: "auto",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Loading />
+                </Container>
               )}
             </Grid>
           </Grid.Container>

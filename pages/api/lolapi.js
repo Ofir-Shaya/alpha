@@ -1019,131 +1019,128 @@ async function getAllChampions() {
 }
 
 async function detailedChampion(championName) {
-  console.log(championName);
-  const champion = await prisma.Champions.findUnique({
-    where: {
-      name: championName,
-    },
-  });
-  console.log(champion);
-  // let totalNumberOfGames = 0;
-  // champion.map((champion) => {
-  //   totalNumberOfGames += champion.gamesPlayed;
-  // });
+  try {
+    const champion = await prisma.champions.findUnique({
+      where: {
+        name: championName,
+      },
+    });
+    const totalNumberOfGames = champion.gamesPlayed;
 
-  // let championWithStats = champion.map((champion) => {
-  //   const pickRate =
-  //     champion.gamesPlayed > 0
-  //       ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
-  //       : "0%";
+    let championWithStats = {
+      ...champion,
+      pickRate:
+        champion.gamesPlayed > 0
+          ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
+          : "0%",
 
-  //   return {
-  //     ...champion,
-  //     winRate:
-  //       champion.gamesPlayed > 0
-  //         ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
-  //         : "0%",
-  //     avgKills:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.kills / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgDeaths:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.deaths / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgAssists:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.assists / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgTotalDamageDealtToChampions:
-  //       champion.gamesPlayed > 0
-  //         ? (
-  //             champion.totalDamageDealtToChampions / champion.gamesPlayed
-  //           ).toFixed(0)
-  //         : 0,
-  //     avgTotalHeal:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgDamageDealtToObjectives:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.damageDealtToObjectives / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgDamageDealtToTurrets:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgVisionScore:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgTimeCCingOthers:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgTotalDamageTaken:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.totalDamageTaken / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgGoldEarned:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
-  //         : 0,
-  //     avgWardsPlaced:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgWardsKilled:
-  //       champion.gamesPlayed > 0
-  //         ? (champion.wardsKilled / champion.gamesPlayed).toFixed(1)
-  //         : 0,
-  //     avgFirstBloodKill:
-  //       champion.gamesPlayed > 0
-  //         ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
-  //             1
-  //           ) + "%"
-  //         : "0%",
-  //     avgFirstTowerKill:
-  //       champion.gamesPlayed > 0
-  //         ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
-  //             1
-  //           ) + "%"
-  //         : "0%",
-  //     avgFirstInhibitorKill:
-  //       champion.gamesPlayed > 0
-  //         ? (
-  //             (champion.firstInhibitorKill / champion.gamesPlayed) *
-  //             100
-  //           ).toFixed(1) + "%"
-  //         : "0%",
-  //     avgFirstBaronKill:
-  //       champion.gamesPlayed > 0
-  //         ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
-  //             1
-  //           ) + "%"
-  //         : "0%",
-  //     avgFirstDragonKill:
-  //       champion.gamesPlayed > 0
-  //         ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
-  //             1
-  //           ) + "%"
-  //         : "0%",
-  //     avgFirstRiftHeraldKill:
-  //       champion.gamesPlayed > 0
-  //         ? (
-  //             (champion.firstRiftHeraldKill / champion.gamesPlayed) *
-  //             100
-  //           ).toFixed(1) + "%"
-  //         : "0%",
-  //     avgCompleteSupportQuestInTime:
-  //       champion.gamesPlayed > 0
-  //         ? (
-  //             (champion.completeSupportQuestInTime / champion.gamesPlayed) *
-  //             100
-  //           ).toFixed(1) + "%"
-  //         : "0%",
-  //     pickRate: pickRate,
-  //   };
-  // });
-  return champion;
+      winRate:
+        champion.gamesPlayed > 0
+          ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
+          : "0%",
+      avgKills:
+        champion.gamesPlayed > 0
+          ? (champion.kills / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgDeaths:
+        champion.gamesPlayed > 0
+          ? (champion.deaths / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgAssists:
+        champion.gamesPlayed > 0
+          ? (champion.assists / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgTotalDamageDealtToChampions:
+        champion.gamesPlayed > 0
+          ? (
+              champion.totalDamageDealtToChampions / champion.gamesPlayed
+            ).toFixed(0)
+          : 0,
+      avgTotalHeal:
+        champion.gamesPlayed > 0
+          ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgDamageDealtToObjectives:
+        champion.gamesPlayed > 0
+          ? (champion.damageDealtToObjectives / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgDamageDealtToTurrets:
+        champion.gamesPlayed > 0
+          ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgVisionScore:
+        champion.gamesPlayed > 0
+          ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgTimeCCingOthers:
+        champion.gamesPlayed > 0
+          ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgTotalDamageTaken:
+        champion.gamesPlayed > 0
+          ? (champion.totalDamageTaken / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgGoldEarned:
+        champion.gamesPlayed > 0
+          ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
+          : 0,
+      avgWardsPlaced:
+        champion.gamesPlayed > 0
+          ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgWardsKilled:
+        champion.gamesPlayed > 0
+          ? (champion.wardsKilled / champion.gamesPlayed).toFixed(1)
+          : 0,
+      avgFirstBloodKill:
+        champion.gamesPlayed > 0
+          ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      avgFirstTowerKill:
+        champion.gamesPlayed > 0
+          ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      avgFirstInhibitorKill:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.firstInhibitorKill / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
+      avgFirstBaronKill:
+        champion.gamesPlayed > 0
+          ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      avgFirstDragonKill:
+        champion.gamesPlayed > 0
+          ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      avgFirstRiftHeraldKill:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.firstRiftHeraldKill / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
+      avgCompleteSupportQuestInTime:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.completeSupportQuestInTime / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
+    };
+
+    return championWithStats;
+  } catch (error) {
+    console.error(error);
+  }
 }
