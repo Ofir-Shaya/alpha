@@ -1048,7 +1048,11 @@ const Profile = () => {
         }}
       >
         <MySidebar />
-        <Container css={{ marginTop: "$10" }}>
+        <Container
+          css={{
+            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+          }}
+        >
           <Grid.Container
             className="summoner-profile-header"
             gap={0}

@@ -68,3 +68,17 @@ figure {
   background-size: 1014px 570px;
   background-position: 50% -60px;
 }
+.text-secondary {
+  font-size: 1.5rem;
+  color: "#bbbedb";
+  font-weight: 300;
+  margin-left: 0.25em;
+}
+.center-text {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-self: center;
+  align-items: center;
+  align-content: center;
+}

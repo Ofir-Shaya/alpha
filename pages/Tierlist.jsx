@@ -404,7 +404,14 @@ const Tierlist = () => {
         }}
       >
         <MySidebar />
-        <Container fluid css={{ display: "flex", flexDirection: "column" }}>
+        <Container
+          fluid
+          css={{
+            display: "flex",
+            flexDirection: "column",
+            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+          }}
+        >
           <Container css={{ marginBlockEnd: "$15" }}>
             <Text h2> LoL Tier List</Text>
             <Text h3> for All Roles, All Ranks.</Text>

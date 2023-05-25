@@ -1034,7 +1034,91 @@ async function detailedChampion(championName) {
     const totalNumberOfGames = champion.gamesPlayed;
 
     let championWithStats = {
-      ...champion,
+      Kills:
+        champion.gamesPlayed > 0
+          ? (champion.kills / champion.gamesPlayed).toFixed(1)
+          : 0,
+      Deaths:
+        champion.gamesPlayed > 0
+          ? (champion.deaths / champion.gamesPlayed).toFixed(1)
+          : 0,
+      Assists:
+        champion.gamesPlayed > 0
+          ? (champion.assists / champion.gamesPlayed).toFixed(1)
+          : 0,
+      GoldEarned:
+        champion.gamesPlayed > 0
+          ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
+          : 0,
+      TotalDamage:
+        champion.gamesPlayed > 0
+          ? (
+              champion.totalDamageDealtToChampions / champion.gamesPlayed
+            ).toFixed(0)
+          : 0,
+      TotalHeal:
+        champion.gamesPlayed > 0
+          ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
+          : 0,
+
+      DamageToTurrets:
+        champion.gamesPlayed > 0
+          ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
+          : 0,
+      VisionScore:
+        champion.gamesPlayed > 0
+          ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
+          : 0,
+      CcingOthers:
+        champion.gamesPlayed > 0
+          ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
+          : 0,
+      FirstBlood:
+        champion.gamesPlayed > 0
+          ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      FirstDragon:
+        champion.gamesPlayed > 0
+          ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      FirstTower:
+        champion.gamesPlayed > 0
+          ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+
+      FirstRiftHerald:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.firstRiftHeraldKill / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
+      FirstBaron:
+        champion.gamesPlayed > 0
+          ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
+              1
+            ) + "%"
+          : "0%",
+      FirstInhibitor:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.firstInhibitorKill / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
+      FastSupportQuest:
+        champion.gamesPlayed > 0
+          ? (
+              (champion.completeSupportQuestInTime / champion.gamesPlayed) *
+              100
+            ).toFixed(1) + "%"
+          : "0%",
       pickRate:
         champion.gamesPlayed > 0
           ? ((champion.gamesPlayed / totalNumberOfGames) * 100).toFixed(1) + "%"
@@ -1044,105 +1128,7 @@ async function detailedChampion(championName) {
         champion.gamesPlayed > 0
           ? ((champion.wins / champion.gamesPlayed) * 100).toFixed(1) + "%"
           : "0%",
-      avgKills:
-        champion.gamesPlayed > 0
-          ? (champion.kills / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgDeaths:
-        champion.gamesPlayed > 0
-          ? (champion.deaths / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgAssists:
-        champion.gamesPlayed > 0
-          ? (champion.assists / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgTotalDamageDealtToChampions:
-        champion.gamesPlayed > 0
-          ? (
-              champion.totalDamageDealtToChampions / champion.gamesPlayed
-            ).toFixed(0)
-          : 0,
-      avgTotalHeal:
-        champion.gamesPlayed > 0
-          ? (champion.totalHeal / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgDamageDealtToObjectives:
-        champion.gamesPlayed > 0
-          ? (champion.damageDealtToObjectives / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgDamageDealtToTurrets:
-        champion.gamesPlayed > 0
-          ? (champion.damageDealtToTurrets / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgVisionScore:
-        champion.gamesPlayed > 0
-          ? (champion.visionScore / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgTimeCCingOthers:
-        champion.gamesPlayed > 0
-          ? (champion.timeCCingOthers / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgTotalDamageTaken:
-        champion.gamesPlayed > 0
-          ? (champion.totalDamageTaken / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgGoldEarned:
-        champion.gamesPlayed > 0
-          ? (champion.goldEarned / champion.gamesPlayed).toFixed(0)
-          : 0,
-      avgWardsPlaced:
-        champion.gamesPlayed > 0
-          ? (champion.wardsPlaced / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgWardsKilled:
-        champion.gamesPlayed > 0
-          ? (champion.wardsKilled / champion.gamesPlayed).toFixed(1)
-          : 0,
-      avgFirstBloodKill:
-        champion.gamesPlayed > 0
-          ? ((champion.firstBloodKill / champion.gamesPlayed) * 100).toFixed(
-              1
-            ) + "%"
-          : "0%",
-      avgFirstTowerKill:
-        champion.gamesPlayed > 0
-          ? ((champion.firstTowerKill / champion.gamesPlayed) * 100).toFixed(
-              1
-            ) + "%"
-          : "0%",
-      avgFirstInhibitorKill:
-        champion.gamesPlayed > 0
-          ? (
-              (champion.firstInhibitorKill / champion.gamesPlayed) *
-              100
-            ).toFixed(1) + "%"
-          : "0%",
-      avgFirstBaronKill:
-        champion.gamesPlayed > 0
-          ? ((champion.firstBaronKill / champion.gamesPlayed) * 100).toFixed(
-              1
-            ) + "%"
-          : "0%",
-      avgFirstDragonKill:
-        champion.gamesPlayed > 0
-          ? ((champion.firstDragonKill / champion.gamesPlayed) * 100).toFixed(
-              1
-            ) + "%"
-          : "0%",
-      avgFirstRiftHeraldKill:
-        champion.gamesPlayed > 0
-          ? (
-              (champion.firstRiftHeraldKill / champion.gamesPlayed) *
-              100
-            ).toFixed(1) + "%"
-          : "0%",
-      avgCompleteSupportQuestInTime:
-        champion.gamesPlayed > 0
-          ? (
-              (champion.completeSupportQuestInTime / champion.gamesPlayed) *
-              100
-            ).toFixed(1) + "%"
-          : "0%",
+      ...champion,
     };
 
     return championWithStats;
@@ -1170,8 +1156,8 @@ async function championItems(championName) {
 
     const itemsToRemove = [
       1083, 1054, 1055, 1056, 3363, 3340, 2055, 3862, 3854, 3858, 2033, 2138,
-      2139, 2140,
-    ]; // Replace with the item IDs you want to remove
+      2139, 2140, 0,
+    ];
 
     const filteredPlayerMatchStats = playerMatchStats.map((player) => {
       const filteredItems = [
@@ -1184,26 +1170,24 @@ async function championItems(championName) {
         player.item6,
       ].filter((itemId) => !itemsToRemove.includes(itemId));
 
-      return { ...player, ...filteredItems };
+      return { ...filteredItems };
     });
-
-    console.log(filteredPlayerMatchStats);
 
     const itemCounts = {};
 
-    playerMatchStats.forEach((player) => {
+    filteredPlayerMatchStats.forEach((player) => {
       const items = [
-        player.item0,
-        player.item1,
-        player.item2,
-        player.item3,
-        player.item4,
-        player.item5,
-        player.item6,
+        player["0"],
+        player["1"],
+        player["2"],
+        player["3"],
+        player["4"],
+        player["5"],
+        player["6"],
       ];
 
       items.forEach((itemId) => {
-        if (itemId && itemId !== 0) {
+        if (itemId) {
           if (itemCounts[itemId]) {
             itemCounts[itemId]++;
           } else {

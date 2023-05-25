@@ -12,6 +12,7 @@
     "@next/font": "13.1.2",
     "@nextui-org/react": "^1.0.0-beta.12",
     "@prisma/client": "^4.14.1",
+    "@react-spectrum/table": "^3.9.0",
     "axios": "^1.2.3",
     "cookies-next": "^2.1.1",
     "eslint": "8.32.0",
@@ -22,6 +23,7 @@
     "next-themes": "^0.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-spectrum": "^1.2.6",
     "react-stately": "^3.22.0"
   },
   "devDependencies": {
