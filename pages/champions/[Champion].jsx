@@ -8,7 +8,9 @@ const Champion = () => {
   const router = useRouter();
   const { Champion } = router.query;
   const [championInfo, setChampionInfo] = useState(null);
+  const [championItems, setChampionItems] = useState(null);
 
+  // Get Champion Info
   useEffect(() => {
     const fetchChampionInfo = async () => {
       if (!Champion) return;
@@ -32,6 +34,33 @@ const Champion = () => {
       }
     };
     fetchChampionInfo();
+  }, [Champion]);
+
+  // Get Champion Items
+  useEffect(() => {
+    const fetchChampionItems = async () => {
+      if (!Champion) return;
+      try {
+        const response = await fetch(
+          `/api/lolapi?championName=${Champion}&func=championItems`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setChampionItems(data);
+        } else console.log("Error fetching Champion Items.");
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchChampionItems();
+    console.log(championItems);
   }, [Champion]);
 
   const calculateKDA = (champion) =>
@@ -346,6 +375,262 @@ const Champion = () => {
       </Card>
     );
   };
+  const ChampionItem0 = () => {
+    return (
+      <Card
+        className="champion-item0"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[0][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem1 = () => {
+    return (
+      <Card
+        className="champion-item1"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[1][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem2 = () => {
+    return (
+      <Card
+        className="champion-item2"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[2][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem3 = () => {
+    return (
+      <Card
+        className="champion-item3"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[3][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem4 = () => {
+    return (
+      <Card
+        className="champion-item4"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[4][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem5 = () => {
+    return (
+      <Card
+        className="champion-item5"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[5][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem6 = () => {
+    return (
+      <Card
+        className="champion-item6"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[6][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
+  const ChampionItem7 = () => {
+    return (
+      <Card
+        className="champion-item7"
+        css={{
+          backgroundColor: "transparent",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          borderRadius: "0",
+          width: "fit-content",
+          position: "relative",
+
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <Image
+          height={32}
+          width={32}
+          src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${championItems[7][0]}.png`}
+          alt={"r"}
+          objectFit="cover"
+          css={{
+            borderRadius: "6px",
+            border: "1px solid rgb(205,69,69)",
+            margin: "0",
+          }}
+        />
+      </Card>
+    );
+  };
 
   return (
     <>
@@ -540,7 +825,37 @@ const Champion = () => {
                     </Grid>
                   </Grid.Container>
 
-                  <Container className="most-picked-items"></Container>
+                  <Container className="most-picked-items">
+                    <Text b h3>
+                      Most picked items on {Champion}:
+                    </Text>
+                    <Grid.Container>
+                      <Grid>
+                        <ChampionItem0 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem1 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem2 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem3 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem4 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem5 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem6 />
+                      </Grid>
+                      <Grid>
+                        <ChampionItem7 />
+                      </Grid>
+                    </Grid.Container>
+                  </Container>
                   <Container className="champion-detailed-stats"></Container>
                 </>
               ) : (

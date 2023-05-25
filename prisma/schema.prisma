@@ -139,5 +139,5 @@ model Champions {
   firstDragonKill             Int
   firstRiftHeraldKill         Int
   completeSupportQuestInTime  Int
-
+  
 }
