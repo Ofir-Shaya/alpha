@@ -118,6 +118,7 @@ async function handleGET(req, res) {
     }
     return data;
   } catch (error) {
+    console.log(error);
     return res.status(500).json(error);
   }
 }
@@ -148,13 +149,13 @@ async function searchPlayer(playerName) {
 
     if (existingProfile) {
       return existingProfile;
-    } else createPlayer(playerName);
+    } else return createPlayer(playerName);
     // fetch the player data from the API if can't find
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      console.log("Player doesn't exist.");
+      return { status: 404, message: "Player not found." };
     } else {
-      console.error(error);
+      throw error;
     }
   }
 }
@@ -182,9 +183,9 @@ async function createPlayer(playerName) {
     return player;
   } catch (error) {
     if (error.response && error.response.status === 404) {
-      console.log("Player doesn't exist.");
+      return { status: 404, name: playerName };
     } else {
-      console.error(error);
+      return error;
     }
   }
 }

@@ -4,27 +4,27 @@ import MySidebar from "@/components/MySidebar";
 import { useTheme, Input, Image, Container, Button } from "@nextui-org/react";
 import { Search } from "../components/Icons/AllIcons";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useRef } from "react";
 
 export default function Home() {
-  const [player, setPlayer] = useState(null);
+  const router = useRouter();
 
-  const [searchInput, setSearchInput] = useState();
+  const searchInputRef = useRef(null);
 
-  const handleInputChange = (event) => {
-    setSearchInput(event.target.value);
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      searchPlayer();
+    }
   };
 
-  const fetchPlayer = async (user) => {
-    await fetch(`/api/lolapi?user=${user}&func=searchPlayer`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.ok)
-      .then((data) => {
-        setPlayer(data);
-      });
+  const searchPlayer = () => {
+    const searchInputValue = searchInputRef.current.value;
+    if (searchInputValue.length >= 4) {
+      router.push(`/player/${searchInputValue}?server=EUNE`);
+    } else {
+      console.error("Must enter a name longer than 3 letters");
+    }
   };
 
   return (
@@ -60,10 +60,14 @@ export default function Home() {
             }}
           />
           <Input
+            aria-label="Search player"
+            aria-labelledby="Search Player"
+            aria-hidden="true"
             id="frontSearchInput"
             clearable
             size="md"
             fullWidth
+            label="Search player"
             contentLeft={
               <Search fill="var(--nextui-colors-accents6)" size={16} />
             }
@@ -73,13 +77,13 @@ export default function Home() {
             }}
             labelLeft="EUNE"
             placeholder="Search..."
-            value={searchInput}
-            onChange={handleInputChange}
+            ref={searchInputRef}
+            onKeyDown={handleKeyDown}
           />
           <Link
             href={{
               pathname: "/player/[profile]",
-              query: { profile: searchInput, server: "EUNE" },
+              query: { profile: searchInputRef, server: "EUNE" },
             }}
           >
             <Button
@@ -87,7 +91,7 @@ export default function Home() {
               auto
               ghost
               autoFocus
-              onClick={fetchPlayer}
+              onClick={searchPlayer}
             >
               Search
             </Button>

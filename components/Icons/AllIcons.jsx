@@ -129,40 +129,135 @@ export const FlipFlops = (props) => (
   </svg>
 );
 
-export const Password = ({ fill, size, height, width, ...props }) => {
-  return (
-    <svg
-      width={size || width || 24}
-      height={size || height || 24}
-      viewBox="0 0 24 24"
-      {...props}
-    >
-      <g fill={fill}>
-        <path d="M18.75 8v2.1a12.984 12.984 0 00-1.5-.1V8c0-3.15-.89-5.25-5.25-5.25S6.75 4.85 6.75 8v2a12.984 12.984 0 00-1.5.1V8c0-2.9.7-6.75 6.75-6.75S18.75 5.1 18.75 8z" />
-        <path d="M18.75 10.1a12.984 12.984 0 00-1.5-.1H6.75a12.984 12.984 0 00-1.5.1C2.7 10.41 2 11.66 2 15v2c0 4 1 5 5 5h10c4 0 5-1 5-5v-2c0-3.34-.7-4.59-3.25-4.9zM8.71 16.71A1.052 1.052 0 018 17a1 1 0 01-.38-.08 1.032 1.032 0 01-.33-.21A1.052 1.052 0 017 16a1 1 0 01.08-.38 1.155 1.155 0 01.21-.33 1.032 1.032 0 01.33-.21 1 1 0 011.09.21 1.155 1.155 0 01.21.33A1 1 0 019 16a1.052 1.052 0 01-.29.71zm4.21-.33a1.155 1.155 0 01-.21.33A1.052 1.052 0 0112 17a1.033 1.033 0 01-.71-.29 1.155 1.155 0 01-.21-.33A1 1 0 0111 16a1.033 1.033 0 01.29-.71 1.047 1.047 0 011.42 0A1.033 1.033 0 0113 16a1 1 0 01-.08.38zm3.79.33a1.014 1.014 0 01-1.42 0 1.014 1.014 0 010-1.42 1.047 1.047 0 011.42 0c.04.05.08.1.12.16a.556.556 0 01.09.17.636.636 0 01.06.18 1.5 1.5 0 01.02.2 1.052 1.052 0 01-.29.71z" />
-      </g>
-    </svg>
-  );
-};
+export const Password = ({ fill, size, height, width, ...props }) => (
+  <svg
+    width={size || width || 24}
+    height={size || height || 24}
+    viewBox="0 0 24 24"
+    {...props}
+  >
+    <g fill={fill}>
+      <path d="M18.75 8v2.1a12.984 12.984 0 00-1.5-.1V8c0-3.15-.89-5.25-5.25-5.25S6.75 4.85 6.75 8v2a12.984 12.984 0 00-1.5.1V8c0-2.9.7-6.75 6.75-6.75S18.75 5.1 18.75 8z" />
+      <path d="M18.75 10.1a12.984 12.984 0 00-1.5-.1H6.75a12.984 12.984 0 00-1.5.1C2.7 10.41 2 11.66 2 15v2c0 4 1 5 5 5h10c4 0 5-1 5-5v-2c0-3.34-.7-4.59-3.25-4.9zM8.71 16.71A1.052 1.052 0 018 17a1 1 0 01-.38-.08 1.032 1.032 0 01-.33-.21A1.052 1.052 0 017 16a1 1 0 01.08-.38 1.155 1.155 0 01.21-.33 1.032 1.032 0 01.33-.21 1 1 0 011.09.21 1.155 1.155 0 01.21.33A1 1 0 019 16a1.052 1.052 0 01-.29.71zm4.21-.33a1.155 1.155 0 01-.21.33A1.052 1.052 0 0112 17a1.033 1.033 0 01-.71-.29 1.155 1.155 0 01-.21-.33A1 1 0 0111 16a1.033 1.033 0 01.29-.71 1.047 1.047 0 011.42 0A1.033 1.033 0 0113 16a1 1 0 01-.08.38zm3.79.33a1.014 1.014 0 01-1.42 0 1.014 1.014 0 010-1.42 1.047 1.047 0 011.42 0c.04.05.08.1.12.16a.556.556 0 01.09.17.636.636 0 01.06.18 1.5 1.5 0 01.02.2 1.052 1.052 0 01-.29.71z" />
+    </g>
+  </svg>
+);
 
-export const Mail = ({ fill, size, height, width, ...props }) => {
-  return (
-    <svg
-      width={size || width || 24}
-      height={size || height || 24}
-      viewBox="0 0 24 24"
-      {...props}
+export const Mail = ({ fill, size, height, width, ...props }) => (
+  <svg
+    width={size || width || 24}
+    height={size || height || 24}
+    viewBox="0 0 24 24"
+    {...props}
+  >
+    <g
+      fill="none"
+      stroke={fill}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
     >
-      <g
-        fill="none"
-        stroke={fill}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-      >
-        <path d="M12 20.5H7c-3 0-5-1.5-5-5v-7c0-3.5 2-5 5-5h10c3 0 5 1.5 5 5v3" />
-        <path d="M17 9l-3.13 2.5a3.166 3.166 0 01-3.75 0L7 9M19.21 14.77l-3.539 3.54a1.232 1.232 0 00-.3.59l-.19 1.35a.635.635 0 00.76.76l1.35-.19a1.189 1.189 0 00.59-.3l3.54-3.54a1.365 1.365 0 000-2.22 1.361 1.361 0 00-2.211.01zM18.7 15.28a3.185 3.185 0 002.22 2.22" />
-      </g>
-    </svg>
-  );
-};
+      <path d="M12 20.5H7c-3 0-5-1.5-5-5v-7c0-3.5 2-5 5-5h10c3 0 5 1.5 5 5v3" />
+      <path d="M17 9l-3.13 2.5a3.166 3.166 0 01-3.75 0L7 9M19.21 14.77l-3.539 3.54a1.232 1.232 0 00-.3.59l-.19 1.35a.635.635 0 00.76.76l1.35-.19a1.189 1.189 0 00.59-.3l3.54-3.54a1.365 1.365 0 000-2.22 1.361 1.361 0 00-2.211.01zM18.7 15.28a3.185 3.185 0 002.22 2.22" />
+    </g>
+  </svg>
+);
+
+export const Home = ({ fill, size, height, width, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size || width || 24}
+    height={size || height || 24}
+    {...props}
+  >
+    <path
+      stroke="#464455"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 20H7a2 2 0 0 1-2-2v-7.08A2 2 0 0 1 5.698 9.4l5-4.285a2 2 0 0 1 2.604 0l5 4.285A2 2 0 0 1 19 10.92V18a2 2 0 0 1-2 2h-2m-6 0v-6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v6m-6 0h6"
+    />
+  </svg>
+);
+
+export const Bookmark = ({ fill, size, height, width, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size || width || 24}
+    height={size || height || 24}
+    {...props}
+  >
+    <path
+      stroke="#464455"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M14.692 6.08c0-.596-.43-1.08-.961-1.08H7.96C7.432 5 7 5.484 7 6.08v10.45l.77-.577m2.5-8.482h5.768c.532 0 .962.484.962 1.08V19l-3.846-2.882L9.308 19V8.551c0-.596.43-1.08.961-1.08Z"
+    />
+  </svg>
+);
+
+export const Champion = ({ fill, size, height, width, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size || width || 24}
+    height={size || height || 24}
+    {...props}
+  >
+    <path
+      stroke="#464455"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M8 21h8m-4 0v-4m0 0a5 5 0 0 1-5-5V6m5 11a5 5 0 0 0 5-5V6m0 0a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2m10 0h1.5a2.5 2.5 0 0 1 0 5H17M7 6H5.5a2.5 2.5 0 0 0 0 5H7"
+    />
+  </svg>
+);
+
+export const Tiers = ({ fill, size, height, width, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size || width || 24}
+    height={size || height || 24}
+    {...props}
+  >
+    <path fill="#464455" d="M20 4H4v16h16V4Z" opacity={0.15} />
+    <path
+      stroke="#464455"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M7 8h10M7 12h10m-8 4h6M4 4h16v16H4V4Z"
+    />
+  </svg>
+);
+
+export const MyChampion = ({ fill, size, height, width, ...props }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size || width || 24}
+    height={size || height || 24}
+    {...props}
+  >
+    <g
+      stroke="#464455"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+    >
+      <circle cx={12} cy={12} r={2.25} />
+      <circle cx={12} cy={12} r={6.75} />
+      <path d="M12 5.25V3M18.75 12H21M12 18.75V21M5.25 12H3" />
+    </g>
+  </svg>
+);

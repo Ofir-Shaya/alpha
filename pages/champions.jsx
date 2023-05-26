@@ -100,15 +100,15 @@ const Champions = () => {
         css={{
           margin: 0,
           padding: 0,
-          backgroundColor: "#262b5a",
+          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
         }}
       >
         <MySidebar />
 
         <Container
           css={{
-            marginTop: "$15",
             margin: "0",
+            marginLeft: "250px",
             display: "flex",
             flexDirection: "column",
             backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,

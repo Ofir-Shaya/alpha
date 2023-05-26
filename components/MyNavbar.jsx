@@ -6,11 +6,12 @@ import {
   MoonRounded,
   SunRounded,
   Search,
-  AcmeLogo,
   Mail,
   Password,
 } from "./Icons/AllIcons";
 import { Modal, Button, Row, Checkbox } from "@nextui-org/react";
+import { useRouter } from "next/router";
+import { useRef } from "react";
 
 const MyNavbar = () => {
   const { setTheme } = useNextTheme();
@@ -28,6 +29,25 @@ const MyNavbar = () => {
     "Login",
     "Sign Up",
   ];
+
+  const router = useRouter();
+
+  const searchInputRef = useRef(null);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      searchPlayer();
+    }
+  };
+
+  const searchPlayer = () => {
+    const searchInputValue = searchInputRef.current.value;
+    if (searchInputValue.length >= 4) {
+      router.push(`/player/${searchInputValue}?server=EUNE`);
+    } else {
+      console.error("Must enter a name longer than 3 letters");
+    }
+  };
 
   const [loginVisible, setLoginVisible] = React.useState(false);
   const [registerVisible, setRegisterVisible] = React.useState(false);
@@ -87,17 +107,14 @@ const MyNavbar = () => {
 
   return (
     <Layout>
-      <Navbar isBordered={isDark} variant="sticky" maxWidth="fluid">
-        <Navbar.Brand css={{ mx: 50 }}>
-          <Navbar.Toggle showIn="xs" aria-label="toggle navigation" />
-
-          <AcmeLogo />
-
-          <Text b color="inherit" hideIn="xs">
-            ALPHA
-          </Text>
-        </Navbar.Brand>
-
+      <Navbar
+        isBordered={isDark}
+        variant="sticky"
+        maxWidth="fluid"
+        containerCss={{
+          backgroundColor: "#0B0B0B !important",
+        }}
+      >
         <Navbar.Content
           css={{
             dflex: "center",
@@ -114,6 +131,9 @@ const MyNavbar = () => {
             }}
           >
             <Input
+              aria-label="Search player"
+              aria-labelledby="Search Player"
+              aria-hidden="true"
               id="navbarSearchInput"
               clearable
               size="md"
@@ -127,6 +147,8 @@ const MyNavbar = () => {
               }}
               labelRight="EUNE"
               placeholder="Search..."
+              ref={searchInputRef}
+              onKeyDown={handleKeyDown}
             />
           </Navbar.Item>
         </Navbar.Content>

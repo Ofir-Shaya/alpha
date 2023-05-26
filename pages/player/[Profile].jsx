@@ -115,6 +115,7 @@ const epochTimeConvertor = (epochValue) => {
 
 const Profile = () => {
   const router = useRouter();
+  const [playerFound, setPlayerFound] = useState(null);
   const { Profile, server } = router.query;
   const [player, setPlayer] = useState(null);
   const [playerRanked, setPlayerRanked] = useState(null);
@@ -138,11 +139,19 @@ const Profile = () => {
             },
           }
         );
-
         if (response.ok) {
           const data = await response.json();
-          setPlayer(data);
-        } else console.log("Error fetching player search.");
+          if (data.status && data.status === 404) {
+            setPlayer(data.name);
+            setPlayerFound(false);
+          } else {
+            setPlayerFound(true);
+            setPlayer(data);
+          }
+        } else {
+          console.log(response);
+          console.log("Error fetching player search.");
+        }
       } catch (error) {
         console.error(error);
       }
@@ -154,6 +163,7 @@ const Profile = () => {
   useEffect(() => {
     const pullRankedInfo = async () => {
       if (!player) return;
+      if (!playerFound) return;
       try {
         const response = await fetch(
           `/api/lolapi?summonerName=${player.username}&func=getRankedInformation`,
@@ -345,6 +355,7 @@ const Profile = () => {
           flexDirection: "row",
           justifyContent: "start",
           borderRadius: "0",
+          width: "fit-content",
         }}
       >
         <Card.Body css={{ flexDirection: "row", margin: "$0" }}>
@@ -1033,6 +1044,65 @@ const Profile = () => {
     return champsOverview;
   };
 
+  const PageHeader = () => {
+    if (!player)
+      return (
+        <Container
+          css={{
+            margin: "auto",
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Loading />
+        </Container>
+      );
+    if (!playerFound)
+      return (
+        <Container
+          className="center-text"
+          css={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Text h2> Oh no! We couldn't find summoner "{player}"</Text>
+          <Text h4>
+            Please Double check your spelling or maybe your summoner is in a
+            different region.
+          </Text>
+        </Container>
+      );
+    return (
+      <Grid.Container
+        className="summoner-profile-header"
+        gap={0}
+        justify="start"
+        direction="row"
+        css={{
+          paddingTop: "20px",
+          borderRadius: "10px",
+        }}
+      >
+        <Grid xs={1} css={{}}>
+          <SummonerIcon />
+        </Grid>
+        <Grid xs={2} direction="column">
+          <SummonerProfileHeader />
+          <Button
+            auto
+            onPress={updateRankedInformation}
+            css={{ width: "fit-content", marginLeft: "$10" }}
+          >
+            Update
+          </Button>
+        </Grid>
+      </Grid.Container>
+    );
+  };
+
   return (
     <>
       <MyNavbar />
@@ -1044,103 +1114,48 @@ const Profile = () => {
         css={{
           margin: 0,
           padding: 0,
-          backgroundColor: "#262b5a",
+          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
         }}
       >
         <MySidebar />
         <Container
           css={{
-            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+            marginLeft: "150px",
           }}
         >
-          <Grid.Container
-            className="summoner-profile-header"
-            gap={0}
-            justify="start"
-            direction="row"
-            css={{
-              paddingTop: "20px",
-              borderRadius: "10px",
-            }}
-          >
-            <Grid xs={1} css={{}}>
-              {player ? (
-                <>
-                  <SummonerIcon />
-                </>
-              ) : (
-                <Container
-                  css={{
-                    margin: "auto",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Loading />
-                </Container>
-              )}
-            </Grid>
-            <Grid xs={2} direction="column">
-              {player ? (
-                <>
-                  <SummonerProfileHeader />
-                  <Button
-                    auto
-                    onPress={updateRankedInformation}
-                    css={{ width: "fit-content", marginLeft: "$10" }}
-                  >
-                    Update
-                  </Button>
-                </>
-              ) : (
-                <Container
-                  css={{
-                    margin: "auto",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Loading />
-                </Container>
-              )}
-            </Grid>
-          </Grid.Container>
-          <Grid.Container
-            className="summoner-profile-overview"
-            gap={0}
-            justify="start"
-            direction="row"
-            css={{
-              paddingTop: "20px",
-              borderRadius: "10px",
-            }}
-          >
-            <Grid
-              className="column-1"
-              css={{ display: "flex", flexDirection: "column", gap: "$10" }}
-              xs={3}
+          <PageHeader />
+          {playerRankedSolo ? (
+            <Grid.Container
+              className="summoner-profile-overview"
+              gap={0}
+              justify="start"
+              direction="row"
+              css={{
+                paddingTop: "20px",
+                borderRadius: "10px",
+              }}
             >
-              <Container
-                display="flex"
-                direction="column"
-                css={{
-                  borderRadius: "18px",
-                  justifyContent: "start",
-                  backgroundColor: "#191937",
-                  height: "fit-content",
-                }}
+              <Grid
+                className="column-1"
+                css={{ display: "flex", flexDirection: "column", gap: "$10" }}
+                xs={3}
               >
-                <Container className="queue-container">
-                  <Text h4 css={{ width: "100%" }}>
-                    Ranked Solo
-                  </Text>
-                </Container>
+                <Container
+                  display="flex"
+                  direction="column"
+                  css={{
+                    borderRadius: "18px",
+                    justifyContent: "start",
+                    backgroundColor: "#191937",
+                    height: "fit-content",
+                  }}
+                >
+                  <Container className="queue-container">
+                    <Text h4 css={{ width: "100%" }}>
+                      Ranked Solo
+                    </Text>
+                  </Container>
 
-                {playerRankedSolo ? (
                   <Container
                     display="flex"
                     direction="row"
@@ -1209,57 +1224,58 @@ const Profile = () => {
                       </Container>
                     </Container>
                   </Container>
-                ) : (
-                  ""
-                )}
-              </Container>
-              <Container
+                </Container>
+
+                <Container
+                  display="flex"
+                  direction="column"
+                  css={{
+                    borderRadius: "18px",
+                    justifyContent: "start",
+                    backgroundColor: "#191937",
+                    height: "fit-content",
+                  }}
+                >
+                  {champInformation && (
+                    <>
+                      <Text h4 css={{ textAlign: "center" }}>
+                        Champions Overview:
+                      </Text>
+                      <Container css={{ padding: "$2" }}>
+                        <ChampsPlayed />
+                      </Container>
+                    </>
+                  )}
+                </Container>
+              </Grid>
+
+              <Grid
                 display="flex"
                 direction="column"
+                xs={8}
                 css={{
                   borderRadius: "18px",
-                  justifyContent: "start",
+                  justifyContent: "center",
                   backgroundColor: "#191937",
-                  height: "fit-content",
+                  marginInlineStart: "$5",
                 }}
               >
-                {champInformation && (
+                {matchInformation && (
                   <>
                     <Text h4 css={{ textAlign: "center" }}>
-                      Champions Overview:
+                      Matches Overview:
                     </Text>
-                    <Container css={{ padding: "$2" }}>
-                      <ChampsPlayed />
+
+                    <Container>
+                      <LatestPlayed />
                     </Container>
                   </>
                 )}
-              </Container>
-            </Grid>
-
-            <Grid
-              display="flex"
-              direction="column"
-              xs={8}
-              css={{
-                borderRadius: "18px",
-                justifyContent: "center",
-                backgroundColor: "#191937",
-                marginInlineStart: "$5",
-              }}
-            >
-              {matchInformation && (
-                <>
-                  <Text h4 css={{ textAlign: "center" }}>
-                    Matches Overview:
-                  </Text>
-
-                  <Container>
-                    <LatestPlayed />
-                  </Container>
-                </>
-              )}
-            </Grid>
-          </Grid.Container>
+              </Grid>
+            </Grid.Container>
+          ) : (
+            ""
+          )}
         </Container>
       </Container>
     </>

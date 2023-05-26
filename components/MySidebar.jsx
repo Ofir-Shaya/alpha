@@ -1,77 +1,172 @@
 import React from "react";
-import { Link, useTheme, Grid, Spacer } from "@nextui-org/react";
+import { Link, useTheme, Grid, Spacer, Text } from "@nextui-org/react";
 import {
-  MoonRounded,
-  SunRounded,
-  Money,
-  FishBone,
-  Flag,
-  FlipFlops,
+  MyChampion,
+  Champion,
+  Home,
+  AcmeLogo,
+  Bookmark,
+  Tiers,
 } from "./Icons/AllIcons";
 
 const MySidebar = () => {
   const { isDark } = useTheme();
-
   return (
     <Grid.Container
       display="flex"
       justify="flex-start"
-      direction="column"
+      direction="row"
       alignItems="flex-start"
       css={{
         margin: "0",
-        width: "20%",
-        backgroundColor: isDark ? "#0B0B0B" : "#B0B0B0",
+        width: "4%",
+        paddingTop: "9px",
         height: "100vh",
-        paddingTop: "25px",
+        position: "fixed",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        zIndex: "9999",
+        backgroundColor: "#000000",
+        transition: "width 0.05s ease",
+        "&:hover": {
+          width: "15%",
+          "& .show-on-hover ": {
+            display: "flex",
+            justifyContent: "center",
+            textAlign: "center",
+            alignSelf: "center",
+            alignItems: "center",
+            alignContent: "center",
+          },
+        },
       }}
     >
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
-        <Link block color="inherit">
-          <FlipFlops width="26" height="26" />
-          Sandals
-        </Link>
-      </Grid>
-      <Spacer y={1} />
+      <Grid
+        gap={0}
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          textAlign: "start",
+          alignSelf: "center",
+          alignItems: "center",
+          alignContent: "center",
+        }}
+      >
+        <AcmeLogo />
 
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
+        <Text
+          b
+          className="show-on-hover "
+          css={{ paddingLeft: "5px", display: "none" }}
+        >
+          Alpha
+        </Text>
+      </Grid>
+      <Grid
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Link block color="inherit">
-          <MoonRounded width="26" height="26" />
-          Moon
+          <Home width="26" height="26" />
+          <Text
+            className=" show-on-hover "
+            css={{ paddingLeft: "5px", display: "none" }}
+          >
+            Home
+          </Text>
         </Link>
       </Grid>
-      <Spacer y={1} />
 
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
+      <Grid
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Link block color="inherit">
-          <SunRounded width="26" height="26" />
-          Rounded
+          <Champion width="26" height="26" />
+          <Text
+            className=" show-on-hover "
+            css={{ paddingLeft: "5px", display: "none" }}
+          >
+            Champions
+          </Text>
         </Link>
       </Grid>
-      <Spacer y={1} />
 
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
+      <Grid
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Link block color="inherit">
-          <Money width="26" height="26" />
-          Money
+          <Tiers width="26" height="26" />
+          <Text
+            className=" show-on-hover "
+            css={{ paddingLeft: "5px", display: "none" }}
+          >
+            Tier List
+          </Text>
         </Link>
       </Grid>
-      <Spacer y={1} />
 
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
+      <Grid
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Link block color="inherit">
-          <FishBone width="26" height="26" />
-          Fish
+          <Bookmark width="26" height="26" />
+          <Text
+            className=" show-on-hover "
+            css={{ paddingLeft: "5px", display: "none" }}
+          >
+            My Profile
+          </Text>
         </Link>
       </Grid>
-      <Spacer y={1} />
 
-      <Grid xs={1} css={{ marginLeft: "50px" }}>
+      <Grid
+        css={{
+          paddingLeft: "5px",
+          borderBottom: "2px solid #0B0B0B",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
         <Link block color="inherit">
-          <Flag width="26" height="26" />
-          Capture
+          <MyChampion width="26" height="26" />
+          <Text
+            className=" show-on-hover "
+            css={{ paddingLeft: "5px", display: "none" }}
+          >
+            My Champion
+          </Text>
         </Link>
       </Grid>
+      <Spacer y={15} />
     </Grid.Container>
   );
 };
