@@ -13,7 +13,8 @@ model User {
   id       Int      @id @default(autoincrement())
   email    String   @unique
   password String
-  profile  Profile?
+  profile  String?
+  champion String?
 }
 
 model Profile {
@@ -22,8 +23,6 @@ model Profile {
   puuid             String             @unique
   summonerLevel     Int
   profileIconId     Int?
-  userId            Int?               @unique
-  user              User?              @relation(fields: [userId], references: [id])
   rankedInformation RankedInformation?
 }
 

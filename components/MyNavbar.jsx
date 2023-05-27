@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Navbar, Link, Text, useTheme, Switch, Input } from "@nextui-org/react";
 import { Layout } from "./common/Layout";
 import { useTheme as useNextTheme } from "next-themes";
@@ -8,6 +8,8 @@ import {
   Search,
   Mail,
   Password,
+  MyChampion,
+  Bookmark,
 } from "./Icons/AllIcons";
 import { Modal, Button, Row, Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/router";
@@ -49,21 +51,209 @@ const MyNavbar = () => {
     }
   };
 
-  const [loginVisible, setLoginVisible] = React.useState(false);
-  const [registerVisible, setRegisterVisible] = React.useState(false);
+  const championNames = [
+    "Aatrox",
+    "Ahri",
+    "Akali",
+    "Akshan",
+    "Alistar",
+    "Amumu",
+    "Anivia",
+    "Annie",
+    "Aphelios",
+    "Ashe",
+    "Aurelion Sol",
+    "Azir",
+    "Bard",
+    "Belveth",
+    "Blitzcrank",
+    "Brand",
+    "Braum",
+    "Caitlyn",
+    "Camille",
+    "Cassiopeia",
+    "Chogath",
+    "Corki",
+    "Darius",
+    "Diana",
+    "Draven",
+    "Dr Mundo",
+    "Ekko",
+    "Elise",
+    "Evelynn",
+    "Ezreal",
+    "Fiddlesticks",
+    "Fiora",
+    "Fizz",
+    "Galio",
+    "Gangplank",
+    "Garen",
+    "Gnar",
+    "Gragas",
+    "Graves",
+    "Gwen",
+    "Hecarim",
+    "Heimerdinger",
+    "Illaoi",
+    "Irelia",
+    "Ivern",
+    "Janna",
+    "Jarvan IV",
+    "Jax",
+    "Jayce",
+    "Jhin",
+    "Jinx",
+    "Kaisa",
+    "Kalista",
+    "Karma",
+    "Karthus",
+    "Kassadin",
+    "Katarina",
+    "Kayle",
+    "Kayn",
+    "Kennen",
+    "Khazix",
+    "Kindred",
+    "Kled",
+    "Kog Maw",
+    "KSante",
+    "Leblanc",
+    "LeeSin",
+    "Leona",
+    "Lillia",
+    "Lissandra",
+    "Lucian",
+    "Lulu",
+    "Lux",
+    "Malphite",
+    "Malzahar",
+    "Maokai",
+    "MasterYi",
+    "Milio",
+    "Miss Fortune",
+    "Mordekaiser",
+    "Morgana",
+    "Nami",
+    "Nasus",
+    "Nautilus",
+    "Neeko",
+    "Nidalee",
+    "Nilah",
+    "Nocturne",
+    "Nunu",
+    "Olaf",
+    "Orianna",
+    "Ornn",
+    "Pantheon",
+    "Poppy",
+    "Pyke",
+    "Qiyana",
+    "Quinn",
+    "Rakan",
+    "Rammus",
+    "RekSai",
+    "Rell",
+    "Renata",
+    "Renekton",
+    "Rengar",
+    "Riven",
+    "Rumble",
+    "Ryze",
+    "Samira",
+    "Sejuani",
+    "Senna",
+    "Seraphine",
+    "Sett",
+    "Shaco",
+    "Shen",
+    "Shyvana",
+    "Singed",
+    "Sion",
+    "Sivir",
+    "Skarner",
+    "Sona",
+    "Soraka",
+    "Swain",
+    "Sylas",
+    "Syndra",
+    "TahmKench",
+    "Taliyah",
+    "Talon",
+    "Taric",
+    "Teemo",
+    "Thresh",
+    "Tristana",
+    "Trundle",
+    "Tryndamere",
+    "Twisted Fate",
+    "Twitch",
+    "Udyr",
+    "Urgot",
+    "Varus",
+    "Vayne",
+    "Veigar",
+    "Velkoz",
+    "Vex",
+    "Vi",
+    "Viego",
+    "Viktor",
+    "Vladimir",
+    "Volibear",
+    "Warwick",
+    "Xayah",
+    "Xerath",
+    "Xin Zhao",
+    "Yasuo",
+    "Yone",
+    "Yorick",
+    "Yuumi",
+    "Zac",
+    "Zed",
+    "Zeri",
+    "Ziggs",
+    "Zilean",
+    "Zoe",
+    "Zyra",
+  ];
 
-  const [inputEmail, setInputEmail] = React.useState("");
-  const [inputPassword, setInputPassword] = React.useState("");
+  const [loginVisible, setLoginVisible] = useState(false);
+  const [registerVisible, setRegisterVisible] = useState(false);
+
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
+  const [inputProfile, setInputProfile] = useState("");
+  const [inputChampion, setInputChampion] = useState("");
+  const [matchedChampions, setMatchedChampions] = useState([]);
+  const [validChampion, setValidChampion] = useState(true);
 
   const emailChangeHandler = (e) => {
-    const newEmail = e.target.value;
-    setInputEmail(newEmail);
-    console.log(newEmail);
+    const { value } = e.target;
+    setInputEmail(value);
   };
   const passwordChangeHandler = (e) => {
-    const newPassword = e.target.value;
-    setInputPassword(newPassword);
-    console.log(newPassword);
+    const { value } = e.target;
+    setInputPassword(value);
+  };
+
+  const ProfileChangeHandler = (e) => {
+    const { value } = e.target;
+    setInputProfile(value);
+  };
+
+  const ChampionChangeHandler = (e) => {
+    const { value } = e.target;
+    setInputChampion(value);
+
+    const matchedChampions = championNames.filter((name) =>
+      name.toLowerCase().includes(value.toLowerCase())
+    );
+    setMatchedChampions(matchedChampions);
+    const isValidChampion = matchedChampions.includes(value);
+    if (value === "" || isValidChampion) {
+      setValidChampion(true);
+    } else {
+      setValidChampion(false);
+    }
   };
 
   const LoginHandler = () => setLoginVisible(true);
@@ -205,11 +395,12 @@ const MyNavbar = () => {
                     css={{ display: "inline-flex" }}
                     size={14}
                   >
-                    New here?{" "}
+                    New here?
                     <Link
                       id="modal-login-link"
                       size={14}
                       onPress={closeLoginOpenRegisterHandler}
+                      css={{ marginLeft: "4px" }}
                     >
                       Create an account
                     </Link>
@@ -244,7 +435,7 @@ const MyNavbar = () => {
                     <Checkbox>
                       <Text size={14}>Remember me</Text>
                     </Checkbox>
-                    <Text size={14}>Forgot password?</Text>
+                    <Link css={{ fontSize: "14px" }}>Forgot password?</Link>
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>
@@ -290,30 +481,32 @@ const MyNavbar = () => {
                       css={{ display: "inline-flex" }}
                       size={14}
                     >
-                      Already have an account?{" "}
+                      Already have an account?
                       <Link
                         id="modal-login-link"
                         size={14}
                         onPress={closeRegisterOpenLoginHandler}
+                        css={{ marginLeft: "4px" }}
                       >
                         Log in.
                       </Link>
                     </Text>
                   </Row>
                   <Input
-                    label="Email"
+                    label="Email *"
                     clearable
                     bordered
                     fullWidth
                     color="primary"
                     size="lg"
                     placeholder="Email"
+                    type="email"
                     initialValue={inputEmail}
                     onChange={emailChangeHandler}
                     contentLeft={<Mail fill="currentColor" />}
                   />
                   <Input.Password
-                    label="Password"
+                    label="Password *"
                     bordered
                     fullWidth
                     color="primary"
@@ -323,6 +516,44 @@ const MyNavbar = () => {
                     onChange={passwordChangeHandler}
                     contentLeft={<Password fill="currentColor" />}
                   />
+                  <Input
+                    label="Profile"
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Profile"
+                    type="text"
+                    initialValue={inputProfile}
+                    onChange={ProfileChangeHandler}
+                    contentLeft={<Bookmark />}
+                  />
+                  <Input
+                    label="Champion"
+                    list="championList"
+                    bordered
+                    fullWidth
+                    color={validChampion ? "primary" : "danger"}
+                    size="lg"
+                    placeholder="Champion"
+                    type="text"
+                    initialValue={inputChampion}
+                    onChange={ChampionChangeHandler}
+                    contentLeft={<MyChampion />}
+                    css={{ textAlign: "left" }}
+                  />
+                  <datalist
+                    id="championList"
+                    style={{ position: "absolute", right: 0 }}
+                  >
+                    {matchedChampions.map((champion) => (
+                      <option
+                        key={champion}
+                        value={champion}
+                        style={{ position: "absolute", right: 0 }}
+                      />
+                    ))}
+                  </datalist>
                 </Modal.Body>
                 <Modal.Footer>
                   <Row justify="center">
