@@ -577,7 +577,7 @@ const MyNavbar = () => {
                   >
                     Close
                   </Button>
-                  <Button auto onPress={registerUser}>
+                  <Button auto onClick={() => signIn()}>
                     Create Account
                   </Button>
                 </Modal.Footer>
