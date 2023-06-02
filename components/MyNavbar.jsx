@@ -14,6 +14,7 @@ import {
 import { Modal, Button, Row, Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const MyNavbar = () => {
   const { setTheme } = useNextTheme();
@@ -442,7 +443,11 @@ const MyNavbar = () => {
                   <Button auto flat color="error" onPress={closeLoginHandler}>
                     Close
                   </Button>
-                  <Button auto onPress={closeLoginHandler}>
+                  <Button
+                    auto
+                    onPress={closeLoginHandler}
+                    onClick={() => signIn()}
+                  >
                     Sign in
                   </Button>
                 </Modal.Footer>
