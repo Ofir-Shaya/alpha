@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
     "@next/font": "13.1.2",
     "@nextui-org/react": "^1.0.0-beta.12",
     "@prisma/client": "^4.14.1",
@@ -26,6 +27,7 @@
     "next-themes": "^0.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.44.3",
     "react-spectrum": "^1.2.6",
     "react-stately": "^3.22.0"
   },

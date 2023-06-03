@@ -15,10 +15,65 @@ import { Modal, Button, Row, Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useForm } from "react-hook-form";
 
 const MyNavbar = () => {
   const { setTheme } = useNextTheme();
   const { isDark } = useTheme();
+
+  let { data: session } = useSession();
+
+  const [loginVisible, setLoginVisible] = useState(false);
+  const [registerVisible, setRegisterVisible] = useState(false);
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputPassword, setInputPassword] = useState("");
+  const [inputProfile, setInputProfile] = useState("");
+  const [inputChampion, setInputChampion] = useState("");
+  const [matchedChampions, setMatchedChampions] = useState([]);
+  const [validChampion, setValidChampion] = useState(true);
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmitRegister = async (data) => {
+    try {
+      const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      };
+      const user = await fetch("/api/auth/register", options);
+      if (user && user.status === 201) {
+        const json = await user.json();
+        setRegisterVisible(false);
+        router.push("http://localhost:3000/");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSubmitLogin = async (data) => {
+    try {
+      const status = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+        callbackUrl: "localhost:3000",
+      });
+      console.log(status);
+      if (status.ok) {
+        console.log(status);
+        router.push(status.url);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const collapseItems = [
     "ALPHA",
@@ -217,16 +272,6 @@ const MyNavbar = () => {
     "Zyra",
   ];
 
-  const [loginVisible, setLoginVisible] = useState(false);
-  const [registerVisible, setRegisterVisible] = useState(false);
-
-  const [inputEmail, setInputEmail] = useState("");
-  const [inputPassword, setInputPassword] = useState("");
-  const [inputProfile, setInputProfile] = useState("");
-  const [inputChampion, setInputChampion] = useState("");
-  const [matchedChampions, setMatchedChampions] = useState([]);
-  const [validChampion, setValidChampion] = useState(true);
-
   const emailChangeHandler = (e) => {
     const { value } = e.target;
     setInputEmail(value);
@@ -262,37 +307,261 @@ const MyNavbar = () => {
 
   const closeLoginHandler = () => {
     setLoginVisible(false);
-    console.log("closed");
   };
 
   const closeRegisterHandler = () => {
     setRegisterVisible(false);
-    console.log("closed");
   };
 
   const closeRegisterOpenLoginHandler = () => {
     setRegisterVisible(false);
     setLoginVisible(true);
-    console.log("closed,opened");
   };
   const closeLoginOpenRegisterHandler = () => {
     setLoginVisible(false);
     setRegisterVisible(true);
-    console.log("closed,opened");
   };
 
-  const registerUser = async () => {
-    if (!String(inputEmail).match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$/i))
-      return console.error(inputEmail + " is not a valid email address.");
+  const Guest = () => {
+    return (
+      <>
+        <Navbar.Content
+          hideIn="xs"
+          color="inherit"
+          href="login"
+          css={{ mx: 10 }}
+        >
+          <div>
+            <Button auto color="secondary" shadow onPress={LoginHandler}>
+              Login
+            </Button>
+            <Modal
+              closeButton
+              aria-labelledby="modal-title-login"
+              open={loginVisible}
+              onClose={closeLoginHandler}
+            >
+              <form onSubmit={handleSubmit(onSubmitLogin)}>
+                <Modal.Header>
+                  <Text id="modal-title-login" size={24}>
+                    Welcome to{" "}
+                    <Text b size={24}>
+                      Alpha
+                    </Text>
+                  </Text>
+                </Modal.Header>
+                <Row justify="center">
+                  <Text
+                    id="modal-title-register-already"
+                    css={{ display: "inline-flex" }}
+                    size={14}
+                  >
+                    New here?
+                    <Link
+                      id="modal-login-link"
+                      size={14}
+                      onPress={closeLoginOpenRegisterHandler}
+                      css={{ marginLeft: "4px" }}
+                    >
+                      Create an account
+                    </Link>
+                  </Text>
+                </Row>
 
-    await fetch(
-      `/api/loginapi?email=${inputEmail}&password=${inputPassword}&func=register`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+                <Modal.Body>
+                  <Input
+                    label="Email"
+                    clearable
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Email"
+                    initialValue={inputEmail}
+                    onChange={emailChangeHandler}
+                    contentLeft={<Mail fill="currentColor" />}
+                    {...register("email", { required: true })}
+                  />
+                  <Input.Password
+                    label="Password"
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Password"
+                    initialValue={inputPassword}
+                    onChange={passwordChangeHandler}
+                    contentLeft={<Password fill="currentColor" />}
+                    {...register("password", { required: true })}
+                  />
+                  <Row justify="space-between">
+                    <Link css={{ fontSize: "14px" }}>Forgot password?</Link>
+                  </Row>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button auto flat color="error" onPress={closeLoginHandler}>
+                    Close
+                  </Button>
+                  <Button auto onPress={closeLoginHandler} type="submit">
+                    Sign in
+                  </Button>
+                </Modal.Footer>
+              </form>
+            </Modal>
+          </div>
+        </Navbar.Content>
+
+        <Navbar.Content
+          hideIn="xs"
+          color="inherit"
+          href="register"
+          css={{ mx: 10 }}
+        >
+          <div>
+            <Button auto color="secondary" shadow onPress={RegisterHandler}>
+              Register
+            </Button>
+            <Modal
+              closeButton
+              aria-labelledby="modal-title-register"
+              open={registerVisible}
+              onClose={closeRegisterHandler}
+            >
+              <form onSubmit={handleSubmit(onSubmitRegister)}>
+                <Modal.Header>
+                  <Text id="modal-title-register" size={24}>
+                    Welcome to{" "}
+                    <Text b size={24}>
+                      Alpha
+                    </Text>
+                  </Text>
+                </Modal.Header>
+                <Modal.Body>
+                  <Row justify="center">
+                    <Text
+                      id="modal-title-register-already"
+                      css={{ display: "inline-flex" }}
+                      size={14}
+                    >
+                      Already have an account?
+                      <Link
+                        id="modal-login-link"
+                        size={14}
+                        onPress={closeRegisterOpenLoginHandler}
+                        css={{ marginLeft: "4px" }}
+                      >
+                        Log in.
+                      </Link>
+                    </Text>
+                  </Row>
+                  <Input
+                    label="Email *"
+                    clearable
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Email"
+                    type="email"
+                    initialValue={inputEmail}
+                    onChange={emailChangeHandler}
+                    contentLeft={<Mail fill="currentColor" />}
+                    {...register("email", { required: true })}
+                  />
+                  <Input.Password
+                    label="Password *"
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Password"
+                    initialValue={inputPassword}
+                    onChange={passwordChangeHandler}
+                    contentLeft={<Password fill="currentColor" />}
+                    {...register("password", { required: true })}
+                  />
+                  <Input
+                    label="Profile"
+                    bordered
+                    fullWidth
+                    color="primary"
+                    size="lg"
+                    placeholder="Profile"
+                    type="text"
+                    initialValue={inputProfile}
+                    onChange={ProfileChangeHandler}
+                    contentLeft={<Bookmark />}
+                    {...register("profile")}
+                  />
+                  <Input
+                    label="Champion"
+                    list="championList"
+                    bordered
+                    fullWidth
+                    color={validChampion ? "primary" : "danger"}
+                    size="lg"
+                    placeholder="Champion"
+                    type="text"
+                    initialValue={inputChampion}
+                    onChange={ChampionChangeHandler}
+                    contentLeft={<MyChampion />}
+                    css={{ textAlign: "left" }}
+                    {...register("champion")}
+                  />
+                  <datalist
+                    id="championList"
+                    style={{ position: "absolute", right: 0 }}
+                  >
+                    {matchedChampions.map((champion) => (
+                      <option
+                        key={champion}
+                        value={champion}
+                        style={{ position: "absolute", right: 0 }}
+                      />
+                    ))}
+                  </datalist>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Row justify="center">
+                    <Text size={10}>
+                      By clicking on Create Account, you agree to our{" "}
+                      <Link id="modal-tos-link" size={14} href="#">
+                        Terms of Service.
+                      </Link>
+                    </Text>
+                  </Row>
+                  <Button
+                    auto
+                    flat
+                    color="error"
+                    onPress={closeRegisterHandler}
+                  >
+                    Close
+                  </Button>
+                  <Button auto type="submit">
+                    Create Account
+                  </Button>
+                </Modal.Footer>
+              </form>
+            </Modal>
+          </div>
+        </Navbar.Content>
+      </>
+    );
+  };
+
+  const User = () => {
+    return (
+      <>
+        <Navbar.Content>
+          {session.user.favProfile
+            ? session.user.favProfile
+            : session.user.email}
+        </Navbar.Content>
+        <Navbar.Content>
+          <Button onClick={() => signOut()}>Sign Out</Button>
+        </Navbar.Content>
+      </>
     );
   };
 
@@ -365,227 +634,8 @@ const MyNavbar = () => {
             checked={isDark}
             onChange={(e) => setTheme(e.target.checked ? "dark" : "light")}
           />
-
-          <Navbar.Content
-            hideIn="xs"
-            color="inherit"
-            href="login"
-            css={{ mx: 10 }}
-          >
-            <div>
-              <Button auto color="secondary" shadow onPress={LoginHandler}>
-                Login
-              </Button>
-              <Modal
-                closeButton
-                aria-labelledby="modal-title-login"
-                open={loginVisible}
-                onClose={closeLoginHandler}
-              >
-                <Modal.Header>
-                  <Text id="modal-title-login" size={24}>
-                    Welcome to{" "}
-                    <Text b size={24}>
-                      Alpha
-                    </Text>
-                  </Text>
-                </Modal.Header>
-                <Row justify="center">
-                  <Text
-                    id="modal-title-register-already"
-                    css={{ display: "inline-flex" }}
-                    size={14}
-                  >
-                    New here?
-                    <Link
-                      id="modal-login-link"
-                      size={14}
-                      onPress={closeLoginOpenRegisterHandler}
-                      css={{ marginLeft: "4px" }}
-                    >
-                      Create an account
-                    </Link>
-                  </Text>
-                </Row>
-
-                <Modal.Body>
-                  <Input
-                    label="Email"
-                    clearable
-                    bordered
-                    fullWidth
-                    color="primary"
-                    size="lg"
-                    placeholder="Email"
-                    initialValue={inputEmail}
-                    onChange={emailChangeHandler}
-                    contentLeft={<Mail fill="currentColor" />}
-                  />
-                  <Input.Password
-                    label="Password"
-                    bordered
-                    fullWidth
-                    color="primary"
-                    size="lg"
-                    placeholder="Password"
-                    initialValue={inputPassword}
-                    onChange={passwordChangeHandler}
-                    contentLeft={<Password fill="currentColor" />}
-                  />
-                  <Row justify="space-between">
-                    <Checkbox>
-                      <Text size={14}>Remember me</Text>
-                    </Checkbox>
-                    <Link css={{ fontSize: "14px" }}>Forgot password?</Link>
-                  </Row>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button auto flat color="error" onPress={closeLoginHandler}>
-                    Close
-                  </Button>
-                  <Button
-                    auto
-                    onPress={closeLoginHandler}
-                    onClick={() => signIn()}
-                  >
-                    Sign in
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-            </div>
-          </Navbar.Content>
-
-          <Navbar.Content
-            hideIn="xs"
-            color="inherit"
-            href="register"
-            css={{ mx: 10 }}
-          >
-            <div>
-              <Button auto color="secondary" shadow onPress={RegisterHandler}>
-                Register
-              </Button>
-              <Modal
-                closeButton
-                aria-labelledby="modal-title-register"
-                open={registerVisible}
-                onClose={closeRegisterHandler}
-              >
-                <Modal.Header>
-                  <Text id="modal-title-register" size={24}>
-                    Welcome to{" "}
-                    <Text b size={24}>
-                      Alpha
-                    </Text>
-                  </Text>
-                </Modal.Header>
-                <Modal.Body>
-                  <Row justify="center">
-                    <Text
-                      id="modal-title-register-already"
-                      css={{ display: "inline-flex" }}
-                      size={14}
-                    >
-                      Already have an account?
-                      <Link
-                        id="modal-login-link"
-                        size={14}
-                        onPress={closeRegisterOpenLoginHandler}
-                        css={{ marginLeft: "4px" }}
-                      >
-                        Log in.
-                      </Link>
-                    </Text>
-                  </Row>
-                  <Input
-                    label="Email *"
-                    clearable
-                    bordered
-                    fullWidth
-                    color="primary"
-                    size="lg"
-                    placeholder="Email"
-                    type="email"
-                    initialValue={inputEmail}
-                    onChange={emailChangeHandler}
-                    contentLeft={<Mail fill="currentColor" />}
-                  />
-                  <Input.Password
-                    label="Password *"
-                    bordered
-                    fullWidth
-                    color="primary"
-                    size="lg"
-                    placeholder="Password"
-                    initialValue={inputPassword}
-                    onChange={passwordChangeHandler}
-                    contentLeft={<Password fill="currentColor" />}
-                  />
-                  <Input
-                    label="Profile"
-                    bordered
-                    fullWidth
-                    color="primary"
-                    size="lg"
-                    placeholder="Profile"
-                    type="text"
-                    initialValue={inputProfile}
-                    onChange={ProfileChangeHandler}
-                    contentLeft={<Bookmark />}
-                  />
-                  <Input
-                    label="Champion"
-                    list="championList"
-                    bordered
-                    fullWidth
-                    color={validChampion ? "primary" : "danger"}
-                    size="lg"
-                    placeholder="Champion"
-                    type="text"
-                    initialValue={inputChampion}
-                    onChange={ChampionChangeHandler}
-                    contentLeft={<MyChampion />}
-                    css={{ textAlign: "left" }}
-                  />
-                  <datalist
-                    id="championList"
-                    style={{ position: "absolute", right: 0 }}
-                  >
-                    {matchedChampions.map((champion) => (
-                      <option
-                        key={champion}
-                        value={champion}
-                        style={{ position: "absolute", right: 0 }}
-                      />
-                    ))}
-                  </datalist>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Row justify="center">
-                    <Text size={10}>
-                      By clicking on Create Account, you agree to our{" "}
-                      <Link id="modal-tos-link" size={14} href="#">
-                        Terms of Service.
-                      </Link>
-                    </Text>
-                  </Row>
-                  <Button
-                    auto
-                    flat
-                    color="error"
-                    onPress={closeRegisterHandler}
-                  >
-                    Close
-                  </Button>
-                  <Button auto onClick={() => signIn()}>
-                    Create Account
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-            </div>
-          </Navbar.Content>
         </Navbar.Content>
-
+        {session ? User() : Guest()}
         <Navbar.Collapse showIn="xs">
           {collapseItems.map((item, index) => (
             <Navbar.CollapseItem key={item}>

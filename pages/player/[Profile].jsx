@@ -34,34 +34,6 @@ const summonersHash = {
   11: "SummonerSmite",
   12: "SummonerTeleport",
 };
-// const runeHash = {
-//   8000: "Precision",
-//   8005: "PressTheAttack",
-//   8008: "LethalTempo",
-//   8010: "Conqueror",
-//   8021: "FleetFootwork",
-
-//   8100: "Domination",
-//   8112: "Electrocute",
-//   8124: "Predator",
-//   8128: "DarkHarvest",
-//   9923: "HailOfBlades",
-
-//   8200: "Sorcery",
-//   8214: "SummonAery",
-//   8229: "ArcaneComet",
-//   8230: "PhaseRush",
-
-//   8300: "Inspiration",
-//   8351: "GlacialAugment",
-//   8360: "UnsealedSpellbook",
-//   8369: "FirstStrike",
-
-//   8400: "Resolve",
-//   8437: "GraspOfTheUndying",
-//   8439: "Aftershock",
-//   8465: "Guardian",
-// };
 
 const romanToInt = (roman) => {
   let accumulator = 0;
@@ -72,22 +44,7 @@ const romanToInt = (roman) => {
     } else if (roman[i] === "I" && roman[i + 1] === "X") {
       accumulator += 9;
       i++;
-    }
-    // useless part ->
-    //  else if (roman[i] === "X" && roman[i + 1] === "L") {
-    //   accumulator += 40;
-    //   i++;
-    // } else if (roman[i] === "X" && roman[i + 1] === "C") {
-    //   accumulator += 90;
-    //   i++;
-    // } else if (roman[i] === "C" && roman[i + 1] === "D") {
-    //   accumulator += 400;
-    //   i++;
-    // } else if (roman[i] === "C" && roman[i + 1] === "M") {
-    //   accumulator += 900;
-    //   i++;
-    // }
-    else accumulator += romanHash[roman[i]];
+    } else accumulator += romanHash[roman[i]];
   }
   return accumulator;
 };
@@ -120,7 +77,6 @@ const Profile = () => {
   const [player, setPlayer] = useState(null);
   const [playerRanked, setPlayerRanked] = useState(null);
   const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
-  // const [playerRankedFlex, setPlayerRankedFlex] = useState(null);
   const [playerChamps, setPlayerChamps] = useState(null);
   const [matchInformation, setMatchInformation] = useState(null);
   const [champInformation, setChampInformation] = useState(null);

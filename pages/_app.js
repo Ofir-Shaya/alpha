@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import { createTheme, NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import Head from "next/head";
+import { SessionProvider } from "next-auth/react";
 
 const lightTheme = createTheme({
   type: "light",
@@ -26,7 +27,9 @@ export default function App({ Component, pageProps }) {
         }}
       >
         <NextUIProvider>
-          <Component {...pageProps} />
+          <SessionProvider session={pageProps.session}>
+            <Component {...pageProps} />
+          </SessionProvider>
         </NextUIProvider>
       </NextThemesProvider>
     </>

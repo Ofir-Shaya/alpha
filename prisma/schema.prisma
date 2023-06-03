@@ -13,8 +13,8 @@ model User {
   id       Int      @id @default(autoincrement())
   email    String   @unique
   password String
-  profile  String?
-  champion String?
+  favProfile  String?
+  favChampion String?
 }
 
 model Profile {
