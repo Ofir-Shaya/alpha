@@ -3,6 +3,7 @@ import MySidebar from "@/components/MySidebar";
 import {
   Container,
   Grid,
+  useTheme,
   Text,
   Card,
   Loading,
@@ -71,6 +72,8 @@ const epochTimeConvertor = (epochValue) => {
 };
 
 const Profile = () => {
+  const { isDark } = useTheme();
+
   const router = useRouter();
   const [playerFound, setPlayerFound] = useState(null);
   const { Profile, server } = router.query;
@@ -1107,7 +1110,13 @@ const Profile = () => {
                   }}
                 >
                   <Container className="queue-container">
-                    <Text h4 css={{ width: "100%" }}>
+                    <Text
+                      h4
+                      css={{
+                        width: "100%",
+                        color: "#ffffff",
+                      }}
+                    >
                       Ranked Solo
                     </Text>
                   </Container>
@@ -1152,13 +1161,13 @@ const Profile = () => {
                         alignItems="center"
                         css={{ padding: "0" }}
                       >
-                        <Text b>
+                        <Text b css={{ color: "#ffffff" }}>
                           {playerRankedSolo.tier.charAt(0) +
                             playerRankedSolo.tier.substring(1).toLowerCase() +
                             " " +
                             romanToInt(playerRankedSolo.rank)}
                         </Text>
-                        <Text>
+                        <Text css={{ color: "#ffffff" }}>
                           {playerRankedSolo.wins}W {playerRankedSolo.losses}L
                         </Text>
                       </Container>
@@ -1169,8 +1178,10 @@ const Profile = () => {
                         alignItems="center"
                         css={{ padding: "0" }}
                       >
-                        <Text>{playerRankedSolo.leaguePoints} LP</Text>
-                        <Text>
+                        <Text css={{ color: "#ffffff" }}>
+                          {playerRankedSolo.leaguePoints} LP
+                        </Text>
+                        <Text css={{ color: "#ffffff" }}>
                           {calcWinPerc(
                             playerRankedSolo.wins,
                             playerRankedSolo.losses
@@ -1194,7 +1205,7 @@ const Profile = () => {
                 >
                   {champInformation && (
                     <>
-                      <Text h4 css={{ textAlign: "center" }}>
+                      <Text h4 css={{ textAlign: "center", color: "#ffffff" }}>
                         Champions Overview:
                       </Text>
                       <Container css={{ padding: "$2" }}>
@@ -1218,7 +1229,7 @@ const Profile = () => {
               >
                 {matchInformation && (
                   <>
-                    <Text h4 css={{ textAlign: "center" }}>
+                    <Text h4 css={{ textAlign: "center", color: "#ffffff" }}>
                       Matches Overview:
                     </Text>
 

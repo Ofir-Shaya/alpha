@@ -8,9 +8,13 @@ import {
   Bookmark,
   Tiers,
 } from "./Icons/AllIcons";
+import nookies from "nookies";
 
 const MySidebar = () => {
   const { isDark } = useTheme();
+
+  const cookies = nookies.get();
+
   return (
     <Grid.Container
       display="flex"
@@ -27,7 +31,7 @@ const MySidebar = () => {
         bottom: 0,
         left: 0,
         zIndex: "9999",
-        backgroundColor: "#000000",
+        backgroundColor: isDark ? "#000000 " : "rgba(191, 191, 191,1)",
         transition: "width 0.05s ease",
         "&:hover": {
           width: "15%",
@@ -76,7 +80,7 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
+        <Link block color="inherit" href="/">
           <Home width="26" height="26" />
           <Text
             className=" show-on-hover "
@@ -96,7 +100,7 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
+        <Link block color="inherit" href="/champions">
           <Champion width="26" height="26" />
           <Text
             className=" show-on-hover "
@@ -116,7 +120,7 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
+        <Link block color="inherit" href="/tierlist">
           <Tiers width="26" height="26" />
           <Text
             className=" show-on-hover "
@@ -136,7 +140,13 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
+        <Link
+          block
+          color="inherit"
+          href={
+            cookies?.profile ? `/player/${cookies.profile}?server=EUNE` : ""
+          }
+        >
           <Bookmark width="26" height="26" />
           <Text
             className=" show-on-hover "
@@ -156,7 +166,11 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
+        <Link
+          block
+          color="inherit"
+          href={cookies?.champion ? `/champions/${cookies.champion}` : ""}
+        >
           <MyChampion width="26" height="26" />
           <Text
             className=" show-on-hover "

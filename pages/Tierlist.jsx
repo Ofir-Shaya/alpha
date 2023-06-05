@@ -42,16 +42,6 @@ const Tierlist = () => {
         allowsSorting: true,
       },
       {
-        key: "winRate",
-        textValue: "Winrate",
-        allowsSorting: true,
-      },
-      {
-        key: "pickRate",
-        textValue: "Pickrate",
-        allowsSorting: true,
-      },
-      {
         key: "avgGoldEarned",
         textValue: "Gold Earned",
         allowsSorting: true,
@@ -118,21 +108,6 @@ const Tierlist = () => {
         allowsSorting: true,
       },
       {
-        key: "winRate",
-        textValue: "Winrate",
-        allowsSorting: true,
-      },
-      {
-        key: "pickRate",
-        textValue: "Pickrate",
-        allowsSorting: true,
-      },
-      {
-        key: "avgGoldEarned",
-        textValue: "Gold Earned",
-        allowsSorting: true,
-      },
-      {
         key: "avgDamageDealtToObjectives",
         textValue: "Objectives Damage",
         allowsSorting: true,
@@ -190,21 +165,6 @@ const Tierlist = () => {
       {
         key: "name",
         textValue: "Champion",
-        allowsSorting: true,
-      },
-      {
-        key: "winRate",
-        textValue: "Winrate",
-        allowsSorting: true,
-      },
-      {
-        key: "pickRate",
-        textValue: "Pickrate",
-        allowsSorting: true,
-      },
-      {
-        key: "avgGoldEarned",
-        textValue: "Gold Earned",
         allowsSorting: true,
       },
       {
@@ -358,6 +318,7 @@ const Tierlist = () => {
               justifyContent: "flex-start",
               textAlign: "center",
               alignItems: "center",
+              flexWrap: "nowrap",
             }}
           >
             <Image
@@ -370,12 +331,12 @@ const Tierlist = () => {
                 objectFit: "contain",
               }}
             />
-            <Text css={{ margin: "auto" }}>{cellValue}</Text>
+            <Text css={{ margin: "auto", color: "#ffffff" }}>{cellValue}</Text>
           </Container>
         );
       default:
         return (
-          <Text>
+          <Text css={{ color: "#ffffff" }}>
             {String(cellValue).endsWith(".0")
               ? cellValue.slice(0, -2)
               : String(cellValue).endsWith(".0%")
@@ -413,8 +374,14 @@ const Tierlist = () => {
           }}
         >
           <Container css={{ marginBlockEnd: "$15" }}>
-            <Text h2> LoL Tier List</Text>
-            <Text h3> for All Roles, All Ranks.</Text>
+            <Text h2 css={{ color: "#ffffff" }}>
+              {" "}
+              LoL Tier List
+            </Text>
+            <Text h3 css={{ color: "#ffffff" }}>
+              {" "}
+              for All Roles, All Ranks.
+            </Text>
           </Container>
           <Container>
             <Container
@@ -427,13 +394,25 @@ const Tierlist = () => {
                 marginBlockEnd: "$15",
               }}
             >
-              <Button light onPress={handleCombatButton}>
+              <Button
+                light
+                onPress={handleCombatButton}
+                css={{ color: "#ffffff" }}
+              >
                 Combat{" "}
               </Button>
-              <Button light onPress={handleSupportButton}>
+              <Button
+                light
+                onPress={handleSupportButton}
+                css={{ color: "#ffffff" }}
+              >
                 Support{" "}
               </Button>
-              <Button light onPress={handleObjectiveButton}>
+              <Button
+                light
+                onPress={handleObjectiveButton}
+                css={{ color: "#ffffff" }}
+              >
                 Objectives{" "}
               </Button>
             </Container>
@@ -442,8 +421,9 @@ const Tierlist = () => {
               aria-label="tier list table"
               css={{
                 minWidth: "100%",
-                height: "calc($space$15 * 15)",
+                height: "calc($space$15 * 17)",
                 backgroundColor: "#191937",
+                margin: "$15",
               }}
               sortDescriptor={list.sortDescriptor}
               onSortChange={list.sort}

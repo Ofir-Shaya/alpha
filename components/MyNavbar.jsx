@@ -39,6 +39,10 @@ const MyNavbar = () => {
     formState: { errors },
   } = useForm();
 
+  useEffect(() => {
+    if (!session) return;
+  }, [session]);
+
   const onSubmitRegister = async (data) => {
     try {
       const options = {
@@ -65,14 +69,18 @@ const MyNavbar = () => {
         password: data.password,
         callbackUrl: "localhost:3000",
       });
-      console.log(status);
       if (status.ok) {
-        console.log(status);
         router.push(status.url);
       }
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleSignOut = async () => {
+    nookies.destroy("champion");
+    nookies.destroy("profile");
+    signOut();
   };
 
   const collapseItems = [
@@ -554,12 +562,12 @@ const MyNavbar = () => {
     return (
       <>
         <Navbar.Content>
-          {session.user.favProfile
-            ? session.user.favProfile
-            : session.user.email}
+          {cookies?.profile && (
+            <Link href={`/player/${cookies.profile}?server=EUNE`}></Link>
+          )}
         </Navbar.Content>
         <Navbar.Content>
-          <Button onClick={() => signOut()}>Sign Out</Button>
+          <Button onClick={() => handleSignOut()}>Sign Out</Button>
         </Navbar.Content>
       </>
     );
@@ -572,7 +580,9 @@ const MyNavbar = () => {
         variant="sticky"
         maxWidth="fluid"
         containerCss={{
-          backgroundColor: "#0B0B0B !important",
+          backgroundColor: isDark
+            ? "#0B0B0B !important"
+            : "rgba(191 191 191,0.6)",
         }}
       >
         <Navbar.Content
