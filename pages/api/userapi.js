@@ -43,17 +43,10 @@ async function handleGET(req, res) {
   }
 }
 
-async function handlePOST(req, res, player) {
+async function handlePOST(req, res) {
   try {
     const token = await getToken({ req });
     console.log(token);
-    await prisma.user.create({
-      data: {
-        puuid: player.puuid,
-        username: player.name,
-      },
-    });
-    res.status(200).send();
   } catch (error) {
     return res.status(500).json(error);
   }
