@@ -1,5 +1,17 @@
-import React, { useState } from "react";
-import { Navbar, Link, Text, useTheme, Switch, Input } from "@nextui-org/react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Navbar,
+  Link,
+  Text,
+  useTheme,
+  Switch,
+  Input,
+  Modal,
+  Button,
+  Row,
+  Container,
+  Loading,
+} from "@nextui-org/react";
 import { Layout } from "./common/Layout";
 import { useTheme as useNextTheme } from "next-themes";
 import {
@@ -8,12 +20,10 @@ import {
   Search,
   Mail,
   Password,
-  MyChampion,
   Bookmark,
+  MyChampion,
 } from "./Icons/AllIcons";
-import { Modal, Button, Row, Checkbox } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import { useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useForm } from "react-hook-form";
 
@@ -28,9 +38,7 @@ const MyNavbar = () => {
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
   const [inputProfile, setInputProfile] = useState("");
-  const [inputChampion, setInputChampion] = useState("");
-  const [matchedChampions, setMatchedChampions] = useState([]);
-  const [validChampion, setValidChampion] = useState(true);
+  const [userInfo, setUserInfo] = useState(null);
 
   const {
     register,
@@ -40,7 +48,32 @@ const MyNavbar = () => {
   } = useForm();
 
   useEffect(() => {
-    if (!session) return;
+    const getUserInfo = async () => {
+      if (!session) return;
+      try {
+        const res = await fetch(
+          `/api/userapi?func=userInfo&email=${session.user.email}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setUserInfo(data);
+        } else {
+          throw new Error("Failed to fetch data. Status: " + res.status);
+        }
+      } catch (error) {
+        console.error(error);
+        throw new Error("An error occurred while loading data.");
+      }
+    };
+    getUserInfo();
+    console.log(userInfo);
   }, [session]);
 
   const onSubmitRegister = async (data) => {
@@ -52,8 +85,8 @@ const MyNavbar = () => {
       };
       const user = await fetch("/api/auth/register", options);
       if (user && user.status === 201) {
-        const json = await user.json();
         setRegisterVisible(false);
+        onSubmitLogin(data);
         router.push("http://localhost:3000/");
       }
     } catch (error) {
@@ -78,8 +111,6 @@ const MyNavbar = () => {
   };
 
   const handleSignOut = async () => {
-    nookies.destroy("champion");
-    nookies.destroy("profile");
     signOut();
   };
 
@@ -217,7 +248,7 @@ const MyNavbar = () => {
     "Rammus",
     "RekSai",
     "Rell",
-    "Renata",
+    "Renata Glasc",
     "Renekton",
     "Rengar",
     "Riven",
@@ -249,7 +280,7 @@ const MyNavbar = () => {
     "Tristana",
     "Trundle",
     "Tryndamere",
-    "Twisted Fate",
+    "Twisted  Fate",
     "Twitch",
     "Udyr",
     "Urgot",
@@ -292,22 +323,6 @@ const MyNavbar = () => {
   const ProfileChangeHandler = (e) => {
     const { value } = e.target;
     setInputProfile(value);
-  };
-
-  const ChampionChangeHandler = (e) => {
-    const { value } = e.target;
-    setInputChampion(value);
-
-    const matchedChampions = championNames.filter((name) =>
-      name.toLowerCase().includes(value.toLowerCase())
-    );
-    setMatchedChampions(matchedChampions);
-    const isValidChampion = matchedChampions.includes(value);
-    if (value === "" || isValidChampion) {
-      setValidChampion(true);
-    } else {
-      setValidChampion(false);
-    }
   };
 
   const LoginHandler = () => setLoginVisible(true);
@@ -487,6 +502,7 @@ const MyNavbar = () => {
                     onChange={passwordChangeHandler}
                     contentLeft={<Password fill="currentColor" />}
                     {...register("password", { required: true })}
+                    autoComplete="new-password"
                   />
                   <Input
                     label="Profile"
@@ -499,35 +515,55 @@ const MyNavbar = () => {
                     initialValue={inputProfile}
                     onChange={ProfileChangeHandler}
                     contentLeft={<Bookmark />}
-                    {...register("profile")}
+                    {...register("profile", { required: true })}
                   />
-                  <Input
-                    label="Champion"
-                    list="championList"
-                    bordered
-                    fullWidth
-                    color={validChampion ? "primary" : "danger"}
-                    size="lg"
-                    placeholder="Champion"
-                    type="text"
-                    initialValue={inputChampion}
-                    onChange={ChampionChangeHandler}
-                    contentLeft={<MyChampion />}
-                    css={{ textAlign: "left" }}
-                    {...register("champion")}
-                  />
-                  <datalist
-                    id="championList"
-                    style={{ position: "absolute", right: 0 }}
+                  <label
+                    style={{
+                      color: "#0072F5",
+                      fontWeight: 400,
+                      padding: "0 0 0 0.25rem",
+                      marginBottom: "0.375rem",
+                      fontSize: "1rem",
+                      lineHeight: 1.5,
+                    }}
                   >
-                    {matchedChampions.map((champion) => (
-                      <option
-                        key={champion}
-                        value={champion}
-                        style={{ position: "absolute", right: 0 }}
-                      />
-                    ))}
-                  </datalist>
+                    Champion
+                  </label>
+                  <Container
+                    css={{
+                      position: "relative",
+                      width: "100%",
+                      display: "flex",
+                      flexDirection: "row",
+                      padding: "0",
+                    }}
+                  >
+                    <MyChampion position="absolute" top="12" left="8" />
+                    <select
+                      {...register("champion", { required: true })}
+                      style={{
+                        backgroundColor: "transparent",
+                        borderRadius: "0.875rem",
+                        height: "3rem",
+                        paddingLeft: "3.5rem",
+                        width: "100%",
+                        margin: "0",
+                      }}
+                    >
+                      {championNames.map((option) => (
+                        <option
+                          value={option}
+                          style={{
+                            backgroundColor: "rgba(22,24,26,0.8)",
+                            border: "none",
+                            borderRadius: "0.875rem",
+                          }}
+                        >
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </Container>
                 </Modal.Body>
                 <Modal.Footer>
                   <Row justify="center">
@@ -558,14 +594,14 @@ const MyNavbar = () => {
     );
   };
 
-  const User = () => {
+  const User = async () => {
+    if (userInfo instanceof Promise) {
+      return <Loading />;
+    }
+    console.log(userInfo);
     return (
       <>
-        <Navbar.Content>
-          {cookies?.profile && (
-            <Link href={`/player/${cookies.profile}?server=EUNE`}></Link>
-          )}
-        </Navbar.Content>
+        <Navbar.Content>123{}</Navbar.Content>
         <Navbar.Content>
           <Button onClick={() => handleSignOut()}>Sign Out</Button>
         </Navbar.Content>

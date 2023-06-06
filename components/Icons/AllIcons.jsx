@@ -247,7 +247,7 @@ export const MyChampion = ({ fill, size, height, width, ...props }) => (
     viewBox="0 0 24 24"
     width={size || width || 24}
     height={size || height || 24}
-    {...props}
+    style={{ ...props }}
   >
     <g
       stroke="#464455"

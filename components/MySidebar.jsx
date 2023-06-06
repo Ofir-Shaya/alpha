@@ -8,12 +8,10 @@ import {
   Bookmark,
   Tiers,
 } from "./Icons/AllIcons";
-import nookies from "nookies";
+import { useSession } from "next-auth/react";
 
 const MySidebar = () => {
   const { isDark } = useTheme();
-
-  const cookies = nookies.get();
 
   return (
     <Grid.Container
@@ -140,13 +138,7 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link
-          block
-          color="inherit"
-          href={
-            cookies?.profile ? `/player/${cookies.profile}?server=EUNE` : ""
-          }
-        >
+        <Link block color="inherit">
           <Bookmark width="26" height="26" />
           <Text
             className=" show-on-hover "
@@ -166,11 +158,7 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link
-          block
-          color="inherit"
-          href={cookies?.champion ? `/champions/${cookies.champion}` : ""}
-        >
+        <Link block color="inherit">
           <MyChampion width="26" height="26" />
           <Text
             className=" show-on-hover "

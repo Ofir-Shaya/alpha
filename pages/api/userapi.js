@@ -27,8 +27,8 @@ async function handleGET(req, res) {
   try {
     let data;
     switch (req.query.func) {
-      case "championItems":
-        data = await championItems(req.query.championName);
+      case "userInfo":
+        data = await userInfo(req.query.email);
         res.status(200).json(data);
         break;
 
@@ -56,5 +56,25 @@ async function handlePOST(req, res, player) {
     res.status(200).send();
   } catch (error) {
     return res.status(500).json(error);
+  }
+}
+
+async function userInfo(email) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (user) {
+      const { password, ...result } = user;
+      return result;
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return { status: 404, message: "User not found." };
+    } else {
+      throw error;
+    }
   }
 }
