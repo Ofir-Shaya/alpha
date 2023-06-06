@@ -1,7 +1,5 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
-import axios from "axios";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -29,6 +27,25 @@ async function handleGET(req, res) {
     switch (req.query.func) {
       case "userInfo":
         data = await userInfo(req.query.email);
+        res.status(200).json(data);
+        break;
+
+      case "updatePassword":
+        data = await updatePassword(
+          req.query.email,
+          req.query.oldPassword,
+          req.query.newPassword
+        );
+        res.status(200).json(data);
+        break;
+
+      case "updateProfile":
+        data = await updateProfile(req.query.email, req.query.newProfile);
+        res.status(200).json(data);
+        break;
+
+      case "updateChampion":
+        data = await updateChampion(req.query.email, req.query.newChampion);
         res.status(200).json(data);
         break;
 
@@ -69,5 +86,75 @@ async function userInfo(email) {
     } else {
       throw error;
     }
+  }
+}
+
+async function updatePassword(email, oldPassword, newPassword) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) return;
+    console.log(oldPassword, newPassword);
+    if (await bcrypt.compare(oldPassword, user.password)) {
+      const updated = await prisma.user.update({
+        where: {
+          email: email,
+        },
+        data: {
+          password: await bcrypt.hash(newPassword, 10),
+        },
+      });
+      console.log(updated);
+      return updated;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function updateProfile(email, newProfile) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) return;
+    const updated = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        favProfile: newProfile,
+      },
+    });
+    console.log(updated);
+    return updated;
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function updateChampion(email, newChampion) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) return;
+    const updated = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        favChampion: newChampion,
+      },
+    });
+    console.log(updated);
+    return updated;
+  } catch (error) {
+    console.error(error);
   }
 }

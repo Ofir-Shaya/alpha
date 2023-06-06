@@ -10,7 +10,7 @@ import {
   Button,
   Row,
   Container,
-  Loading,
+  Dropdown,
 } from "@nextui-org/react";
 import { Layout } from "./common/Layout";
 import { useTheme as useNextTheme } from "next-themes";
@@ -35,15 +35,11 @@ const MyNavbar = () => {
 
   const [loginVisible, setLoginVisible] = useState(false);
   const [registerVisible, setRegisterVisible] = useState(false);
-  const [inputEmail, setInputEmail] = useState("");
-  const [inputPassword, setInputPassword] = useState("");
-  const [inputProfile, setInputProfile] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
+  const [userInfo, setUserInfo] = useState({});
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 
@@ -73,7 +69,6 @@ const MyNavbar = () => {
       }
     };
     getUserInfo();
-    console.log(userInfo);
   }, [session]);
 
   const onSubmitRegister = async (data) => {
@@ -87,7 +82,7 @@ const MyNavbar = () => {
       if (user && user.status === 201) {
         setRegisterVisible(false);
         onSubmitLogin(data);
-        router.push("http://localhost:3000/");
+        router.reload();
       }
     } catch (error) {
       console.error(error);
@@ -96,6 +91,7 @@ const MyNavbar = () => {
 
   const onSubmitLogin = async (data) => {
     try {
+      console.log(data);
       const status = await signIn("credentials", {
         redirect: false,
         email: data.email,
@@ -103,7 +99,7 @@ const MyNavbar = () => {
         callbackUrl: "localhost:3000",
       });
       if (status.ok) {
-        router.push(status.url);
+        router.reload();
       }
     } catch (error) {
       console.error(error);
@@ -311,20 +307,6 @@ const MyNavbar = () => {
     "Zyra",
   ];
 
-  const emailChangeHandler = (e) => {
-    const { value } = e.target;
-    setInputEmail(value);
-  };
-  const passwordChangeHandler = (e) => {
-    const { value } = e.target;
-    setInputPassword(value);
-  };
-
-  const ProfileChangeHandler = (e) => {
-    const { value } = e.target;
-    setInputProfile(value);
-  };
-
   const LoginHandler = () => setLoginVisible(true);
   const RegisterHandler = () => setRegisterVisible(true);
 
@@ -400,8 +382,6 @@ const MyNavbar = () => {
                     color="primary"
                     size="lg"
                     placeholder="Email"
-                    initialValue={inputEmail}
-                    onChange={emailChangeHandler}
                     contentLeft={<Mail fill="currentColor" />}
                     {...register("email", { required: true })}
                   />
@@ -412,8 +392,6 @@ const MyNavbar = () => {
                     color="primary"
                     size="lg"
                     placeholder="Password"
-                    initialValue={inputPassword}
-                    onChange={passwordChangeHandler}
                     contentLeft={<Password fill="currentColor" />}
                     {...register("password", { required: true })}
                   />
@@ -425,7 +403,7 @@ const MyNavbar = () => {
                   <Button auto flat color="error" onPress={closeLoginHandler}>
                     Close
                   </Button>
-                  <Button auto onPress={closeLoginHandler} type="submit">
+                  <Button auto type="submit">
                     Sign in
                   </Button>
                 </Modal.Footer>
@@ -486,8 +464,6 @@ const MyNavbar = () => {
                     size="lg"
                     placeholder="Email"
                     type="email"
-                    initialValue={inputEmail}
-                    onChange={emailChangeHandler}
                     contentLeft={<Mail fill="currentColor" />}
                     {...register("email", { required: true })}
                   />
@@ -498,8 +474,6 @@ const MyNavbar = () => {
                     color="primary"
                     size="lg"
                     placeholder="Password"
-                    initialValue={inputPassword}
-                    onChange={passwordChangeHandler}
                     contentLeft={<Password fill="currentColor" />}
                     {...register("password", { required: true })}
                     autoComplete="new-password"
@@ -512,8 +486,6 @@ const MyNavbar = () => {
                     size="lg"
                     placeholder="Profile"
                     type="text"
-                    initialValue={inputProfile}
-                    onChange={ProfileChangeHandler}
                     contentLeft={<Bookmark />}
                     {...register("profile", { required: true })}
                   />
@@ -594,14 +566,33 @@ const MyNavbar = () => {
     );
   };
 
-  const User = async () => {
-    if (userInfo instanceof Promise) {
-      return <Loading />;
-    }
-    console.log(userInfo);
+  const User = () => {
     return (
       <>
-        <Navbar.Content>123{}</Navbar.Content>
+        <Navbar.Content css={{ marginInline: "1rem" }}>
+          <Dropdown>
+            <Navbar.Item>
+              <Dropdown.Button
+                auto
+                light
+                css={{ px: 0, dflex: "center" }}
+                ripple={false}
+              >
+                {userInfo.favProfile}
+              </Dropdown.Button>
+            </Navbar.Item>
+            <Dropdown.Menu>
+              <Dropdown.Item>
+                <Link href={`/player/${userInfo.favProfile}?server=EUNE`}>
+                  LoL Profile
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
+                <Link href={"/profile"}>Edit User</Link>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Navbar.Content>
         <Navbar.Content>
           <Button onClick={() => handleSignOut()}>Sign Out</Button>
         </Navbar.Content>
