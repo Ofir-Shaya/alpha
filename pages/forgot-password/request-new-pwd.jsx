@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
 import { Text, Container, Input, Button } from "@nextui-org/react";
-import { useRouter } from "next/router";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { SuccessModal, ErrModal } from "@/components/Modals";
@@ -15,25 +14,23 @@ const RequestNewPwd = () => {
   const [resetSuccess, setResetSuccess] = useState(null);
   const [resetError, setResetError] = useState(null);
 
-  const handleForgot = async (e, data) => {
-    e.preventDefault();
+  const handleForgot = async (data) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios({
+      await fetch(`/api/userapi?email=${data.email}`, {
         method: "POST",
-        url: `api/userapi?func=recoverPasswordMail&email=${data.email}`,
-
         headers: {
           "Content-Type": "application/json",
         },
       });
-      setResetSuccess(response.data.msg);
+
       setLoading(false);
-      setResetError("");
+      setResetError(null);
+      setResetSuccess("Email sent.");
     } catch (error) {
+      console.log(error);
       setLoading(false);
-      const { data } = error.response;
-      setResetError(data.msg);
+      setResetError(error.message);
       setResetSuccess(null);
     }
   };
@@ -67,7 +64,15 @@ const RequestNewPwd = () => {
         >
           <Text h1>Forgot Password</Text>
           <Text h4>It's okay, literally everyone forget at some point...</Text>
-          <Container>
+          <Container
+            css={{
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              textAlign: "center",
+              alignItems: "center",
+            }}
+          >
             {resetError ? <ErrModal message={resetError} /> : null}
             {resetSuccess ? <SuccessModal message={resetSuccess} /> : null}
 
@@ -77,9 +82,14 @@ const RequestNewPwd = () => {
                 name="email"
                 id="email"
                 placeholder="Email"
+                css={{ marginTop: "1rem" }}
                 {...register("email", { required: true })}
               />
-              <Button name="reset-pwd-btn" type="submit">
+              <Button
+                name="reset-pwd-btn"
+                type="submit"
+                css={{ marginTop: "1rem" }}
+              >
                 {!loading ? "Get secure link" : "Sending..."}
               </Button>
             </form>
