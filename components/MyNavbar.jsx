@@ -47,7 +47,6 @@ const MyNavbar = () => {
   useEffect(() => {
     const getUserInfo = async () => {
       if (!session) return;
-      console.log(session);
       try {
         const res = await fetch(
           `/api/userapi?func=userInfo&email=${session.user.email}`,
@@ -586,12 +585,12 @@ const MyNavbar = () => {
             </Navbar.Item>
             <Dropdown.Menu>
               <Dropdown.Item>
+                <Link href={"/profile"}>Edit User</Link>
+              </Dropdown.Item>
+              <Dropdown.Item>
                 <Link href={`/player/${userInfo.favProfile}?server=EUNE`}>
                   LoL Profile
                 </Link>
-              </Dropdown.Item>
-              <Dropdown.Item>
-                <Link href={"/profile"}>Edit User</Link>
               </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>

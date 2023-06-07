@@ -127,7 +127,6 @@ async function handleGET(req, res) {
 async function handlePOST(req, res, player) {
   try {
     const token = await getToken({ req });
-    console.log(token);
     await prisma.user.create({
       data: {
         puuid: player.puuid,
@@ -255,7 +254,6 @@ async function getPlayerRankedInfo(summonerName) {
         });
       }
     }
-    console.log(playerRankedArray);
     return playerRankedArray[soloqIndex];
   } catch (error) {
     if (error.response && error.response.status === 404) {

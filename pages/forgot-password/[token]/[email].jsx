@@ -3,9 +3,10 @@ import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
 import { Text, Container, Input, Button, Loading } from "@nextui-org/react";
 import { useRouter } from "next/router";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { SuccessModal, ErrModal } from "@/components/Modals";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 const DefaultResetPassword = () => {
   const { register, handleSubmit } = useForm();
@@ -15,7 +16,7 @@ const DefaultResetPassword = () => {
   const [resetPasswordError, setResetPasswordError] = useState(null);
   const [verified, setVerified] = useState(null);
 
-  const { router } = useRouter();
+  const router = useRouter();
   const { query } = useRouter();
 
   const token = query.token;
@@ -27,7 +28,6 @@ const DefaultResetPassword = () => {
         setVerified(false);
         return;
       }
-      console.log("calling verify");
 
       const response = await fetch(
         `/api/userapi?func=verifyToken&token=${token}&email=${email}`,
@@ -49,7 +49,7 @@ const DefaultResetPassword = () => {
       setLoading(true);
 
       const response = await fetch(
-        `api/userapi?func=resetPassword&email=${data.email}&token=${token}&password=${data.password}`,
+        `/api/userapi?func=updatePassword&email=${email}&password=${data.password}`,
         {
           method: "PATCH",
           headers: {
@@ -57,19 +57,30 @@ const DefaultResetPassword = () => {
           },
         }
       );
+      console.log(response);
       if (response.ok) {
-        setResetSuccess("Password updated successfully.");
+        toast.success("🦄 Wow so easy!", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         setLoading(false);
         setTimeout(() => {
           router.push("/");
-        }, 4000);
-        setResetError("");
+        }, 3000);
+        setResetPasswordError("");
+        return;
       }
     } catch (error) {
       setLoading(false);
-      const { data } = error.response;
-      setResetError(data.msg);
-      setResetSuccess(null);
+      const data = error.message;
+      setResetPasswordError(data);
+      setResetPasswordSuccess(null);
     }
   };
 
@@ -106,26 +117,35 @@ const DefaultResetPassword = () => {
               It's okay, literally everyone forget at some point...
             </Text>
             <Text h4>Please enter below the new password that you desire</Text>
-            <Container>
+            <Container css={{ display: "flex", margin: "0 auto" }}>
               {resetPasswordError ? (
                 <ErrModal message={resetPasswordError} />
               ) : null}
-              {resetPasswordSuccess ? (
-                <SuccessModal message={resetPasswordSuccess} />
-              ) : null}
 
-              <form onSubmit={handleSubmit(resetPassword)}>
-                <Input
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="New Password..."
-                  {...register("password", { required: true })}
-                />
-                <Button name="reset-pwd-btn" type="submit">
-                  {!loading ? "Reset" : "Processing..."}
-                </Button>
-              </form>
+              <Container
+                css={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  textAlign: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <form onSubmit={handleSubmit(resetPassword)}>
+                  <Input
+                    aria-label="password"
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="New Password..."
+                    {...register("password", { required: true })}
+                  />
+                  <Button name="reset-pwd-btn" type="submit">
+                    {!loading ? "Reset" : "Processing..."}
+                  </Button>
+                </form>
+              </Container>
             </Container>
           </Container>
         ) : verified === null ? (

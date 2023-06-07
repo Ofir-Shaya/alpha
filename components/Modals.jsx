@@ -3,16 +3,20 @@ import * as React from "react";
 import { toast } from "react-toastify";
 
 export const SuccessModal = ({ message }) => {
-  return toast.success(message, {
-    position: "top",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-  });
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+    />
+  );
 };
 export const ErrModal = ({ message }) => {
   const [visible, setVisible] = React.useState(false);

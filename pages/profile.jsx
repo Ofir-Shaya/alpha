@@ -314,7 +314,7 @@ const Profile = () => {
               <Container css={{ dispaly: "flex", width: "48%" }}>
                 <Text h3>Update Info:</Text>
                 <form onSubmit={handleSubmit(handleEdit)}>
-                  <Link href="#">
+                  <Link href="/forgot-password/request-new-pwd">
                     <Text h5>Click Here To Get a Password Reset to Email</Text>
                   </Link>
                   <Input

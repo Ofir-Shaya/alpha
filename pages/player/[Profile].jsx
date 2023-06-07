@@ -1080,6 +1080,7 @@ const Profile = () => {
         <Container
           css={{
             marginLeft: "150px",
+            minHeight: "100vh",
           }}
         >
           <PageHeader />

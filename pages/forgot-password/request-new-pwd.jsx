@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
 import { Text, Container, Input, Button } from "@nextui-org/react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { SuccessModal, ErrModal } from "@/components/Modals";
+import { useRouter } from "next/router";
 
 const RequestNewPwd = () => {
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const { register, handleSubmit } = useForm();
 
+  const [loading, setLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(null);
   const [resetError, setResetError] = useState(null);
 
@@ -27,6 +28,9 @@ const RequestNewPwd = () => {
       setLoading(false);
       setResetError(null);
       setResetSuccess("Email sent.");
+      setTimeout(() => {
+        router.push("/");
+      }, 4000);
     } catch (error) {
       console.log(error);
       setLoading(false);
