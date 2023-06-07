@@ -1,40 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { Text, Container, Input, Button } from "@nextui-org/react";
+import { Text, Container, Input, Button, Loading } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { SuccessModal, ErrModal } from "@/components/Modals";
 
 const DefaultResetPassword = () => {
-  const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
+
+  const [loading, setLoading] = useState(false);
   const [resetPasswordSuccess, setResetPasswordSuccess] = useState(null);
   const [resetPasswordError, setResetPasswordError] = useState(null);
+  const [verified, setVerified] = useState(null);
+
   const { router } = useRouter();
   const { query } = useRouter();
+
   const token = query.token;
   const email = query.email;
 
-  const resetPassword = async (e, data) => {
-    e.preventDefault();
+  useEffect(() => {
+    const verifyTokenEmail = async () => {
+      if (token === undefined || email === undefined) {
+        setVerified(false);
+        return;
+      }
+      console.log("calling verify");
+
+      const response = await fetch(
+        `/api/userapi?func=verifyToken&token=${token}&email=${email}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) setVerified(true);
+    };
+
+    verifyTokenEmail();
+  }, [email]);
+
+  const resetPassword = async (data) => {
     try {
       setLoading(true);
-      const response = await axios({
-        method: "POST",
-        url: `api/userapi?func=resetPassword&email=${data.email}&token=${token}&password=${data.password}`,
 
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setResetSuccess(response.data.msg);
-      setLoading(false);
-      setTimeout(() => {
-        router.push("/");
-      }, 3000);
-      setResetError("");
+      const response = await fetch(
+        `api/userapi?func=resetPassword&email=${data.email}&token=${token}&password=${data.password}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        setResetSuccess("Password updated successfully.");
+        setLoading(false);
+        setTimeout(() => {
+          router.push("/");
+        }, 4000);
+        setResetError("");
+      }
     } catch (error) {
       setLoading(false);
       const { data } = error.response;
@@ -60,7 +90,7 @@ const DefaultResetPassword = () => {
       >
         <MySidebar />
 
-        {email && token ? (
+        {verified ? (
           <Container
             fluid
             display="flex"
@@ -75,6 +105,7 @@ const DefaultResetPassword = () => {
             <Text h4>
               It's okay, literally everyone forget at some point...
             </Text>
+            <Text h4>Please enter below the new password that you desire</Text>
             <Container>
               {resetPasswordError ? (
                 <ErrModal message={resetPasswordError} />
@@ -97,8 +128,17 @@ const DefaultResetPassword = () => {
               </form>
             </Container>
           </Container>
+        ) : verified === null ? (
+          <Container css={{ display: "flex", margin: "0 auto" }}>
+            <Loading />
+          </Container>
         ) : (
-          <Text h2>The page you're trying to get to isn't available</Text>
+          <Text
+            h2
+            css={{ display: "flex", textAlign: "center", margin: "0 auto" }}
+          >
+            The page you're trying to get to isn't available
+          </Text>
         )}
       </Container>
     </>

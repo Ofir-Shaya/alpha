@@ -231,7 +231,13 @@ const Profile = () => {
 
       if (data.newProfile) {
         const response = await fetch(
-          `/api/userapi?email=${userInfo.email}&newProfile=${data.newProfile}&func=updateProfile`
+          `/api/userapi?email=${userInfo.email}&newProfile=${data.newProfile}&func=updateProfile`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
         if (response.ok) {
           setDataUpdated(true);
@@ -239,7 +245,13 @@ const Profile = () => {
       }
       if (data.newChampion) {
         const response = await fetch(
-          `/api/userapi?email=${userInfo.email}&newChampion=${data.newChampion}&func=updateChampion`
+          `/api/userapi?email=${userInfo.email}&newChampion=${data.newChampion}&func=updateChampion`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
         if (response.ok) {
           setDataUpdated(true);

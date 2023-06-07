@@ -40,12 +40,14 @@ const MyNavbar = () => {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
 
   useEffect(() => {
     const getUserInfo = async () => {
       if (!session) return;
+      console.log(session);
       try {
         const res = await fetch(
           `/api/userapi?func=userInfo&email=${session.user.email}`,
@@ -60,12 +62,12 @@ const MyNavbar = () => {
         if (res.ok) {
           const data = await res.json();
           setUserInfo(data);
+          return;
         } else {
-          throw new Error("Failed to fetch data. Status: " + res.status);
+          console.error(res.status);
         }
       } catch (error) {
         console.error(error);
-        throw new Error("An error occurred while loading data.");
       }
     };
     getUserInfo();
@@ -81,7 +83,6 @@ const MyNavbar = () => {
       const user = await fetch("/api/auth/register", options);
       if (user && user.status === 201) {
         setRegisterVisible(false);
-        onSubmitLogin(data);
         router.reload();
       }
     } catch (error) {
@@ -91,12 +92,9 @@ const MyNavbar = () => {
 
   const onSubmitLogin = async (data) => {
     try {
-      console.log(data);
       const status = await signIn("credentials", {
-        redirect: false,
         email: data.email,
         password: data.password,
-        callbackUrl: "localhost:3000",
       });
       if (status.ok) {
         router.reload();
@@ -396,7 +394,12 @@ const MyNavbar = () => {
                     {...register("password", { required: true })}
                   />
                   <Row justify="space-between">
-                    <Link css={{ fontSize: "14px" }}>Forgot password?</Link>
+                    <Link
+                      href="/forgot-password/request-new-pwd"
+                      css={{ fontSize: "14px" }}
+                    >
+                      Forgot password?
+                    </Link>
                   </Row>
                 </Modal.Body>
                 <Modal.Footer>
@@ -487,7 +490,7 @@ const MyNavbar = () => {
                     placeholder="Profile"
                     type="text"
                     contentLeft={<Bookmark />}
-                    {...register("profile", { required: true })}
+                    {...register("profile", { required: registerVisible })}
                   />
                   <label
                     style={{
@@ -512,7 +515,7 @@ const MyNavbar = () => {
                   >
                     <MyChampion position="absolute" top="12" left="8" />
                     <select
-                      {...register("champion", { required: true })}
+                      {...register("champion", { required: registerVisible })}
                       style={{
                         backgroundColor: "transparent",
                         borderRadius: "0.875rem",
