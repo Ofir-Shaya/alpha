@@ -49,12 +49,10 @@ export default async function handler(req, res) {
     }
 
     case "GET":
-      handleGET(req, res);
-      break;
+      return handleGET(req, res);
 
     case "PATCH":
-      handlePATCH(req, res);
-      break;
+      return handlePATCH(req, res);
 
     default:
       res.setHeader("Allow", ["GET", "PUT", "PATCH", "POST"]);
