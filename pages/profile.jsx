@@ -6,23 +6,23 @@ import {
   Text,
   Input,
   Button,
-  Row,
   Container,
   Loading,
+  useTheme,
 } from "@nextui-org/react";
 import { useForm } from "react-hook-form";
-import {
-  Mail,
-  Password,
-  Bookmark,
-  MyChampion,
-} from "../components/Icons/AllIcons";
+import { Bookmark, MyChampion } from "../components/Icons/AllIcons";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState(null);
-  const [dataUpdated, setDataUpdated] = useState(false);
+  const [userFound, setUserFound] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const { isDark } = useTheme();
+
   let { data: session } = useSession();
   const router = useRouter();
 
@@ -199,7 +199,11 @@ const Profile = () => {
 
   useEffect(() => {
     const getUserInfo = async () => {
-      if (!session) return;
+      if (!session) {
+        setUserFound(false);
+        return;
+      }
+
       try {
         const res = await fetch(
           `/api/userapi?func=userInfo&email=${session.user.email}`,
@@ -215,10 +219,12 @@ const Profile = () => {
           const data = await res.json();
           setUserInfo(data);
         } else {
+          setUserFound(false);
           throw new Error("Failed to fetch data. Status: " + res.status);
         }
       } catch (error) {
         console.error(error);
+        setUserFound(false);
         throw new Error("An error occurred while loading data.");
       }
     };
@@ -227,8 +233,12 @@ const Profile = () => {
 
   const handleEdit = async (data) => {
     try {
-      if (!data || !userInfo || !userInfo.email) return;
+      if (!data || !userInfo || !userInfo.email) {
+        notifyBad("incorrect data.");
+        return;
+      }
 
+      setLoading(true);
       if (data.newProfile) {
         const response = await fetch(
           `/api/userapi?email=${userInfo.email}&newProfile=${data.newProfile}&func=updateProfile`,
@@ -240,7 +250,9 @@ const Profile = () => {
           }
         );
         if (response.ok) {
-          setDataUpdated(true);
+          const data = await response.json();
+          setLoading(false);
+          notifyGood(data.message);
         }
       }
       if (data.newChampion) {
@@ -254,15 +266,48 @@ const Profile = () => {
           }
         );
         if (response.ok) {
-          setDataUpdated(true);
+          const data = await response.json();
+          setLoading(false);
+          notifyGood(data.message);
         }
       }
       setTimeout(() => {
         router.reload();
-      }, 1500);
+      }, 3000);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleUserNotFound = () => {
+    setTimeout(() => {
+      router.push("/");
+    }, 500);
+  };
+
+  const notifyGood = (message) => {
+    toast.success(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
+  const notifyBad = (message) => {
+    toast.warn(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
   };
 
   return (
@@ -292,9 +337,10 @@ const Profile = () => {
             marginTop: "10rem",
           }}
         >
+          <ToastContainer />
           <Text h1>Edit Profile</Text>
 
-          {userInfo ? (
+          {userInfo && userFound ? (
             <Container
               css={{
                 width: "40rem",
@@ -380,11 +426,13 @@ const Profile = () => {
                     type="submit"
                     css={{ margin: "0 auto", marginTop: "1rem" }}
                   >
-                    Edit
+                    {loading ? "Updating..." : "Edit"}
                   </Button>
                 </form>
               </Container>
             </Container>
+          ) : !userFound ? (
+            handleUserNotFound()
           ) : (
             <Loading />
           )}

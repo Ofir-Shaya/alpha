@@ -26,6 +26,8 @@ import {
 import { useRouter } from "next/router";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useForm } from "react-hook-form";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 
 const MyNavbar = () => {
   const { setTheme } = useNextTheme();
@@ -82,24 +84,46 @@ const MyNavbar = () => {
       const user = await fetch("/api/auth/register", options);
       if (user && user.status === 201) {
         setRegisterVisible(false);
-        router.reload();
+        notifyGood("Registered Successfully! Please Log in.");
+        setTimeout(() => {
+          router.reload();
+        }, 4000);
+      } else {
+        const data = await user.json();
+        console.error(data.message);
+        notifyBad(data.message);
+        setRegisterVisible(false);
       }
     } catch (error) {
       console.error(error);
+      notifyBad(error);
     }
   };
 
   const onSubmitLogin = async (data) => {
     try {
       const status = await signIn("credentials", {
+        redirect: false,
         email: data.email,
         password: data.password,
       });
       if (status.ok) {
-        router.reload();
+        notifyGood("Logged In Successfully. Please wait.");
+        setTimeout(() => {
+          router.reload();
+        }, 4000);
+      } else {
+        console.error(status.error);
+        notifyBad("Invalid Credentials.");
+        setLoginVisible(false);
+        setTimeout(() => {
+          router.reload();
+        }, 3000);
       }
     } catch (error) {
       console.error(error);
+      notifyBad(error);
+      setTimeout(() => {}, 3000);
     }
   };
 
@@ -602,6 +626,32 @@ const MyNavbar = () => {
     );
   };
 
+  const notifyGood = (message) => {
+    toast.success(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
+
+  const notifyBad = (message) => {
+    toast.error(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
+
   return (
     <Layout>
       <Navbar
@@ -614,6 +664,7 @@ const MyNavbar = () => {
             : "rgba(191 191 191,0.6)",
         }}
       >
+        <ToastContainer />
         <Navbar.Content
           css={{
             dflex: "center",

@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { transporter } from "../../config/nodemailer";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 const myEmail = process.env.EMAIL;
 const jwtSecret = process.env.JWT_SECRET;
@@ -10,56 +11,21 @@ const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   switch (req.method) {
-    case "POST": {
-      try {
-        const email = req.query.email;
-        if (!email) return { status: 400, message: "Bad request" };
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email: email,
-          },
-        });
-
-        if (!user) return { status: 400, message: "Bad request" };
-
-        const token = encodeURIComponent(jwt.sign(user.email, jwtSecret));
-        const data = {};
-        data.emailMessage = `Dear ${user.email}, We've attached a link that you could reset your password through.\n
-       We hope you will enjoy using our site.\n
-       From Alpha :)`;
-        data.link = `http://localhost:3000/forgot-password/${token}/${user.email}`;
-
-        try {
-          await transporter.sendMail({
-            from: myEmail,
-            to: user.email,
-            ...generateEmailContent(data),
-            subject: "Recover password request",
-          });
-          return { success: true };
-        } catch (error) {
-          console.log(error);
-          return { status: 400, message: "Bad request" };
-        }
-      } catch (error) {
-        console.error(error);
-      }
-      break;
-    }
+    case "POST":
+      return await emailPwd(req.query.email, res);
 
     case "GET":
-      return handleGET(req, res);
+      return await handleGET(req, res);
 
     case "PATCH":
-      return handlePATCH(req, res);
+      return await handlePATCH(req, res);
 
     default:
       res.setHeader("Allow", ["GET", "PUT", "PATCH", "POST"]);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-
-  return;
+  console.log(res);
+  return res;
 }
 
 async function handleGET(req, res) {
@@ -92,33 +58,65 @@ async function handlePATCH(req, res) {
     let data;
     switch (req.query.func) {
       case "updatePassword":
-        data = await updatePassword(
-          req,
+        return await updatePassword(
           res,
           req.query.email,
           req.query.newPassword
         );
-        res.status(200).json(data);
-        break;
 
       case "updateProfile":
-        data = await updateProfile(req.query.email, req.query.newProfile);
-        res.status(200).json(data);
-        break;
+        return await updateProfile(res, req.query.email, req.query.newProfile);
 
       case "updateChampion":
-        data = await updateChampion(req.query.email, req.query.newChampion);
-        res.status(200).json(data);
-        break;
+        return await updateChampion(
+          res,
+          req.query.email,
+          req.query.newChampion
+        );
 
       default:
-        console.error("bad query func");
-        break;
+        return res.status(400).json({ message: "bad query func" });
     }
-    return data;
   } catch (error) {
     console.error(error);
     return res.status(500).json(error);
+  }
+}
+
+async function emailPwd(email, res) {
+  try {
+    if (!email) return res.status(400).json({ message: "Bad Request" });
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!user) return res.status(400).json({ message: "Bad Request" });
+
+    const token = encodeURIComponent(jwt.sign(user.email, jwtSecret));
+    const data = {};
+    data.emailMessage = `Dear ${user.email}, We've attached a link that you could reset your password through.\n
+                        We hope you will enjoy using our site.\n
+                        From Alpha :)`;
+    data.link = `http://localhost:3000/forgot-password/${token}/${user.email}`;
+
+    try {
+      await transporter.sendMail({
+        from: myEmail,
+        to: user.email,
+        ...generateEmailContent(data),
+        subject: "Recover password request",
+      });
+      console.log(112);
+      return res.status(200).json({ message: "Email Sent!" });
+    } catch (error) {
+      console.error(error);
+      return res.status(400).json({ message: "Bad Request" });
+    }
+  } catch (error) {
+    return res.status(400).json({ message: error });
   }
 }
 
@@ -186,14 +184,14 @@ const verifyToken = async (email, token) => {
   }
 };
 
-async function updatePassword(req, res, email, newPassword) {
+async function updatePassword(res, email, newPassword) {
   try {
     const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
     });
-    if (!user) return { status: 400, message: "Bad request" };
+    if (!user) return res.status(400).json({ message: "Bad request" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -202,31 +200,27 @@ async function updatePassword(req, res, email, newPassword) {
         email: email,
       },
       data: {
-        user: {
-          update: {
-            password: hashedPassword,
-          },
-        },
+        password: hashedPassword,
       },
     });
     if (result) {
-      return { status: 200, success: true };
+      return res.status(200).json({ message: "Password Updated" });
     } else {
-      return { status: 400, message: "Bad request" };
+      return res.status(400).json({ message: "Bad request" });
     }
   } catch (error) {
     console.error(error);
-    return { status: 400, message: "Bad request" };
+    return res.status(400).json({ message: error });
   }
 }
-async function updateProfile(email, newProfile) {
+async function updateProfile(res, email, newProfile) {
   try {
     const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
     });
-    if (!user) return;
+    if (!user) return res.status(400).json({ message: "Bad request" });
     const updated = await prisma.user.update({
       where: {
         email: email,
@@ -235,19 +229,19 @@ async function updateProfile(email, newProfile) {
         favProfile: newProfile,
       },
     });
-    return updated;
+    return res.status(200).json({ message: "Profile Updated" });
   } catch (error) {
-    console.error(error);
+    return res.status(400).json({ message: error });
   }
 }
-async function updateChampion(email, newChampion) {
+async function updateChampion(res, email, newChampion) {
   try {
     const user = await prisma.user.findUnique({
       where: {
         email: email,
       },
     });
-    if (!user) return;
+    if (!user) return res.status(400).json({ message: "Bad request" });
     const updated = await prisma.user.update({
       where: {
         email: email,
@@ -256,8 +250,8 @@ async function updateChampion(email, newChampion) {
         favChampion: newChampion,
       },
     });
-    return updated;
+    return res.status(200).json({ message: "Champion Updated" });
   } catch (error) {
-    console.error(error);
+    return res.status(400).json({ message: error });
   }
 }

@@ -16,6 +16,18 @@ export default async function handler(request, response) {
     )
       return response.status(422).json({ message: "User Already Exists." });
 
+    if (password.length <= 5) {
+      return response.status(422).json({ message: "Password is too short." });
+    }
+    if (profile.length <= 2 || profile.length >= 18) {
+      return response.status(422).json({ message: "Profile name is invalid." });
+    }
+    if (champion.length <= 1 || champion.length >= 25) {
+      return response
+        .status(422)
+        .json({ message: "Champion name is invalid." });
+    }
+
     const user = await prisma.user.create({
       data: {
         email: email,

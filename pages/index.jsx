@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { useTheme, Input, Image, Container, Button } from "@nextui-org/react";
+import {
+  useTheme,
+  Input,
+  Image,
+  Container,
+  Button,
+  Text,
+} from "@nextui-org/react";
 import { Search } from "../components/Icons/AllIcons";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -45,14 +52,36 @@ export default function Home() {
           direction="column"
           alignContent="center"
           alignItems="center"
-          css={{ marginTop: "10rem" }}
+          css={{ marginTop: "2rem" }}
         >
+          <Container
+            css={{
+              marginBottom: "1rem",
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+              textAlign: "center",
+              flexDirection: "column",
+            }}
+          >
+            <Text
+              h1
+              css={{
+                textGradient: "45deg, $yellow600 -20%, $red600 100%",
+              }}
+            >
+              Alpha
+            </Text>
+            <Text h2>A League of Legends Statistics Site.</Text>
+            <Text h4>This site is specifically made for the GOAT</Text>
+            <Text h5>Greatest Of All Time.</Text>
+          </Container>
           <Image
             showSkeleton
             width={480}
             height={320}
             src="/media/goat.jpg"
-            alt="Default"
+            alt="Goat Image"
             objectFit="cover"
             containerCss={{
               marginBottom: "50px",
@@ -92,6 +121,7 @@ export default function Home() {
               ghost
               autoFocus
               onClick={searchPlayer}
+              css={{ marginTop: "0.5rem" }}
             >
               Search
             </Button>

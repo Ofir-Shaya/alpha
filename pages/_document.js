@@ -16,7 +16,15 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>{CssBaseline.flush()} </Head>
+        <Head>
+          {" "}
+          <link
+            rel="icon"
+            href="/public/media/favicons/favicon.ico"
+            sizes="any"
+          />
+          {CssBaseline.flush()}{" "}
+        </Head>
         <body>
           <Main />
           <NextScript />

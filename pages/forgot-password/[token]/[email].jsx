@@ -1,19 +1,24 @@
 import React, { useState, useEffect } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { Text, Container, Input, Button, Loading } from "@nextui-org/react";
+import {
+  Text,
+  Container,
+  Input,
+  Button,
+  Loading,
+  useTheme,
+} from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
-import { SuccessModal, ErrModal } from "@/components/Modals";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
 const DefaultResetPassword = () => {
   const { register, handleSubmit } = useForm();
+  const { isDark } = useTheme();
 
   const [loading, setLoading] = useState(false);
-  const [resetPasswordSuccess, setResetPasswordSuccess] = useState(null);
-  const [resetPasswordError, setResetPasswordError] = useState(null);
   const [verified, setVerified] = useState(null);
 
   const router = useRouter();
@@ -49,7 +54,7 @@ const DefaultResetPassword = () => {
       setLoading(true);
 
       const response = await fetch(
-        `/api/userapi?func=updatePassword&email=${email}&password=${data.password}`,
+        `/api/userapi?func=updatePassword&email=${email}&newPassword=${data.password}`,
         {
           method: "PATCH",
           headers: {
@@ -57,31 +62,44 @@ const DefaultResetPassword = () => {
           },
         }
       );
-      console.log(response);
       if (response.ok) {
-        toast.success("🦄 Wow so easy!", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        const data = await response.json();
         setLoading(false);
+        notifyGood(data.message);
         setTimeout(() => {
           router.push("/");
-        }, 3000);
-        setResetPasswordError("");
-        return;
+        }, 4000);
       }
     } catch (error) {
+      const data = await response.json();
       setLoading(false);
-      const data = error.message;
-      setResetPasswordError(data);
-      setResetPasswordSuccess(null);
+      notifyBad(data.message);
     }
+  };
+
+  const notifyGood = (message) => {
+    toast.success(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
+  const notifyBad = (message) => {
+    toast.warn(message, {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
   };
 
   return (
@@ -112,16 +130,14 @@ const DefaultResetPassword = () => {
               marginTop: "10rem",
             }}
           >
+            <ToastContainer />
+
             <Text h1>Reset Your Password</Text>
             <Text h4>
               It's okay, literally everyone forget at some point...
             </Text>
             <Text h4>Please enter below the new password that you desire</Text>
             <Container css={{ display: "flex", margin: "0 auto" }}>
-              {resetPasswordError ? (
-                <ErrModal message={resetPasswordError} />
-              ) : null}
-
               <Container
                 css={{
                   display: "flex",

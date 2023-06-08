@@ -17,6 +17,11 @@ export default function App({ Component, pageProps }) {
     <>
       <Head>
         <link rel="stylesheet" href="/styles/global.css" />
+        <link
+          rel="icon"
+          href="/public/media/favicons/favicon.ico"
+          sizes="any"
+        />
       </Head>
       <NextThemesProvider
         defaultTheme="system"
