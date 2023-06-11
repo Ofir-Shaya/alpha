@@ -43,10 +43,15 @@ const DefaultResetPassword = () => {
           },
         }
       );
-      if (response.ok) setVerified(true);
+      if (!cleanup) {
+        if (response.ok) setVerified(true);
+      }
     };
-
+    let cleanup = false;
     verifyTokenEmail();
+    return () => {
+      cleanup = true;
+    };
   }, [email]);
 
   const resetPassword = async (data) => {

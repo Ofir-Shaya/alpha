@@ -11,7 +11,6 @@ import {
   Button,
   Link as NextUiLink,
 } from "@nextui-org/react";
-import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
@@ -75,8 +74,9 @@ const Profile = () => {
   const { isDark } = useTheme();
 
   const router = useRouter();
-  const [playerFound, setPlayerFound] = useState(null);
   const { Profile, server } = router.query;
+
+  const [playerFound, setPlayerFound] = useState(null);
   const [player, setPlayer] = useState(null);
   const [playerRanked, setPlayerRanked] = useState(null);
   const [playerRankedSolo, setPlayerRankedSolo] = useState(null);
@@ -91,6 +91,7 @@ const Profile = () => {
       try {
         const response = await fetch(
           `/api/lolapi?user=${Profile}&func=searchPlayer`,
+
           {
             method: "GET",
             headers: {
@@ -104,18 +105,23 @@ const Profile = () => {
             setPlayer(data.name);
             setPlayerFound(false);
           } else {
-            setPlayerFound(true);
-            setPlayer(data);
+            if (!cleanup) {
+              setPlayerFound(true);
+              setPlayer(data);
+            }
           }
         } else {
-          console.log(response);
           console.log("Error fetching player search.");
         }
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     fetchPlayer();
+    return () => {
+      cleanup = true;
+    };
   }, [Profile]);
 
   // Getting ranked info -> when player changed
@@ -135,16 +141,22 @@ const Profile = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          setPlayerRanked(data);
+          if (!cleanup) {
+            setPlayerRanked(data);
+          }
         } else console.error("Error pulling player ranked.");
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     pullRankedInfo();
+    return () => {
+      cleanup = true;
+    };
   }, [player]);
 
-  // Update soloq and flexq rank -> when player ranked changed
+  // Update soloq rank -> when player ranked changed
   useEffect(() => {
     if (!playerRanked) return;
     if (playerRanked.queueType === "RANKED_SOLO_5x5") {
@@ -176,13 +188,19 @@ const Profile = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          setPlayerChamps(data);
+          if (!cleanup) {
+            setPlayerChamps(data);
+          }
         } else console.error("Error fetching player champs.");
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     pullPlayerChamps();
+    return () => {
+      cleanup = true;
+    };
   }, [playerRanked]);
 
   // getting more information about player matches -> when player matches changed
@@ -196,10 +214,15 @@ const Profile = () => {
           return { ...match, ...matchInfo };
         })
       );
-      console.log(matchesWithInfo);
-      setMatchInformation(matchesWithInfo);
+      if (!cleanup) {
+        setMatchInformation(matchesWithInfo);
+      }
     }
+    let cleanup = false;
     fetchMatchesWithInfo();
+    return () => {
+      cleanup = true;
+    };
   }, [playerChamps]);
 
   useEffect(() => {
@@ -217,18 +240,25 @@ const Profile = () => {
         );
         if (response.ok) {
           const data = await response.json();
-          setChampInformation(data);
-          return data;
+          if (!cleanup) {
+            setChampInformation(data);
+            return data;
+          }
         }
       } catch (error) {
         console.error(error);
       }
     }
+    let cleanup = false;
     getPlayerChampionOverview();
+    return () => {
+      cleanup = true;
+    };
   }, [playerChamps]);
 
   // Update ranked info
   const updateRankedInformation = async () => {
+    if (!player || !player.username) return;
     try {
       const response = await fetch(
         `/api/lolapi?summonerName=${player.username}&func=updateUser`,
@@ -733,10 +763,11 @@ const Profile = () => {
                     padding: "0",
                   }}
                 >
-                  {match.players.map((player) => {
+                  {match.players.map((player, index) => {
                     return (
                       player.teamId === 100 && (
                         <Container
+                          key={"container" + index}
                           css={{
                             display: "flex",
                             flexDirection: "row",
@@ -746,6 +777,7 @@ const Profile = () => {
                             flexWrap: "nowrap",
                             marginLeft: "auto",
                             overflow: "hidden",
+                            justifyContent: "space-evenly",
                           }}
                         >
                           <Image
@@ -760,27 +792,28 @@ const Profile = () => {
                               alignSelf: "center",
                               margin: "0",
                             }}
-                            src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
+                            src={
+                              player.championName === "FiddleSticks"
+                                ? `https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/Fiddlesticks.png`
+                                : `https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`
+                            }
                           />
 
-                          <NextLink
+                          <NextUiLink
                             href={
                               "/player/" +
                               player.player.profile.username +
                               "?server=EUNE"
                             }
+                            css={{
+                              fontSize: "10px",
+                              textAlign: "center",
+                              overflow: "hidden",
+                              "&:hover": { textDecoration: "underline" },
+                            }}
                           >
-                            <NextUiLink
-                              css={{
-                                fontSize: "10px",
-                                textAlign: "center",
-                                overflow: "hidden",
-                                "&:hover": { textDecoration: "underline" },
-                              }}
-                            >
-                              {player.player.profile.username}
-                            </NextUiLink>
-                          </NextLink>
+                            {player.player.profile.username}
+                          </NextUiLink>
                         </Container>
                       )
                     );
@@ -794,10 +827,11 @@ const Profile = () => {
                     padding: "0",
                   }}
                 >
-                  {match.players.map((player) => {
+                  {match.players.map((player, index) => {
                     return (
                       player.teamId === 200 && (
                         <Container
+                          key={"container" + index}
                           css={{
                             display: "flex",
                             flexDirection: "row",
@@ -806,6 +840,7 @@ const Profile = () => {
                             padding: "0",
                             flexWrap: "nowrap",
                             marginLeft: "auto",
+                            justifyContent: "space-evenly",
                           }}
                         >
                           <Image
@@ -823,24 +858,21 @@ const Profile = () => {
                             src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
                           />
 
-                          <NextLink
+                          <NextUiLink
                             href={
                               "/player/" +
                               player.player.profile.username +
                               "?server=EUNE"
                             }
+                            css={{
+                              fontSize: "10px",
+                              textAlign: "center",
+                              overflow: "hidden",
+                              "&:hover": { textDecoration: "underline" },
+                            }}
                           >
-                            <NextUiLink
-                              css={{
-                                fontSize: "10px",
-                                textAlign: "center",
-                                overflow: "hidden",
-                                "&:hover": { textDecoration: "underline" },
-                              }}
-                            >
-                              {player.player.profile.username}
-                            </NextUiLink>
-                          </NextLink>
+                            {player.player.profile.username}
+                          </NextUiLink>
                         </Container>
                       )
                     );
@@ -1052,7 +1084,7 @@ const Profile = () => {
           <SummonerProfileHeader />
           <Button
             auto
-            onPress={updateRankedInformation}
+            onClick={updateRankedInformation}
             css={{ width: "fit-content", marginLeft: "$10" }}
           >
             Update

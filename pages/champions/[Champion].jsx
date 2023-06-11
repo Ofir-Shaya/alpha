@@ -36,14 +36,20 @@ const Champion = () => {
         );
 
         if (response.ok) {
-          const data = await response.json();
-          setChampionInfo(data);
+          if (!cleanup) {
+            const data = await response.json();
+            setChampionInfo(data);
+          }
         } else console.log("Error fetching Champion search.");
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     fetchChampionInfo();
+    return () => {
+      cleanup = true;
+    };
   }, [Champion]);
 
   // Get Champion Items
@@ -62,14 +68,21 @@ const Champion = () => {
         );
 
         if (response.ok) {
-          const data = await response.json();
-          setChampionItems(data);
+          if (!cleanup) {
+            const data = await response.json();
+
+            setChampionItems(data);
+          }
         } else console.log("Error fetching Champion Items.");
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     fetchChampionItems();
+    return () => {
+      cleanup = true;
+    };
   }, [Champion]);
 
   // Fetch Items,Champs Data
@@ -78,7 +91,9 @@ const Champion = () => {
       try {
         const response = await fetch("/json/items.json");
         const data = await response.json();
-        setItemsData(data);
+        if (!cleanup) {
+          setItemsData(data);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -89,14 +104,19 @@ const Champion = () => {
       try {
         const response = await fetch(`/json/${Champion}.json`);
         const data = await response.json();
-        console.log(data);
-        setChampionData(data);
+        if (!cleanup) {
+          setChampionData(data);
+        }
       } catch (error) {
         console.error(error);
       }
     };
+    let cleanup = false;
     fetchItemsData();
     fetchChampionData();
+    return () => {
+      cleanup = true;
+    };
   }, [Champion]);
 
   const calculateKDA = (champion) =>

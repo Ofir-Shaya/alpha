@@ -22,7 +22,6 @@ export default async function handler(req, res) {
       res.setHeader("Allow", ["GET", "PUT", "PATCH", "POST"]);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-  console.log(res);
   return res;
 }
 
@@ -107,7 +106,6 @@ async function emailPwd(email, res) {
         ...generateEmailContent(data),
         subject: "Recover password request",
       });
-      console.log(112);
       return res.status(200).json({ message: "Email Sent!" });
     } catch (error) {
       console.error(error);
