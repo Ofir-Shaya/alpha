@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../../client";
 import * as bcrypt from "bcrypt";
 import { transporter } from "../../config/nodemailer";
 import jwt from "jsonwebtoken";
@@ -6,8 +6,6 @@ import { NextResponse } from "next/server";
 
 const myEmail = process.env.EMAIL;
 const jwtSecret = process.env.JWT_SECRET;
-
-const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   switch (req.method) {

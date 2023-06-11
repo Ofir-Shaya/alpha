@@ -200,6 +200,9 @@ const Profile = () => {
   useEffect(() => {
     const getUserInfo = async () => {
       if (!session) {
+        return;
+      }
+      if (!session.user) {
         setUserFound(false);
         return;
       }
@@ -218,6 +221,7 @@ const Profile = () => {
         if (res.ok) {
           const data = await res.json();
           setUserInfo(data);
+          setUserFound(true);
         } else {
           setUserFound(false);
           throw new Error("Failed to fetch data. Status: " + res.status);

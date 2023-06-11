@@ -1,9 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 
 import axios from "axios";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../../client";
 
 function fmtMSS(s) {
   return (s - (s %= 60)) / 60 + (9 < s ? ":" : ":0") + s;
