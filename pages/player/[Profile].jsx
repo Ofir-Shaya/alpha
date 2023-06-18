@@ -460,6 +460,7 @@ const Profile = () => {
                   }}
                 >
                   <Image
+                    alt={"Champion Name"}
                     src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${match.championName}.png`}
                     containerCss={{
                       margin: "$0",
