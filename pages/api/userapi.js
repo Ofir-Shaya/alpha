@@ -97,8 +97,11 @@ async function emailPwd(email, res) {
     data.emailMessage = `Dear ${user.email}, We've attached a link that you could reset your password through.\n
                         We hope you will enjoy using our site.\n
                         From Alpha :)`;
-    data.link = `http://localhost:3000/forgot-password/${token}/${user.email}`;
-
+    if (process.env.NODE_ENV === "development") {
+      data.link = `http://localhost:3000/forgot-password/${token}/${user.email}`;
+    } else {
+      data.link = `https://alpha-tawny.vercel.app/forgot-password/${token}/${user.email}`;
+    }
     try {
       await transporter.sendMail({
         from: myEmail,
