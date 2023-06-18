@@ -139,7 +139,7 @@ const DefaultResetPassword = () => {
 
             <Text h1>Reset Your Password</Text>
             <Text h4>
-              It's okay, literally everyone forget at some point...
+              It&apos;s okay, literally everyone forget at some point...
             </Text>
             <Text h4>Please enter below the new password that you desire</Text>
             <Container css={{ display: "flex", margin: "0 auto" }}>
@@ -178,7 +178,7 @@ const DefaultResetPassword = () => {
             h2
             css={{ display: "flex", textAlign: "center", margin: "0 auto" }}
           >
-            The page you're trying to get to isn't available
+            The page you&apos;re trying to get to isn&apos;t available
           </Text>
         )}
       </Container>

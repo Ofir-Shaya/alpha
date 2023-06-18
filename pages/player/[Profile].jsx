@@ -1059,7 +1059,10 @@ const Profile = () => {
             flexDirection: "column",
           }}
         >
-          <Text h2> Oh no! We couldn't find summoner "{player}"</Text>
+          <Text h2>
+            {" "}
+            Oh no! We couldn&apos;t find summoner &quot;{player}&quot;
+          </Text>
           <Text h4>
             Please Double check your spelling or maybe your summoner is in a
             different region.

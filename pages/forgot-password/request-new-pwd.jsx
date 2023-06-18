@@ -100,7 +100,9 @@ const RequestNewPwd = () => {
         >
           <ToastContainer />
           <Text h1>Forgot Password</Text>
-          <Text h4>It's okay, literally everyone forget at some point...</Text>
+          <Text h4>
+            It&apos;s okay, literally everyone forget at some point...
+          </Text>
           <Container
             css={{
               display: "flex",

@@ -411,8 +411,9 @@ const Profile = () => {
                         margin: "0",
                       }}
                     >
-                      {championNames.map((option) => (
+                      {championNames.map((option, index) => (
                         <option
+                          key={index}
                           value={option}
                           style={{
                             backgroundColor: "rgba(22,24,26,0.8)",
