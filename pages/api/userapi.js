@@ -100,7 +100,7 @@ async function emailPwd(email, res) {
     if (process.env.NODE_ENV === "development") {
       data.link = `http://localhost:3000/forgot-password/${token}/${user.email}`;
     } else {
-      data.link = `https://alpha-tawny.vercel.app/forgot-password/${token}/${user.email}`;
+      data.link = `https://alpha-ofir-shaya.vercel.app/forgot-password/${token}/${user.email}`;
     }
     try {
       await transporter.sendMail({
