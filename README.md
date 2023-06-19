@@ -1,4 +1,4 @@
-## League of Legends Statistics Website
+# League of Legends Statistics Website
 
 This project is a final project for the Full Stack Development course. It is a website dedicated to the popular online game League of Legends. The website provides real-time data and statistics for players based on their recent matches. It displays success rates for each champion and player, along with the champions they have played with. Additionally, it recommends the most recommended game skins.
 
@@ -6,7 +6,7 @@ The website utilizes the RIOT GAMES API to fetch all the necessary data and impl
 
 ## Deployed Version
 
-A deployed version of the website is available at https://alpha-ofir-shaya.vercel.app/. You can visit this link to see the website in action and explore its features.
+A deployed version of the website is available at [here](https://alpha-ofir-shaya.vercel.app/). You can visit this link to see the website in action and explore its features.
 
 ## Getting Started
 
