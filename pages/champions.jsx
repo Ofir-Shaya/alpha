@@ -1,9 +1,18 @@
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { Container, Text, Button, Table, Image, Link } from "@nextui-org/react";
+import {
+  Container,
+  Text,
+  Button,
+  Table,
+  Image,
+  Link,
+  useTheme,
+} from "@nextui-org/react";
 import { useAsyncList } from "react-stately";
 
 const Champions = () => {
+  const { isDark } = useTheme();
   async function load() {
     try {
       const response = await fetch(`/api/lolapi?func=getAllChampions`, {
@@ -101,7 +110,9 @@ const Champions = () => {
         css={{
           margin: 0,
           padding: 0,
-          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+            isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+          },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%) !important`,
         }}
       >
         <MySidebar />
@@ -112,7 +123,9 @@ const Champions = () => {
             marginLeft: "250px",
             display: "flex",
             flexDirection: "column",
-            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+              isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+            },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%) !important`,
           }}
         >
           <Container
@@ -141,7 +154,9 @@ const Champions = () => {
               css={{
                 minWidth: "100%",
                 height: "calc($space$15 * 15)",
-                backgroundColor: "#191937",
+                backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+                  isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+                },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%) !important`,
               }}
             >
               <Table.Header>

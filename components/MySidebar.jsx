@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useTheme, Grid, Spacer, Text } from "@nextui-org/react";
 import {
   MyChampion,
@@ -8,10 +8,57 @@ import {
   Bookmark,
   Tiers,
 } from "./Icons/AllIcons";
+import { ToastContainer, toast } from "react-toastify";
 import { useSession } from "next-auth/react";
+import "react-toastify/dist/ReactToastify.min.css";
 
 const MySidebar = () => {
   const { isDark } = useTheme();
+
+  let { data: session } = useSession();
+
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const getUserInfo = async () => {
+      if (!session) return;
+      try {
+        const res = await fetch(
+          `/api/userapi?func=userInfo&email=${session.user.email}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setUserInfo(data);
+          return;
+        } else {
+          console.error(res.status);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getUserInfo();
+  }, [session]);
+
+  const notifyBad = () => {
+    toast.warn("You must be logged in to use this.", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
 
   return (
     <Grid.Container
@@ -44,6 +91,7 @@ const MySidebar = () => {
         },
       }}
     >
+      <ToastContainer />
       <Grid
         gap={0}
         css={{
@@ -138,15 +186,31 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
-          <Bookmark width="26" height="26" />
-          <Text
-            className=" show-on-hover "
-            css={{ paddingLeft: "5px", display: "none" }}
+        {userInfo ? (
+          <Link
+            block
+            color="inherit"
+            href={`/player/${userInfo.favProfile}?server=EUNE`}
           >
-            My Profile
-          </Text>
-        </Link>
+            <Bookmark width="26" height="26" />
+            <Text
+              className=" show-on-hover "
+              css={{ paddingLeft: "5px", display: "none" }}
+            >
+              My Profile
+            </Text>
+          </Link>
+        ) : (
+          <Link block color="inherit" onPress={notifyBad}>
+            <Bookmark width="26" height="26" />
+            <Text
+              className=" show-on-hover "
+              css={{ paddingLeft: "5px", display: "none" }}
+            >
+              My Profile
+            </Text>
+          </Link>
+        )}
       </Grid>
 
       <Grid
@@ -158,15 +222,31 @@ const MySidebar = () => {
           flexDirection: "row",
         }}
       >
-        <Link block color="inherit">
-          <MyChampion width="26" height="26" />
-          <Text
-            className=" show-on-hover "
-            css={{ paddingLeft: "5px", display: "none" }}
+        {userInfo ? (
+          <Link
+            block
+            color="inherit"
+            href={`/champions/${userInfo.favChampion}`}
           >
-            My Champion
-          </Text>
-        </Link>
+            <MyChampion width="26" height="26" />
+            <Text
+              className=" show-on-hover "
+              css={{ paddingLeft: "5px", display: "none" }}
+            >
+              My Champion
+            </Text>
+          </Link>
+        ) : (
+          <Link block color="inherit" onPress={notifyBad}>
+            <MyChampion width="26" height="26" />
+            <Text
+              className=" show-on-hover "
+              css={{ paddingLeft: "5px", display: "none" }}
+            >
+              My Champion
+            </Text>
+          </Link>
+        )}
       </Grid>
       <Spacer y={15} />
     </Grid.Container>

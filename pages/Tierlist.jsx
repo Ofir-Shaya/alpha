@@ -1,10 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import MyNavbar from "@/components/MyNavbar";
 import MySidebar from "@/components/MySidebar";
-import { Container, Text, Button, Table, Image } from "@nextui-org/react";
+import {
+  Container,
+  Text,
+  Button,
+  Table,
+  Image,
+  useTheme,
+} from "@nextui-org/react";
 import { useAsyncList } from "react-stately";
 
 const Tierlist = () => {
+  const { isDark } = useTheme();
+
   const initialColumns = [
     {
       key: "name",
@@ -371,7 +380,9 @@ const Tierlist = () => {
           css={{
             display: "flex",
             flexDirection: "column",
-            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+            backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+              isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+            },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%) !important`,
           }}
         >
           <Container css={{ marginBlockEnd: "$15" }}>
@@ -423,7 +434,7 @@ const Tierlist = () => {
               css={{
                 minWidth: "100%",
                 height: "calc($space$15 * 17)",
-                backgroundColor: "#191937",
+                backgroundColor: isDark ? "#191937" : "rgba(202 202 235,0.7)",
                 margin: "$15",
               }}
               sortDescriptor={list.sortDescriptor}
@@ -437,11 +448,16 @@ const Tierlist = () => {
                     allowsSorting={column.allowsSorting}
                     css={{
                       textAlign: "center",
-                      color:
-                        column.key === list.sortDescriptor.column
-                          ? "White"
-                          : "#cddcfe",
-                      backgroundColor: "#191937",
+                      color: isDark
+                        ? column.key === list.sortDescriptor.column
+                          ? "White !important"
+                          : "#cddcfe"
+                        : column.key === list.sortDescriptor.column
+                        ? "black !important"
+                        : "rgb(0,78,255)",
+                      backgroundColor: isDark
+                        ? "#191937"
+                        : "rgba(202 202 235,0.7)",
                       fontSize:
                         column.key === list.sortDescriptor.column && "1rem",
                       textDecorationLine:
@@ -449,7 +465,9 @@ const Tierlist = () => {
                         "underline",
                       textDecorationColor: "#3273fa",
                       "&:hover": {
-                        backgroundColor: "#191937",
+                        backgroundColor: isDark
+                          ? "#191937"
+                          : "rgba(202 202 235,0.7) !important ",
                         color:
                           column.key === list.sortDescriptor.column
                             ? "White"
@@ -474,17 +492,24 @@ const Tierlist = () => {
                         aria-label="table row"
                         key={item.id + "-champ"}
                         css={{
-                          backgroundColor:
-                            rowIndex.current % 2 === 0 ? "#191937" : "#11112a",
+                          backgroundColor: isDark
+                            ? rowIndex.current % 2 === 0
+                              ? "#191937"
+                              : "#11112a"
+                            : rowIndex.current % 2 === 0
+                            ? "rgba(210,210,255,0.8)"
+                            : "rgba(168,168,243,0.8)",
                           borderRadius: "10px",
                         }}
                       >
                         {(columnKey) => (
                           <Table.Cell
                             css={{
-                              backgroundColor:
-                                columnKey === list.sortDescriptor.column &&
-                                "rgba(37,37,75,.75)",
+                              backgroundColor: isDark
+                                ? columnKey === list.sortDescriptor.column &&
+                                  "rgba(37,37,75,.75)"
+                                : columnKey === list.sortDescriptor.column &&
+                                  "rgba(190,190,255,.75)",
                             }}
                           >
                             {renderCell(item, columnKey)}

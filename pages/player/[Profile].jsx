@@ -12,6 +12,8 @@ import {
   Link as NextUiLink,
 } from "@nextui-org/react";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 import { useEffect, useState } from "react";
 
 const romanHash = {
@@ -256,10 +258,25 @@ const Profile = () => {
     };
   }, [playerChamps]);
 
+  const toastWait = () => {
+    toast.info("Please wait patiently while your user is updating.", {
+      position: "top-center",
+      autoClose: 10000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: isDark ? "dark" : "light",
+    });
+  };
+
   // Update ranked info
   const updateRankedInformation = async () => {
     if (!player || !player.username) return;
+
     try {
+      toastWait();
       const response = await fetch(
         `/api/lolapi?summonerName=${player.username}&func=updateUser`,
         {
@@ -401,7 +418,13 @@ const Profile = () => {
               width="100%"
               variant="bordered"
               css={{
-                backgroundColor: match.win ? "rgba(8,166,255,0.3)" : "#45192b",
+                backgroundColor: isDark
+                  ? match.win
+                    ? "rgba(8,166,255,0.3)"
+                    : "#45192b"
+                  : match.win
+                  ? "rgba(0,163,255,0.3)"
+                  : "rgb(167,110,133)",
                 display: "flex",
                 flexDirection: "row",
                 borderRadius: "0",
@@ -1134,6 +1157,7 @@ const Profile = () => {
             minHeight: "100vh",
           }}
         >
+          <ToastContainer />
           <PageHeader />
           {playerRankedSolo ? (
             <Grid.Container

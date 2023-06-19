@@ -8,11 +8,14 @@ import {
   Card,
   Image,
   Tooltip,
+  useTheme,
 } from "@nextui-org/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 
 const Champion = () => {
+  const { isDark } = useTheme();
+
   const router = useRouter();
   const { Champion } = router.query;
   const [championInfo, setChampionInfo] = useState(null);
@@ -888,7 +891,9 @@ const Champion = () => {
         css={{
           margin: 0,
           padding: 0,
-          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%)`,
+          backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+            isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+          },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%) !important`,
           minHeight: "100vh",
         }}
       >
@@ -904,7 +909,9 @@ const Champion = () => {
               css={{
                 width: "1014px",
                 height: "auto",
-                backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,rgb(7, 7, 32) 100%),linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%),url(https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/splash/${Champion}_0.webp);`,
+                backgroundImage: `radial-gradient(400px 200px at 60% 34%,rgba(7, 7, 32, 0) 0%,${
+                  isDark ? "rgb(7, 7, 32) 100%)" : "rgb(217 217 247) 100%)"
+                },linear-gradient(90deg, rgb(7, 7, 32) 0%, rgba(7, 7, 32, 0.6) 100%),url(https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/splash/${Champion}_0.webp);`,
               }}
             >
               <Container
@@ -1029,7 +1036,7 @@ const Champion = () => {
                         xs={2}
                         className="win-rate"
                         css={{
-                          backgroundColor: "#11112a",
+                          backgroundColor: "transparent",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "center",
@@ -1049,7 +1056,7 @@ const Champion = () => {
                         xs={2}
                         className="win-rate"
                         css={{
-                          backgroundColor: "#11112a",
+                          backgroundColor: "transparent",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "center",
@@ -1069,7 +1076,7 @@ const Champion = () => {
                         xs={2}
                         className="win-rate"
                         css={{
-                          backgroundColor: "#11112a",
+                          backgroundColor: "transparent",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "center",
@@ -1089,7 +1096,7 @@ const Champion = () => {
                         xs={2}
                         className="win-rate"
                         css={{
-                          backgroundColor: "#11112a",
+                          backgroundColor: "transparent",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "center",
@@ -1109,7 +1116,7 @@ const Champion = () => {
                         xs={2}
                         className="win-rate"
                         css={{
-                          backgroundColor: "#11112a",
+                          backgroundColor: "transparent",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "center",
@@ -1272,7 +1279,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1292,7 +1299,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1312,7 +1319,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1332,7 +1339,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1352,7 +1359,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1371,7 +1378,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1390,7 +1397,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
@@ -1409,7 +1416,7 @@ const Champion = () => {
                           xs={1.5}
                           className="win-rate"
                           css={{
-                            backgroundColor: "#11112a",
+                            backgroundColor: "transparent",
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "center",
