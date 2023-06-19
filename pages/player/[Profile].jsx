@@ -474,6 +474,7 @@ const Profile = () => {
                 </Container>
                 <Container css={{ margin: "$0", padding: "$0" }}>
                   <Image
+                    alt={"Spell"}
                     width={22}
                     height={22}
                     src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
@@ -482,6 +483,7 @@ const Profile = () => {
                     containerCss={{ margin: "$0", padding: "$0" }}
                   />
                   <Image
+                    alt={"Spell"}
                     width={22}
                     height={22}
                     src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
@@ -492,12 +494,14 @@ const Profile = () => {
                 </Container>
                 <Container css={{ margin: "$0", padding: "$0" }}>
                   <Image
+                    alt={"Rune"}
                     width={22}
                     height={22}
                     src={`https://opgg-static.akamaized.net/meta/images/lol/perk/${match.mainRune}.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
                   />
                   <Image
+                    alt={"secondaryRune"}
                     width={22}
                     height={22}
                     src={`https://opgg-static.akamaized.net/meta/images/lol/perkStyle/${match.secondaryRune}.png`}
@@ -585,6 +589,7 @@ const Profile = () => {
                 >
                   {match.item1 !== 0 ? (
                     <Image
+                      alt={"Item1"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item1}.png
@@ -614,6 +619,7 @@ const Profile = () => {
 
                   {match.item2 !== 0 ? (
                     <Image
+                      alt={"Item2"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item2}.png
@@ -640,6 +646,7 @@ const Profile = () => {
                   )}
                   {match.item3 !== 0 ? (
                     <Image
+                      alt={"Item3"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item3}.png
@@ -666,6 +673,7 @@ const Profile = () => {
                   )}
                   {match.item4 !== 0 ? (
                     <Image
+                      alt={"Item4"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item4}.png
@@ -692,6 +700,7 @@ const Profile = () => {
                   )}
                   {match.item5 !== 0 ? (
                     <Image
+                      alt={"Item5"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item5}.png
@@ -719,6 +728,7 @@ const Profile = () => {
 
                   {match.item6 !== 0 ? (
                     <Image
+                      alt={"Item6"}
                       width={"22px"}
                       height={"22px"}
                       src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item6}.png
@@ -782,6 +792,7 @@ const Profile = () => {
                           }}
                         >
                           <Image
+                            alt={"Champion"}
                             height={"14px"}
                             width={"14px"}
                             containerCss={{
@@ -845,6 +856,7 @@ const Profile = () => {
                           }}
                         >
                           <Image
+                            alt={"Champion"}
                             height={"14px"}
                             width={"14px"}
                             containerCss={{
@@ -924,6 +936,7 @@ const Profile = () => {
                 }}
               >
                 <Image
+                  alt={"Champion"}
                   src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${champ.championName}.png`}
                   height={48}
                   width={48}

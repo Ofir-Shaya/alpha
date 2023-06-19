@@ -55,6 +55,7 @@ const Champions = () => {
         >
           <figure>
             <Image
+              alt={"Item"}
               src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${item}.png`}
               containerCss={{
                 margin: "$0",

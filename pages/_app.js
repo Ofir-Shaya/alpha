@@ -16,7 +16,6 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Head>
-        <link rel="stylesheet" href="/styles/global.css" />
         <link
           rel="icon"
           href="/public/media/favicons/favicon.ico"
