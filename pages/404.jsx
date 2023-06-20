@@ -1,4 +1,6 @@
 import { Container, Text, useTheme } from "@nextui-org/react";
+import MyNavbar from "@/components/MyNavbar";
+import MySidebar from "@/components/MySidebar";
 
 export default function Custom404() {
   const { isDark } = useTheme();
@@ -18,6 +20,7 @@ export default function Custom404() {
           justifyContent: "center",
           textAlign: "center",
           alignContent: "center",
+          minHeight: "100vh",
         }}
       >
         <MySidebar />
