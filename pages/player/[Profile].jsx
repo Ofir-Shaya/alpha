@@ -485,7 +485,7 @@ const Profile = () => {
                 >
                   <Image
                     alt={"Champion Name"}
-                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${match.championName}.png`}
+                    src={`https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/${match.championName}.png`}
                     containerCss={{
                       margin: "$0",
                       padding: "$0",
@@ -501,7 +501,7 @@ const Profile = () => {
                     alt={"Spell"}
                     width={22}
                     height={22}
-                    src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
+                    src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/spell/${
                       summonersHash[match.spell1Id]
                     }.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
@@ -510,7 +510,7 @@ const Profile = () => {
                     alt={"Spell"}
                     width={22}
                     height={22}
-                    src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/spell/${
+                    src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/spell/${
                       summonersHash[match.spell2Id]
                     }.png`}
                     containerCss={{ margin: "$0", padding: "$0" }}
@@ -616,7 +616,7 @@ const Profile = () => {
                       alt={"Item1"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item1}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item1}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -646,7 +646,7 @@ const Profile = () => {
                       alt={"Item2"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item2}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item2}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -673,7 +673,7 @@ const Profile = () => {
                       alt={"Item3"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item3}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item3}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -700,7 +700,7 @@ const Profile = () => {
                       alt={"Item4"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item4}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item4}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -727,7 +727,7 @@ const Profile = () => {
                       alt={"Item5"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item5}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item5}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -755,7 +755,7 @@ const Profile = () => {
                       alt={"Item6"}
                       width={"22px"}
                       height={"22px"}
-                      src={`https://ddragon.leagueoflegends.com/cdn/13.9.1/img/item/${match.item6}.png
+                      src={`https://ddragon.leagueoflegends.com/cdn/13.10.1/img/item/${match.item6}.png
                       `}
                       css={{ margin: "0", padding: "0" }}
                       containerCss={{
@@ -830,8 +830,8 @@ const Profile = () => {
                             }}
                             src={
                               player.championName === "FiddleSticks"
-                                ? `https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/Fiddlesticks.png`
-                                : `https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`
+                                ? `https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/Fiddlesticks.png`
+                                : `https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/${player.championName}.png`
                             }
                           />
 
@@ -892,7 +892,7 @@ const Profile = () => {
                               alignSelf: "center",
                               margin: "0",
                             }}
-                            src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${player.championName}.png`}
+                            src={`https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/${player.championName}.png`}
                           />
 
                           <NextUiLink
@@ -963,7 +963,7 @@ const Profile = () => {
               >
                 <Image
                   alt={"Champion"}
-                  src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${champ.championName}.png`}
+                  src={`https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/${champ.championName}.png`}
                   height={48}
                   width={48}
                   containerCss={{

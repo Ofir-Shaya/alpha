@@ -333,7 +333,7 @@ const Tierlist = () => {
           >
             <Image
               alt={"Champion"}
-              src={`https://static.bigbrain.gg/assets/lol/riot_static/13.9.1/img/champion/${cellValue}.png`}
+              src={`https://static.bigbrain.gg/assets/lol/riot_static/13.10.1/img/champion/${cellValue}.png`}
               containerCss={{
                 width: "48px",
                 height: "48px",
