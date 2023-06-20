@@ -217,6 +217,7 @@ const Profile = () => {
         })
       );
       if (!cleanup) {
+        matchesWithInfo.reverse();
         setMatchInformation(matchesWithInfo);
       }
     }
@@ -940,12 +941,14 @@ const Profile = () => {
               width="100%"
               variant="bordered"
               css={{
-                backgroundColor: isDark ? "#191937" : "rgb(177 177 197)",
+                backgroundColor: isDark ? "#191937" : "rgb(177,177,197)",
                 display: "flex",
                 flexDirection: "row",
                 borderRadius: "0",
                 "&:hover": {
-                  backgroundColor: "#0d0d22",
+                  backgroundColor: isDark
+                    ? "#0d0d22"
+                    : "rgba(0,99,247,0.56) !important",
                 },
               }}
             >

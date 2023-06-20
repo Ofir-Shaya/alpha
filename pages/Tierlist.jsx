@@ -226,6 +226,7 @@ const Tierlist = () => {
   };
 
   const [selectedColumns, setSelectedColumns] = useState(initialColumns);
+
   const rowIndex = useRef(0);
   const tableRef = useRef(null);
 
